@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,8 +18,14 @@ namespace gbtis {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
     public partial class MainWindow : Window {
+
+        private KinectSensor sensor;
+
         public MainWindow() {
+            sensor = KinectSensor.GetDefault();
+            sensor.Open();
             InitializeComponent();
         }
     }

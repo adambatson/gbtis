@@ -20,11 +20,7 @@ namespace gbtis {
     /// </summary>
     public partial class StandbyWindow : Window {
         // Settings for the text fade effect
-        public static int nameTimerInterval = 100;
-        public static double nameOpacityDelta = 0.05;
-
-        // Selects random start indices for the text
-        private static Random selector = new Random();
+        public static int nameFadeInterval = 5000;
 
         // For the kinect display
         KinectSensor sensor;
@@ -42,12 +38,18 @@ namespace gbtis {
                 gbtis.Properties.Resources.msgNoSensor :
                 gbtis.Properties.Resources.msgStart;
 
+            // Prepare sensor feed
             this.sensor = _sensor;
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
             frameReader.MultiSourceFrameArrived += FrameReader_MultiSourceFrameArrived;
 
+            // Initialize the names
+            topName.Text = "";
+            centerName.Text = "";
+            bottomName.Text = "";
+
             // Start the timer for the name animation
-            Timer timer = new Timer(nameTimerInterval);
+            Timer timer = new Timer(nameFadeInterval);
             timer.Elapsed += HandleTimer;
             timer.Start();
             HandleTimer(null, null);
@@ -77,36 +79,11 @@ namespace gbtis {
                 this.Dispatcher.Invoke(() => {
                     int i = selector.Next(names.Count());
 
-                    updateName(topName, names[i]);
-                    updateName(centerName, names[(i + 1) % names.Count()]);
-                    updateName(bottomName, names[(i + 2) % names.Count()]);
+                    new TextBlockFadeAnimation(topName, names[i]);
+                    new TextBlockFadeAnimation(centerName, names[(i + 1) % names.Count()]);
+                    new TextBlockFadeAnimation(bottomName, names[(i + 2) % names.Count()]);
                 });
             } catch (OperationCanceledException) { }
-        }
-
-        /// <summary>
-        /// Update one of the names to perform the animated fading
-        /// </summary>
-        /// <param name="block">The block containing the name</param>
-        /// <param name="newName">Replacement text, if applicable</param>
-        private void updateName(TextBlock block, String newName) {
-            if ((double)block.GetValue(OpactityDeltaProperty) == 0) {
-                block.Text = newName;
-                block.SetValue(OpactityDeltaProperty, -nameOpacityDelta);
-            } else if ((double)block.GetValue(OpactityDeltaProperty) < 0) {
-                if (block.Opacity <= 0) {
-                    block.SetValue(OpactityDeltaProperty, nameOpacityDelta);
-                    block.Text = newName;
-                }
-
-                block.Opacity += (double)block.GetValue(OpactityDeltaProperty);
-            } else if ((double)block.GetValue(OpactityDeltaProperty) > 0) {
-                if (block.Opacity >= 1) {
-                    block.SetValue(OpactityDeltaProperty, -nameOpacityDelta);
-                }
-
-                block.Opacity += (double)block.GetValue(OpactityDeltaProperty);
-            }
         }
 
         /// <summary>
@@ -133,15 +110,8 @@ namespace gbtis {
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
 
-        // Property used to store the change in opacity for the name
-        public static readonly DependencyProperty OpactityDeltaProperty = DependencyProperty.RegisterAttached(
-          "OpactityDelta",
-          typeof(Double),
-          typeof(TextBlock),
-          new PropertyMetadata(null)
-        );
-           
         // Temporary source of names to display.
+        private static Random selector = new Random();
         private static String[] names = {
                 "Ringo Starr",
                 "Floobo Bopity",

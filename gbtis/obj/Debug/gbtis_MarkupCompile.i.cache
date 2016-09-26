@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\
+D:\repositories\gbtis\gbtis\obj\Debug\
 gbtis
 none
 false
 DEBUG;TRACE
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\App.xaml
-11151548125
+D:\repositories\gbtis\gbtis\App.xaml
+11703732370
 
-9316761551
-14664175727
-MainWindow.xaml;
+9-1605953206
+141309539237
+StandbyWindow.xaml;
 
-True
+False
 

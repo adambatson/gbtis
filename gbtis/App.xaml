@@ -1,8 +1,7 @@
 ﻿<Application x:Class="gbtis.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:gbtis"
-             StartupUri="MainWindow.xaml">
+             xmlns:local="clr-namespace:gbtis">
     <Application.Resources>
          
     </Application.Resources>

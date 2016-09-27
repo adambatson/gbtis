@@ -34,7 +34,7 @@ namespace gbtis {
             InitializeComponent();
 
             // Initialize load text
-            standbyMsg.Text = (sensor == null) ? 
+            standbyMsg.Text = (_sensor == null) ? 
                 gbtis.Properties.Resources.msgNoSensor :
                 gbtis.Properties.Resources.msgStart;
 
@@ -64,7 +64,8 @@ namespace gbtis {
             var reference = e.FrameReference.AcquireFrame();
             using (var frame = reference.ColorFrameReference.AcquireFrame()) {
                 if (frame != null) {
-                    sensorFeed.Source = ToBitmap(frame);
+                    this.Dispatcher.Invoke(new Action(() =>
+                    sensorFeed.Source = ToBitmap(frame)));
                 }
             }
         }

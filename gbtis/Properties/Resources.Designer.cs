@@ -61,6 +61,24 @@ namespace gbtis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Gesture based text input system\nAdam Batson, Richard Carson, Maxwell DeMelo.
+        /// </summary>
+        internal static string aboutText {
+            get {
+                return ResourceManager.GetString("aboutText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to About GBTIS.
+        /// </summary>
+        internal static string aboutTitle {
+            get {
+                return ResourceManager.GetString("aboutTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Kinect found!.
         /// </summary>
         internal static string msgNoSensor {

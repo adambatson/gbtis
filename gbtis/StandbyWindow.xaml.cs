@@ -34,9 +34,9 @@ namespace gbtis {
             InitializeComponent();
 
             // Initialize load text
-            standbyMsg.Text = (_sensor == null) ? 
-                gbtis.Properties.Resources.msgNoSensor :
-                gbtis.Properties.Resources.msgStart;
+            standbyMsg.Text = (_sensor.IsAvailable) ? 
+                gbtis.Properties.Resources.msgStart :
+                gbtis.Properties.Resources.msgNoSensor;
 
             // Prepare sensor feed
             this.sensor = _sensor;

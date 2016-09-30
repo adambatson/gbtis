@@ -3,12 +3,9 @@ c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\gbtis.pdb
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\MainWindow.g.cs
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\App.g.cs
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\MainWindow.baml
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.g.resources
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
@@ -30,3 +27,8 @@ D:\repositories\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.exe
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.pdb
+C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
+C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.VisualGestureBuilder.dll
+C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.dll
+C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\obj\Debug\StandbyWindow.baml
+C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache

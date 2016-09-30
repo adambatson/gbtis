@@ -61,6 +61,16 @@ namespace gbtis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] gbtisg {
+            get {
+                object obj = ResourceManager.GetObject("gbtisg", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Kinect found!.
         /// </summary>
         internal static string msgNoSensor {

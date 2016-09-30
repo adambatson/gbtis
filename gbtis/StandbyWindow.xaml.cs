@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 using Microsoft.Kinect.VisualGestureBuilder;
+using System.IO;
 
 namespace gbtis {
     /// <summary>
@@ -24,6 +25,7 @@ namespace gbtis {
         public static int nameFadeInterval = 5000;
 
         Gesture waveGesture;
+        VisualGestureBuilderDatabase db;
         Body[] bodies;
         BodyFrameReader bodyReader;
         VisualGestureBuilderFrameSource gestureSource;
@@ -49,7 +51,7 @@ namespace gbtis {
             this.sensor = _sensor;
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
             frameReader.MultiSourceFrameArrived += FrameReader_MultiSourceFrameArrived;
-            OnLoadGestureFromDb();
+            //OnLoadGestureFromDb();
             OnOpenReaders();
 
             // Initialize the names
@@ -76,11 +78,21 @@ namespace gbtis {
             this.bodyReader.FrameArrived += OnBodyFrameArrived;
         }
         void OpenGestureReader() {
+
+            // we assume that this file exists and will load
+            db = new VisualGestureBuilderDatabase(
+              @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\gbtisg.gbd");
+
+            // we assume that this gesture is in that database (it should be, it's the only
+            // gesture in there).
+            this.waveGesture =
+              db.AvailableGestures.Where(g => g.Name == "wave").Single();
             this.gestureSource = new VisualGestureBuilderFrameSource(this.sensor, 0);
+            this.gestureReader = this.gestureSource.OpenReader();
 
             this.gestureSource.AddGesture(this.waveGesture);
+            this.gestureSource.TrackingIdLost += OnTrackingIdLost;
 
-            this.gestureReader = this.gestureSource.OpenReader();
             this.gestureReader.IsPaused = true;
             this.gestureReader.FrameArrived += OnGestureFrameArrived;
         }
@@ -100,15 +112,21 @@ namespace gbtis {
                 }
             }
         }
+        void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
+            this.gestureReader.IsPaused = true;
+        }
         void OnGestureFrameArrived(object sender, VisualGestureBuilderFrameArrivedEventArgs e) {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
-                    var continuousResults = frame.ContinuousGestureResults;
+                    var result = frame.DiscreteGestureResults;
 
-                    if ((continuousResults != null) &&
-                      (continuousResults.ContainsKey(this.waveGesture))) {
-                        var result = continuousResults[this.waveGesture];
-                        standbyMsg.Text = "You just waved!";
+                    if ((result != null) &&
+                      (result.ContainsKey(this.waveGesture))) {
+                        var gesture = result[this.waveGesture];
+                        if (gesture.Confidence > 0.5)
+                            this.Dispatcher.Invoke(() => {
+                                standbyMsg.Text = "You just waved!";
+                            });
                     }
                 }
             }
@@ -116,13 +134,14 @@ namespace gbtis {
 
         void OnLoadGestureFromDb() {
             // we assume that this file exists and will load
-            VisualGestureBuilderDatabase db = new VisualGestureBuilderDatabase(
-              @"Resources\gbtisg.gbd");
+            db = new VisualGestureBuilderDatabase(
+              @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\gbtisg.gbd");
 
             // we assume that this gesture is in that database (it should be, it's the only
             // gesture in there).
             this.waveGesture =
               db.AvailableGestures.Where(g => g.Name == "wave").Single();
+            
         }
 
         /// <summary>

@@ -32,20 +32,6 @@
                         <Button Content="Return to Standby" Click="ReturnToStandby_Click" />
                     </StackPanel>
                 </GroupBox>
-                
-                <GroupBox Header="Kinect Playback" HorizontalAlignment="Left" Margin="10" Padding="5">
-                    <StackPanel>
-                        <StackPanel.Resources>
-                            <Style TargetType="Button">
-                                <Setter Property="Margin" Value="3" />
-                            </Style>
-                        </StackPanel.Resources>
-                        
-                        <Button Content="Play neutral" Tag="neutral" Click="Playback_Click" />
-                        <Button Content="Play wave" Tag="wave" Click="Playback_Click" />
-                    </StackPanel>
-                    
-                </GroupBox>
             </DockPanel>
 
             <StatusBar x:Name="statusBar" DockPanel.Dock="Bottom">

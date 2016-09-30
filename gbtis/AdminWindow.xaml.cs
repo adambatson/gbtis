@@ -18,6 +18,10 @@ namespace gbtis {
     /// </summary>
     public partial class AdminWindow : Window {
 
+        public event EventHandler Exit;
+        public event EventHandler About;
+        public event EventHandler ReturnToStandby;
+
         /// <summary>
         /// Initialize the window
         /// </summary>
@@ -31,7 +35,9 @@ namespace gbtis {
         /// <param name="sender">Event source</param>
         /// <param name="args">Event args</param>
         private void FileExit_Click(object sender, EventArgs args) {
-            Application.Current.Shutdown();
+            EventHandler handler = Exit;
+            if (handler != null)
+                handler(this, args);
         }
 
         /// <summary>
@@ -39,11 +45,10 @@ namespace gbtis {
         /// </summary>
         /// <param name="sender">Event source</param>
         /// <param name="args">Event args</param>
-        private void HelpAbout_Click(object sender, RoutedEventArgs args) {
-            MessageBox.Show(
-                gbtis.Properties.Resources.aboutText,
-                gbtis.Properties.Resources.aboutTitle
-            );
+        private void HelpAbout_Click(object sender, EventArgs args) {
+            EventHandler handler = About;
+            if (handler != null)
+                handler(this, args);
         }
 
         /// <summary>
@@ -51,20 +56,10 @@ namespace gbtis {
         /// </summary>
         /// <param name="sender">Event source</param>
         /// <param name="e">Event args</param>
-        private void ReturnToStandby_Click(object sender, RoutedEventArgs e) {
-            throw new NotImplementedException("Not yet implemented");
-        }
-
-        /// <summary>
-        /// Playback test data to simulate the kinect. Button Tag property is the clip's name
-        /// </summary>
-        /// <param name="sender">A button sending the event</param>
-        /// <param name="e">Event arguments</param>
-        private void Playback_Click(object sender, RoutedEventArgs e) {
-            var btn = sender as Button;
-            var tag = btn.Tag as String;
-
-            throw new NotImplementedException("Not yet implemented");
+        private void ReturnToStandby_Click(object sender, EventArgs args) {
+            EventHandler handler = ReturnToStandby;
+            if (handler != null)
+                handler(this, args);
         }
     }
 }

@@ -48,3 +48,5 @@ C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.baml

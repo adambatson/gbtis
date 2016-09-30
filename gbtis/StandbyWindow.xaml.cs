@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Kinect;
 using Microsoft.Kinect.VisualGestureBuilder;
 using System.IO;
+using System.Media;
 
 namespace gbtis {
     /// <summary>
@@ -24,7 +25,7 @@ namespace gbtis {
         // Settings for the text fade effect
         public static int nameFadeInterval = 5000;
 
-        Gesture waveGesture;
+        Gesture waveGesture, easterEgg;
         VisualGestureBuilderDatabase db;
         Body[] bodies;
         BodyFrameReader bodyReader;
@@ -87,10 +88,13 @@ namespace gbtis {
             // gesture in there).
             this.waveGesture =
               db.AvailableGestures.Where(g => g.Name == "wave").Single();
+
+            this.easterEgg =
+              db.AvailableGestures.Where(g => g.Name == "dab").Single();
             this.gestureSource = new VisualGestureBuilderFrameSource(this.sensor, 0);
             this.gestureReader = this.gestureSource.OpenReader();
 
-            this.gestureSource.AddGesture(this.waveGesture);
+            this.gestureSource.AddGestures(this.db.AvailableGestures);
             this.gestureSource.TrackingIdLost += OnTrackingIdLost;
 
             this.gestureReader.IsPaused = true;
@@ -108,6 +112,8 @@ namespace gbtis {
                             this.gestureSource.TrackingId = trackedBody.TrackingId;
                             this.gestureReader.IsPaused = false;
                         }
+                    } else {
+                        OnTrackingIdLost(null, null);
                     }
                 }
             }
@@ -120,13 +126,26 @@ namespace gbtis {
                 if (frame != null) {
                     var result = frame.DiscreteGestureResults;
 
-                    if ((result != null) &&
-                      (result.ContainsKey(this.waveGesture))) {
-                        var gesture = result[this.waveGesture];
-                        if (gesture.Confidence > 0.5)
-                            this.Dispatcher.Invoke(() => {
-                                standbyMsg.Text = "You just waved!";
-                            });
+                    if (result != null) {
+                        if (result.ContainsKey(this.waveGesture)) {
+                            var gesture = result[this.waveGesture];
+                            if (gesture.Confidence > 0.5)
+                                this.Dispatcher.Invoke(() => {
+                                    standbyMsg.Text = "You just waved!";
+                                });
+                        }
+
+                        if (result.ContainsKey(this.easterEgg)) {
+                            var gesture = result[this.easterEgg];
+                            if (gesture.Confidence > 0.8) {
+                                this.Dispatcher.Invoke(() => {
+                                    standbyMsg.Text = "Bruh.";
+                                    SoundPlayer player = new SoundPlayer(
+                                        @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\excellent.wav");
+                                    player.Play();
+                                });
+                            }
+                        }
                     }
                 }
             }

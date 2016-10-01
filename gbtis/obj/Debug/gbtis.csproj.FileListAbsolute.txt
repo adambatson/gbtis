@@ -3,9 +3,12 @@ c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\gbtis.pdb
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
+c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\MainWindow.g.cs
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\App.g.cs
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
+c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\MainWindow.baml
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.g.resources
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
@@ -27,8 +30,23 @@ D:\repositories\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.exe
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.pdb
-C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
-C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.VisualGestureBuilder.dll
-C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.dll
-C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\obj\Debug\StandbyWindow.baml
-C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.config
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.pdb
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\App.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.baml

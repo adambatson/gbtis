@@ -124,6 +124,12 @@
   <data name="gbtisg" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\gbtisg.gbd;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="aboutText" xml:space="preserve">
+    <value>Gesture based text input system\nAdam Batson, Richard Carson, Maxwell DeMelo</value>
+  </data>
+  <data name="aboutTitle" xml:space="preserve">
+    <value>About GBTIS</value>
+  </data>
   <data name="msgNoSensor" xml:space="preserve">
     <value>No Kinect found!</value>
   </data>

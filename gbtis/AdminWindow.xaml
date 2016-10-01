@@ -6,17 +6,17 @@
         xmlns:local="clr-namespace:gbtis"
         mc:Ignorable="d"
         
-        Closed="FileExit_Click"
+        Closing="FileExit_Click"
         Title="Admininstration" Height="600" Width="800">
     <Grid>
 
         <DockPanel LastChildFill="False">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem x:Name="fileExitButton" Header="_Exit" Click="FileExit_Click" />
+                    <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
                 <MenuItem Header="_Help">
-                    <MenuItem Header="_About" Click="HelpAbout_Click" />
+                    <MenuItem x:Name="helpAboutButton" x:FieldModifier="public" Header="_About" Click="HelpAbout_Click" />
                 </MenuItem>
             </Menu>
 
@@ -29,7 +29,7 @@
                             </Style>
                         </StackPanel.Resources>
 
-                        <Button Content="Return to Standby" Click="ReturnToStandby_Click" />
+                        <Button x:Name="returnToStandbyButton" x:FieldModifier="public" Content="Return to Standby" Click="ReturnToStandby_Click" />
                     </StackPanel>
                 </GroupBox>
             </DockPanel>

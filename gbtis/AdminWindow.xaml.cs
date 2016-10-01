@@ -35,9 +35,7 @@ namespace gbtis {
         /// <param name="sender">Event source</param>
         /// <param name="args">Event args</param>
         private void FileExit_Click(object sender, EventArgs args) {
-            EventHandler handler = Exit;
-            if (handler != null)
-                handler(this, args);
+            Exit?.Invoke(this, args);
         }
 
         /// <summary>
@@ -46,9 +44,7 @@ namespace gbtis {
         /// <param name="sender">Event source</param>
         /// <param name="args">Event args</param>
         private void HelpAbout_Click(object sender, EventArgs args) {
-            EventHandler handler = About;
-            if (handler != null)
-                handler(this, args);
+            About?.Invoke(this, args);
         }
 
         /// <summary>
@@ -57,9 +53,7 @@ namespace gbtis {
         /// <param name="sender">Event source</param>
         /// <param name="e">Event args</param>
         private void ReturnToStandby_Click(object sender, EventArgs args) {
-            EventHandler handler = ReturnToStandby;
-            if (handler != null)
-                handler(this, args);
+            ReturnToStandby?.Invoke(this, args);
         }
     }
 }

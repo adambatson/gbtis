@@ -81,12 +81,12 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestReturnToStandbyEvent() {
-            window.ReturnToStandby += (s, e) => {
+        public void TestStandbyEvent() {
+            window.Standby += (s, e) => {
                 eventFlag = true;
             };
 
-            window.returnToStandbyButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            window.fileStandbyButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Timer t = new Timer(100);
             t.Start();
             t.Elapsed += (s, e) => {

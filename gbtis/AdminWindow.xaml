@@ -10,9 +10,10 @@
         Title="Admininstration" Height="600" Width="800">
     <Grid>
 
-        <DockPanel LastChildFill="False">
+        <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
+                    <MenuItem x:Name="fileStandbyButton" x:FieldModifier="public"  Header="_Return To Standby" Click="FileStandby_Click" />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
                 <MenuItem Header="_Help">
@@ -20,25 +21,78 @@
                 </MenuItem>
             </Menu>
 
-            <DockPanel DockPanel.Dock="Top">
-                <GroupBox Header="Controls" HorizontalAlignment="Left" Margin="10" Padding="5">
-                    <StackPanel>
-                        <StackPanel.Resources>
-                            <Style TargetType="Button">
-                                <Setter Property="Margin" Value="3" />
-                            </Style>
-                        </StackPanel.Resources>
-
-                        <Button x:Name="returnToStandbyButton" x:FieldModifier="public" Content="Return to Standby" Click="ReturnToStandby_Click" />
-                    </StackPanel>
-                </GroupBox>
-            </DockPanel>
-
             <StatusBar x:Name="statusBar" DockPanel.Dock="Bottom">
                 <StatusBarItem>
                     <TextBlock x:Name="statusText" Text="Loading..."/>
                 </StatusBarItem>
             </StatusBar>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border BorderThickness="1,0,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="0">
+                    <Grid x:Name="bodyStatus">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="0" Grid.Row="0" Margin="15">
+                            <Viewbox HorizontalAlignment="Stretch">
+                                <TextBlock FontWeight="Bold" Text="1" />
+                            </Viewbox>
+                        </Border>
+
+                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="1" Grid.Row="0" Margin="15">
+                            <Viewbox HorizontalAlignment="Stretch">
+                                <TextBlock FontWeight="Bold" Text="2" />
+                            </Viewbox>
+                        </Border>
+
+                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="2" Grid.Row="0" Margin="15">
+                            <Viewbox HorizontalAlignment="Stretch">
+                                <TextBlock FontWeight="Bold" Text="3" />
+                            </Viewbox>
+                        </Border>
+
+                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="0" Grid.Row="1" Margin="15">
+                            <Viewbox HorizontalAlignment="Stretch">
+                                <TextBlock FontWeight="Bold" Text="4" />
+                            </Viewbox>
+                        </Border>
+
+                        <Border BorderThickness="1" CornerRadius="6" BorderBrush="Black" Grid.Column="1" Grid.Row="1" Margin="15">
+                            <Viewbox HorizontalAlignment="Stretch">
+                                <TextBlock FontWeight="Bold" Text="5" />
+                            </Viewbox>
+                        </Border>
+
+                        <Border BorderThickness="1" CornerRadius="6" BorderBrush="Black" Grid.Column="2" Grid.Row="1" Margin="15">
+                            <Viewbox HorizontalAlignment="Stretch">
+                                <TextBlock FontWeight="Bold" Text="6" />
+                            </Viewbox>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
+                    <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </Grid>
         </DockPanel>
     </Grid>
 </Window>

@@ -19,9 +19,7 @@ namespace gbtis {
     /// Interaction logic for Canvas.xaml
     /// </summary>
     public partial class Canvas : UserControl {
-        /// <summary>
-        ///  HD
-        /// </summary>
+        Point? previous;
         byte[] pixels;
         int stride;
 
@@ -69,6 +67,14 @@ namespace gbtis {
             radialUpdate(p, size, false, false);
         }
 
+        private double slope(Point src, Point dst) {
+            return (dst.Y - src.Y) / (dst.X - src.X);
+        }
+
+        private double yIntercept(Point p, double slope) {
+            return p.Y - slope * p.X;
+        }
+
         /// <summary>
         /// Update around a point
         /// </summary>
@@ -96,6 +102,26 @@ namespace gbtis {
                     }
                 }
             }
+
+            if (previous.HasValue) {
+                Point src = previous.Value;
+                previous = null;
+                double m = slope(src, p);
+                double b = yIntercept(p, m);
+                if (src.X < p.X) {
+                    for (int x = (int)p.X; x > (int)src.X; x--) {
+                        int y = (int)(m * x + b);
+                        radialUpdate(new Point(x, y), size, rounded, mode);
+                    }
+                } else {
+                    for (int x = (int)p.X; x < (int)src.X; x++) {
+                        int y = (int)(m * x + b);
+                        radialUpdate(new Point(x, y), size, rounded, mode);
+                    }
+                }
+            }
+
+            previous = p;
         }
 
         /// <summary>

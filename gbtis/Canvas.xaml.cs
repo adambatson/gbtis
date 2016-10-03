@@ -22,7 +22,6 @@ namespace gbtis {
         /// <summary>
         ///  HD
         /// </summary>
-        public static Point SIZE = new Point(1920, 1080);
         byte[] pixels;
         int stride;
 
@@ -31,17 +30,25 @@ namespace gbtis {
         /// </summary>
         public Canvas() {
             InitializeComponent();
-
-            // Initialize canvas to the right size
-            pixels = new byte[(int)SIZE.X * (int)SIZE.Y * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
-            stride = (int)SIZE.X * PixelFormats.Bgr32.BitsPerPixel / 8;
-            for (int i = 0; i < pixels.Length; i++)
-                pixels[i] = 0xFF;
-
+            
             // Update timer
             Timer t = new Timer(50);
             t.Elapsed += (s, e) => updateSource();
             t.Start();
+        }
+
+        /// <summary>
+        /// Init pixel array
+        /// </summary>
+        public void InitializeCanvas() {
+            if ((int)ActualWidth == 0)
+                return;
+
+            // Initialize canvas to the right size
+            pixels = new byte[(int)ActualWidth * (int)ActualHeight * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
+            stride = (int)ActualWidth * PixelFormats.Bgr32.BitsPerPixel / 8;
+            for (int i = 0; i < pixels.Length; i++)
+                pixels[i] = 0xFF;
         }
 
         /// <summary>
@@ -84,7 +91,7 @@ namespace gbtis {
                     }
 
                     // Write to point
-                    if (x >= 0 && x < (int)SIZE.X && y >= 0 && y < (int)SIZE.Y) {
+                    if (x >= 0 && x < (int)ActualWidth && y >= 0 && y < (int)ActualHeight) {
                         set(x, y, (byte) (mode ? 0x00 : 0xFF));
                     }
                 }
@@ -98,8 +105,10 @@ namespace gbtis {
         /// <param name="y">Y coordinate</param>
         /// <param name="value">Value to write</param>
         private void set(int x, int y, byte value) {
-            int root = ((int)x + (int)y * (int)SIZE.X) * 4;
-
+            if (pixels == null)
+                InitializeCanvas();
+  
+            int root = ((int)x + (int)y * (int)ActualWidth) * 4;
             pixels[root] = value;
             pixels[root + 1] = value;
             pixels[root + 2] = value;
@@ -112,7 +121,10 @@ namespace gbtis {
         private void updateSource() {
             try {
                 this.Dispatcher.Invoke(() => {
-                    content.Source = BitmapSource.Create((int)SIZE.X, (int)SIZE.Y, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
+                    if (pixels == null)
+                        InitializeCanvas();
+
+                    content.Source = BitmapSource.Create((int)ActualWidth, (int)ActualHeight, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
                 });
             } catch (OperationCanceledException) { }
         }

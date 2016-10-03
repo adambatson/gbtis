@@ -14,24 +14,6 @@ c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.exe
 c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.pdb
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.config
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.pdb
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\App.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
 D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\Cursor.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
@@ -58,3 +40,28 @@ D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
 D:\repositories\gbtis\gbtis\obj\Debug\Canvas.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\Canvas.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Canvas.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasWindow.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasCursor.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\App.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Canvas.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasWindow.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasCursor.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.config
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.pdb
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Themes\Generic.baml
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache

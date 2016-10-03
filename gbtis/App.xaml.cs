@@ -20,7 +20,6 @@ namespace gbtis {
             sensor.Open();
 
             CanvasWindow canvas = new CanvasWindow();
-            canvas.CursorType(Cursor.CursorType.Draw);
             canvas.Show();
 
             // Start the admin window

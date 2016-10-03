@@ -84,8 +84,8 @@
     <Compile Include="CanvasWindow.xaml.cs">
       <DependentUpon>CanvasWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Cursor.xaml.cs">
-      <DependentUpon>Cursor.xaml</DependentUpon>
+    <Compile Include="CanvasCursor.xaml.cs">
+      <DependentUpon>CanvasCursor.xaml</DependentUpon>
     </Compile>
     <Compile Include="StandbyWindow.xaml.cs">
       <DependentUpon>StandbyWindow.xaml</DependentUpon>
@@ -107,7 +107,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Cursor.xaml">
+    <Page Include="CanvasCursor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

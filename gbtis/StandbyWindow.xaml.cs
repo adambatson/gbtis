@@ -13,9 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
-using Microsoft.Kinect.VisualGestureBuilder;
-using System.IO;
-using System.Media;
 
 namespace gbtis {
     /// <summary>
@@ -25,12 +22,8 @@ namespace gbtis {
         // Settings for the text fade effect
         public static int nameFadeInterval = 5000;
 
-        Gesture waveGesture, easterEgg;
-        VisualGestureBuilderDatabase db;
-        Body[] bodies;
-        BodyFrameReader bodyReader;
-        VisualGestureBuilderFrameSource gestureSource;
-        VisualGestureBuilderFrameReader gestureReader;
+        // Events
+        public event EventHandler Exit;
 
         // For the kinect display
         KinectSensor sensor;
@@ -52,8 +45,6 @@ namespace gbtis {
             this.sensor = _sensor;
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
             frameReader.MultiSourceFrameArrived += FrameReader_MultiSourceFrameArrived;
-            //OnLoadGestureFromDb();
-            OnOpenReaders();
 
             // Initialize the names
             topName.Text = "";
@@ -65,102 +56,6 @@ namespace gbtis {
             timer.Elapsed += HandleTimer;
             timer.Start();
             HandleTimer(null, null);
-        }
-
-        void OnOpenReaders() {
-            this.OpenBodyReader();
-            this.OpenGestureReader();
-        }
-        void OpenBodyReader() {
-            if (this.bodies == null) {
-                this.bodies = new Body[this.sensor.BodyFrameSource.BodyCount];
-            }
-            this.bodyReader = this.sensor.BodyFrameSource.OpenReader();
-            this.bodyReader.FrameArrived += OnBodyFrameArrived;
-        }
-        void OpenGestureReader() {
-
-            // we assume that this file exists and will load
-            db = new VisualGestureBuilderDatabase(
-              @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\gbtisg.gbd");
-
-            // we assume that this gesture is in that database (it should be, it's the only
-            // gesture in there).
-            this.waveGesture =
-              db.AvailableGestures.Where(g => g.Name == "wave").Single();
-
-            this.easterEgg =
-              db.AvailableGestures.Where(g => g.Name == "dab").Single();
-            this.gestureSource = new VisualGestureBuilderFrameSource(this.sensor, 0);
-            this.gestureReader = this.gestureSource.OpenReader();
-
-            this.gestureSource.AddGestures(this.db.AvailableGestures);
-            this.gestureSource.TrackingIdLost += OnTrackingIdLost;
-
-            this.gestureReader.IsPaused = true;
-            this.gestureReader.FrameArrived += OnGestureFrameArrived;
-        }
-        void OnBodyFrameArrived(object sender, BodyFrameArrivedEventArgs e) {
-            using (var frame = e.FrameReference.AcquireFrame()) {
-                if (frame != null) {
-                    frame.GetAndRefreshBodyData(this.bodies);
-
-                    var trackedBody = this.bodies.Where(b => b.IsTracked).FirstOrDefault();
-
-                    if (trackedBody != null) {
-                        if (this.gestureReader.IsPaused) {
-                            this.gestureSource.TrackingId = trackedBody.TrackingId;
-                            this.gestureReader.IsPaused = false;
-                        }
-                    } else {
-                        OnTrackingIdLost(null, null);
-                    }
-                }
-            }
-        }
-        void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
-            this.gestureReader.IsPaused = true;
-        }
-        void OnGestureFrameArrived(object sender, VisualGestureBuilderFrameArrivedEventArgs e) {
-            using (var frame = e.FrameReference.AcquireFrame()) {
-                if (frame != null) {
-                    var result = frame.DiscreteGestureResults;
-
-                    if (result != null) {
-                        if (result.ContainsKey(this.waveGesture)) {
-                            var gesture = result[this.waveGesture];
-                            if (gesture.Confidence > 0.5)
-                                this.Dispatcher.Invoke(() => {
-                                    standbyMsg.Text = "You just waved!";
-                                });
-                        }
-
-                        if (result.ContainsKey(this.easterEgg)) {
-                            var gesture = result[this.easterEgg];
-                            if (gesture.Confidence > 0.8) {
-                                this.Dispatcher.Invoke(() => {
-                                    standbyMsg.Text = "Bruh.";
-                                    SoundPlayer player = new SoundPlayer(
-                                        @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\excellent.wav");
-                                    player.Play();
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        void OnLoadGestureFromDb() {
-            // we assume that this file exists and will load
-            db = new VisualGestureBuilderDatabase(
-              @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\gbtisg.gbd");
-
-            // we assume that this gesture is in that database (it should be, it's the only
-            // gesture in there).
-            this.waveGesture =
-              db.AvailableGestures.Where(g => g.Name == "wave").Single();
-            
         }
 
         /// <summary>
@@ -205,7 +100,7 @@ namespace gbtis {
         private static ImageSource ToBitmap(ColorFrame frame) {
             int width = frame.FrameDescription.Width;
             int height = frame.FrameDescription.Height;
-
+            
             byte[] pixels = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
 
             if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
@@ -215,8 +110,16 @@ namespace gbtis {
             }
 
             int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
-
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
+        }
+
+        /// <summary>
+        /// Called when the window is closed
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="args">The event arguments</param>
+        private void Window_Closed(object sender, EventArgs args) {
+            Exit?.Invoke(this, args);
         }
 
         // Temporary source of names to display.

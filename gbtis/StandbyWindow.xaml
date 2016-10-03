@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:gbtis"
         mc:Ignorable="d"
         
+        Closing="Window_Closed"
         WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
@@ -30,7 +31,7 @@
 
         <!-- Shows the current feed from the camera -->
         <Border Background="DarkBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2" Grid.ColumnSpan="3">
-            <Image x:Name="sensorFeed" />
+            <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
 
         <!-- Intro text... Hidden until someone is in frame -->

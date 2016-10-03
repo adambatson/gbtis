@@ -22,6 +22,9 @@ namespace gbtis {
         // Settings for the text fade effect
         public static int nameFadeInterval = 5000;
 
+        // Events
+        public event EventHandler Exit;
+
         // For the kinect display
         KinectSensor sensor;
         MultiSourceFrameReader frameReader;
@@ -97,7 +100,7 @@ namespace gbtis {
         private static ImageSource ToBitmap(ColorFrame frame) {
             int width = frame.FrameDescription.Width;
             int height = frame.FrameDescription.Height;
-
+            
             byte[] pixels = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
 
             if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
@@ -107,8 +110,16 @@ namespace gbtis {
             }
 
             int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
-
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
+        }
+
+        /// <summary>
+        /// Called when the window is closed
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="args">The event arguments</param>
+        private void Window_Closed(object sender, EventArgs args) {
+            Exit?.Invoke(this, args);
         }
 
         // Temporary source of names to display.

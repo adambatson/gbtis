@@ -9,8 +9,32 @@
         WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
-        <local:Canvas x:Name="drawCanvas" />
-        <Image x:Name="sensorOverlay" Opacity="0.2" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <local:CanvasCursor x:Name="drawCursor" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
+            <Grid>
+                <local:Canvas x:Name="drawCanvas" />
+                <Image x:Name="sensorOverlay" Opacity="0.2" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <local:CanvasCursor x:Name="drawCursor" />
+            </Grid>
+        </Border>
+
+        <local:HoverButton x:Name="clearButton" Margin="10" Grid.Row="9" Grid.Column="0" Text="Clear" />
     </Grid>
 </Window>

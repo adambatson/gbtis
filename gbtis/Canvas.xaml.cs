@@ -48,13 +48,13 @@ namespace gbtis {
             for (int i = 0; i < pixels.Length; i++)
                 pixels[i] = 0xFF;
         }
-
+        
         /// <summary>
         /// Mark a point
         /// </summary>
         /// <param name="p">Center point</param>
         /// <param name="size">Brush size</param>
-        public void mark(Point p, int size) {
+        public void Mark(Point p, int size) {
             radialUpdate(p, size, true, true);
         }
 
@@ -63,14 +63,33 @@ namespace gbtis {
         /// </summary>
         /// <param name="p">Center point</param>
         /// <param name="size">Brush size</param>
-        public void erase(Point p, int size) {
+        public void Erase(Point p, int size) {
             radialUpdate(p, size, false, false);
         }
 
+        /// <summary>
+        /// Clear the previous position of the cursor
+        /// </summary>
+        public void ClearPrevious() {
+            previous = null;
+        }
+
+        /// <summary>
+        /// Get the slope of the line between 2 points
+        /// </summary>
+        /// <param name="src">Source point</param>
+        /// <param name="dst">Destination point</param>
+        /// <returns>The slope</returns>
         private double slope(Point src, Point dst) {
             return (dst.Y - src.Y) / (dst.X - src.X);
         }
 
+        /// <summary>
+        /// Get the y intercept of a line
+        /// </summary>
+        /// <param name="p">A point on the line</param>
+        /// <param name="slope">The slope of the line</param>
+        /// <returns></returns>
         private double yIntercept(Point p, double slope) {
             return p.Y - slope * p.X;
         }

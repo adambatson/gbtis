@@ -24,7 +24,7 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow() {
             InitializeComponent();
-            Mouse.OverrideCursor = Cursors.None;
+            //Mouse.OverrideCursor = Cursors.None;
             drawCursor.Type = CanvasCursor.CursorType.Idle;
 
             // Set up cursor update events
@@ -33,6 +33,8 @@ namespace gbtis {
             MouseLeftButtonUp += (s, e) => Idle();
             MouseRightButtonDown += (s, e) => Erase();
             MouseRightButtonUp += (s, e) => Idle();
+
+            clearButton.Clicked += (s, e) => drawCanvas.InitializeCanvas();
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace gbtis {
         private void Draw() {
             Point p = CursorPosition();
             drawCursor.Type = CanvasCursor.CursorType.Draw;
-            drawCanvas.mark(p, drawCursor.Size);
+            drawCanvas.Mark(p, drawCursor.Size);
         }
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace gbtis {
         private void Erase() {
             Point p = CursorPosition();
             drawCursor.Type = CanvasCursor.CursorType.Erase;
-            drawCanvas.erase(p, drawCursor.Size);
+            drawCanvas.Erase(p, drawCursor.Size);
         }
 
         /// <summary>
@@ -58,6 +60,7 @@ namespace gbtis {
         /// </summary>
         private void Idle() {
             drawCursor.Type = CanvasCursor.CursorType.Idle;
+            drawCanvas.ClearPrevious();
         }
 
         /// <summary>
@@ -77,6 +80,8 @@ namespace gbtis {
                 } else if (Mouse.RightButton == MouseButtonState.Pressed) {
                     Erase();
                 }
+
+                clearButton.CursorOver(Mouse.GetPosition(this));
             });
         }
 
@@ -138,9 +143,6 @@ namespace gbtis {
         /// <returns>The cursor position</returns>
         private Point CursorPosition() {
             Point p = Mouse.GetPosition(drawCanvas);
-            p.X = moveIntoRange(p.X, 0, drawCanvas.ActualWidth - 1);
-            p.Y = moveIntoRange(p.Y, 0, drawCanvas.ActualHeight - 1);
-
             return p;
         }
     }

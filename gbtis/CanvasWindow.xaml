@@ -27,6 +27,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <local:HoverButton x:Name="clearButton" Margin="10" Grid.Row="0" Grid.Column="0" Text="Clear" />
+
         <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
             <Grid>
                 <local:Canvas x:Name="drawCanvas" />
@@ -34,7 +36,5 @@
                 <local:CanvasCursor x:Name="drawCursor" />
             </Grid>
         </Border>
-
-        <local:HoverButton x:Name="clearButton" Margin="10" Grid.Row="9" Grid.Column="0" Text="Clear" />
     </Grid>
 </Window>

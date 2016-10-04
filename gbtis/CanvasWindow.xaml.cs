@@ -73,12 +73,16 @@ namespace gbtis {
                 // Update cursor position
                 Point p = CursorPosition();
                 drawCursor.Position = p;
-                
-                // Perform on the spot
-                if (Mouse.LeftButton == MouseButtonState.Pressed) {
-                    Draw();
-                } else if (Mouse.RightButton == MouseButtonState.Pressed) {
-                    Erase();
+
+                // Test canvas borders
+                if (!isInRange(p.X, 0, drawCanvas.ActualWidth - 1) && isInRange(p.Y, 0, drawCanvas.ActualHeight - 1)) {
+                    // Perform on the spot
+                    if (Mouse.LeftButton == MouseButtonState.Pressed)
+                        Draw();
+                    else if (Mouse.RightButton == MouseButtonState.Pressed)
+                        Erase();
+                } else {
+                    drawCursor.Type = CanvasCursor.CursorType.Missing;
                 }
 
                 clearButton.CursorOver(Mouse.GetPosition(this));
@@ -125,16 +129,14 @@ namespace gbtis {
         }
 
         /// <summary>
-        /// Move a value into a set range so that min < n < max
+        /// Test a value for a range
         /// </summary>
         /// <param name="n">The value</param>
         /// <param name="min">Minimum value</param>
         /// <param name="max">Maximum value</param>
-        /// <returns>The new value</returns>
-        private double moveIntoRange(double n, double min, double max) {
-            if (n < min) n = min;
-            if (n > max) n = max;
-            return n;
+        /// <returns>True if in range</returns>
+        private bool isInRange(double n, double min, double max) {
+            return (n < min) || (n > max);
         }
 
         /// <summary>

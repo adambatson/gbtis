@@ -15,6 +15,13 @@ using System.Windows.Shapes;
 
 namespace gbtis {
     public partial class CanvasCursor : UserControl {
+        Point? previous;
+        bool motionOn;
+
+        public event EventHandler Moved;
+        public event EventHandler Draw;
+        public event EventHandler Erase;
+
         public int Size { get; set; }
 
         private CursorType type;
@@ -47,6 +54,15 @@ namespace gbtis {
         public CanvasCursor() {
             InitializeComponent();
             Type = CursorType.Missing;
+
+            if (motionOn) {
+            } else {
+
+            }
+        }
+
+        public Point RelativePosition(IInputElement relativeTo) {
+
         }
 
         /// <summary>
@@ -99,10 +115,10 @@ namespace gbtis {
                 return new CursorType(background, border, size, round);
             }
 
-            public static CursorType Missing = Create(Colors.White, Colors.White, 0, false);
-            public static CursorType Idle = Create(Colors.Gray, Colors.DarkSlateGray, 15, true);
-            public static CursorType Draw = Create(Colors.Black, Colors.White, 10, true);
-            public static CursorType Erase = Create(Colors.White, Colors.Black, 50, false);
+            public static readonly CursorType Missing = Create(Colors.White, Colors.White, 0, false);
+            public static readonly CursorType Idle = Create(Colors.Gray, Colors.DarkSlateGray, 15, true);
+            public static readonly CursorType Draw = Create(Colors.Black, Colors.White, 10, true);
+            public static readonly CursorType Erase = Create(Colors.White, Colors.Black, 50, false);
         }
     }
 }

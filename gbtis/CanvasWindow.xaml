@@ -32,9 +32,12 @@
         <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
             <Grid>
                 <local:Canvas x:Name="drawCanvas" />
-                <Image x:Name="sensorOverlay" Opacity="0.2" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 <local:CanvasCursor x:Name="drawCursor" />
             </Grid>
         </Border>
+
+        <Image x:Name="sensorOverlay" Opacity="0.2" 
+               Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
+               Grid.ColumnSpan="3" Grid.RowSpan="10" />
     </Grid>
 </Window>

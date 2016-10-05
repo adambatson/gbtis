@@ -15,15 +15,17 @@ using System.Windows.Shapes;
 
 namespace gbtis {
     public partial class CanvasCursor : UserControl {
-        Point? previous;
-        bool motionOn;
+        private bool motionOn;
 
         public event EventHandler Moved;
         public event EventHandler Draw;
         public event EventHandler Erase;
+        public event EventHandler Idle;
 
+        // Size of the cursor brush
         public int Size { get; set; }
-
+        
+        // The type of cursor
         private CursorType type;
         public CursorType Type {
             get { return type; }
@@ -33,6 +35,7 @@ namespace gbtis {
             }
         }
 
+        // Position of the cursor's center
         private Point position;
         public Point Position {
             get { return position; }
@@ -56,13 +59,65 @@ namespace gbtis {
             Type = CursorType.Missing;
 
             if (motionOn) {
+                throw new NotImplementedException();
             } else {
+                Loaded += (ls, le) => {
+                    Window parentWindow = Window.GetWindow(this);
+                    parentWindow.MouseMove += (s, e) => {
+                        Position = RelativePosition(parentWindow);
 
+                        if (Mouse.LeftButton == MouseButtonState.Pressed)
+                            cursorDraw();
+                        else if (Mouse.RightButton == MouseButtonState.Pressed)
+                            cursorErase();
+
+                        Moved?.Invoke(this, new EventArgs());
+                    };
+
+                    MouseLeftButtonDown += (s, e) => cursorDraw();
+                    MouseRightButtonDown += (s, e) => cursorErase();
+
+                    MouseLeftButtonUp += (s, e) => cursorIdle();
+                    MouseRightButtonUp += (s, e) => cursorIdle();
+                };
             }
         }
 
+        /// <summary>
+        /// Get the current cursor position relative to another element
+        /// </summary>
+        /// <param name="relativeTo">Relative element</param>
+        /// <returns>Coordinates of the cursor</returns>
         public Point RelativePosition(IInputElement relativeTo) {
+            if (motionOn) {
+                throw new NotImplementedException();
+            } else {
+                return Mouse.GetPosition(relativeTo);
+            }
+        }
 
+        /// <summary>
+        /// Draw at cursor
+        /// </summary>
+        private void cursorDraw() {
+            Type = CanvasCursor.CursorType.Draw;
+            Draw?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Erase at cursor
+        /// </summary>
+        private void cursorErase() {
+            Type = CanvasCursor.CursorType.Erase;
+            Erase?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Return to idle
+        /// </summary>
+        private void cursorIdle() {
+            Type = CanvasCursor.CursorType.Idle;
+            Idle?.Invoke(this, new EventArgs());
         }
 
         /// <summary>

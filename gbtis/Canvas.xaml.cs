@@ -48,14 +48,15 @@ namespace gbtis {
             for (int i = 0; i < pixels.Length; i++)
                 pixels[i] = 0xFF;
         }
-        
+
         /// <summary>
         /// Mark a point
         /// </summary>
         /// <param name="p">Center point</param>
         /// <param name="size">Brush size</param>
-        public void Mark(Point p, int size) {
-            radialUpdate(p, size, true, true);
+        /// <param name="rounded">True if round</param>
+        public void Mark(Point p, int size, bool rounded) {
+            drawLine(p, size, rounded, true);
         }
 
         /// <summary>
@@ -63,8 +64,9 @@ namespace gbtis {
         /// </summary>
         /// <param name="p">Center point</param>
         /// <param name="size">Brush size</param>
-        public void Erase(Point p, int size) {
-            radialUpdate(p, size, false, false);
+        /// <param name="rounded">True if round</param>
+        public void Erase(Point p, int size, bool rounded) {
+            drawLine(p, size, rounded, false);
         }
 
         /// <summary>
@@ -95,6 +97,71 @@ namespace gbtis {
         }
 
         /// <summary>
+        /// Draw a line from the last cursor position to p
+        /// </summary>
+        /// <param name="p">Center point</param>
+        /// <param name="size">Brush size</param>
+        /// <param name="rounded">True if round</param>
+        /// <param name="mode">True for on, false for off</param>
+        private void drawLine(Point p, int size, bool rounded, bool mode) {
+            if (previous.HasValue) {
+                // No line
+                if (previous.Equals(p)) {
+                    radialUpdate(p, size, rounded, mode);
+                    return;
+                }
+
+                // Get the line's equation
+                double m = slope(previous.Value, p);
+                double b = yIntercept(p, m);
+
+                // Straight line updates
+                if ((int)p.X == (int)previous.Value.X) {
+                    if (previous.Value.Y < p.Y) {
+                        for (int y = (int)p.Y; y > (int)previous.Value.Y; y--) {
+                            radialUpdate(new Point(p.X, y), size, rounded, mode);
+                        }
+                    } else {
+                        for (int y = (int)p.Y; y < (int)previous.Value.Y; y++) {
+                            radialUpdate(new Point(p.X, y), size, rounded, mode);
+                        }
+                    }
+
+                    return;
+                }
+
+                // Horizontal updates
+                if (previous.Value.X < p.X) {
+                    for (int x = (int)p.X; x > (int)previous.Value.X; x--) {
+                        int y = (int)(m * x + b);
+                        radialUpdate(new Point(x, y), size, rounded, mode);
+                    }
+                } else {
+                    for (int x = (int)p.X; x < (int)previous.Value.X; x++) {
+                        int y = (int)(m * x + b);
+                        radialUpdate(new Point(x, y), size, rounded, mode);
+                    }
+                }
+
+                // Vertial updates
+                if (previous.Value.Y < p.Y) {
+                    for (int y = (int)p.Y; y > (int)previous.Value.Y; y--) {
+                        int x = (int)((y - b) / m);
+                        radialUpdate(new Point(x, y), size, rounded, mode);
+                    }
+                } else {
+                    for (int y = (int)p.Y; y < (int)previous.Value.Y; y++) {
+                        int x = (int)((y - b) / m);
+                        radialUpdate(new Point(x, y), size, rounded, mode);
+                    }
+                }
+            }
+
+            // Update previous draw position
+            previous = p;
+        }
+
+        /// <summary>
         /// Update around a point
         /// </summary>
         /// <param name="p">Center point</param>
@@ -121,26 +188,6 @@ namespace gbtis {
                     }
                 }
             }
-
-            if (previous.HasValue) {
-                Point src = previous.Value;
-                previous = null;
-                double m = slope(src, p);
-                double b = yIntercept(p, m);
-                if (src.X < p.X) {
-                    for (int x = (int)p.X; x > (int)src.X; x--) {
-                        int y = (int)(m * x + b);
-                        radialUpdate(new Point(x, y), size, rounded, mode);
-                    }
-                } else {
-                    for (int x = (int)p.X; x < (int)src.X; x++) {
-                        int y = (int)(m * x + b);
-                        radialUpdate(new Point(x, y), size, rounded, mode);
-                    }
-                }
-            }
-
-            previous = p;
         }
 
         /// <summary>
@@ -154,6 +201,8 @@ namespace gbtis {
                 InitializeCanvas();
   
             int root = ((int)x + (int)y * (int)ActualWidth) * 4;
+            if (root < 0 || root >= pixels.Length) return;
+
             pixels[root] = value;
             pixels[root + 1] = value;
             pixels[root + 2] = value;

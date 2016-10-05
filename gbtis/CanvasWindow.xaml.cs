@@ -28,39 +28,15 @@ namespace gbtis {
             drawCursor.Type = CanvasCursor.CursorType.Idle;
 
             // Set up cursor update events
-            MouseMove += CanvasWindow_MouseMove;
-            MouseLeftButtonDown += (s, e) => Draw();
-            MouseLeftButtonUp += (s, e) => Idle();
-            MouseRightButtonDown += (s, e) => Erase();
-            MouseRightButtonUp += (s, e) => Idle();
+            drawCursor.Moved += DrawCursor_Moved;
+            drawCursor.Draw += (s, e) => drawCanvas.Mark(
+                drawCursor.RelativePosition(drawCanvas), drawCursor.Size, drawCursor.Type.round);
+            drawCursor.Erase += (s, e) => drawCanvas.Erase(
+                drawCursor.RelativePosition(drawCanvas), drawCursor.Size, drawCursor.Type.round);
+            drawCursor.Idle += (s, e) => drawCanvas.ClearPrevious();
 
+            // Button events
             clearButton.Clicked += (s, e) => drawCanvas.InitializeCanvas();
-        }
-
-        /// <summary>
-        /// Draw at cursor
-        /// </summary>
-        private void Draw() {
-            Point p = CursorPosition();
-            drawCursor.Type = CanvasCursor.CursorType.Draw;
-            drawCanvas.Mark(p, drawCursor.Size);
-        }
-
-        /// <summary>
-        /// Erase at cursor
-        /// </summary>
-        private void Erase() {
-            Point p = CursorPosition();
-            drawCursor.Type = CanvasCursor.CursorType.Erase;
-            drawCanvas.Erase(p, drawCursor.Size);
-        }
-
-        /// <summary>
-        /// Return to idle
-        /// </summary>
-        private void Idle() {
-            drawCursor.Type = CanvasCursor.CursorType.Idle;
-            drawCanvas.ClearPrevious();
         }
 
         /// <summary>
@@ -68,27 +44,24 @@ namespace gbtis {
         /// </summary>
         /// <param name="sender">Source of the event</param>
         /// <param name="e">Event parameters</param>
-        private void CanvasWindow_MouseMove(object sender, MouseEventArgs e) {
+        private void DrawCursor_Moved(object sender, EventArgs e) {
             this.Dispatcher.Invoke(() => {
                 // Update cursor position
-                Point p = CursorPosition();
+                Point p = drawCursor.RelativePosition(drawCanvas);
                 drawCursor.Position = p;
 
                 // Test canvas borders
-                if (!isInRange(p.X, 0, drawCanvas.ActualWidth - 1) && isInRange(p.Y, 0, drawCanvas.ActualHeight - 1)) {
-                    // Perform on the spot
-                    if (Mouse.LeftButton == MouseButtonState.Pressed)
-                        Draw();
-                    else if (Mouse.RightButton == MouseButtonState.Pressed)
-                        Erase();
-                } else {
+                if (!isInRange(p.X, 0, drawCanvas.ActualWidth - 1) || !isInRange(p.Y, 0, drawCanvas.ActualHeight - 1)) {
                     drawCursor.Type = CanvasCursor.CursorType.Missing;
+                } else if (drawCursor.Type == CanvasCursor.CursorType.Missing) {
+                    drawCursor.Type = CanvasCursor.CursorType.Idle;
                 }
 
+                // Test button
                 clearButton.CursorOver(Mouse.GetPosition(this));
             });
         }
-
+        
         /// <summary>
         /// Update the camera feed from the sensor
         /// </summary>
@@ -136,7 +109,7 @@ namespace gbtis {
         /// <param name="max">Maximum value</param>
         /// <returns>True if in range</returns>
         private bool isInRange(double n, double min, double max) {
-            return (n < min) || (n > max);
+            return (n >= min) && (n <= max);
         }
 
         /// <summary>

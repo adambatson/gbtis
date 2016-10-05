@@ -19,7 +19,10 @@ namespace gbtis {
     /// Interaction logic for HoverButton.xaml
     /// </summary>
     public partial class HoverButton : UserControl {
-        public const double BOUNCE_RATE = 3.5;
+        public const float COMPLETION_TIME = 0.75f;
+        public const float UNDO_MULTIPLIER = 2.0f;
+
+        private float completion;
         private bool over;
         private bool done;
 
@@ -33,7 +36,8 @@ namespace gbtis {
 
         public HoverButton() {
             InitializeComponent();
-            over = false;
+            over = done = false;
+            completion = 0;
 
             Timer t = new Timer(50);
             t.Elapsed += T_Elapsed;
@@ -41,40 +45,63 @@ namespace gbtis {
         }
 
         public bool CursorOver(Point cursor) {
-            Point self = this.PointFromScreen(cursor);
+            Window parentWindow = Window.GetWindow(this);
+            Point self = parentWindow.TransformToDescendant(this).Transform(cursor);
             over =
-                self.X >= 0 && self.X < ActualWidth &&
-                self.Y >= 0 && self.Y < ActualHeight;
+                self.X >= 0 && self.X <= ActualWidth &&
+                self.Y >= 0 && self.Y <= ActualHeight;
             return over;
         }
 
         private void clicked() {
             if (done) return;
+            done = true;
 
             Clicked?.Invoke(this, new EventArgs());
-            borderBox.BorderBrush = new SolidColorBrush(Colors.Black);
-            textBox.Foreground = new SolidColorBrush(Colors.Black);
-            done = true;
+
+            try {
+                this.Dispatcher.Invoke(() => {
+                    borderBox.BorderBrush = new SolidColorBrush(Colors.Black);
+                    textBox.Foreground = new SolidColorBrush(Colors.Black);
+                });
+            } catch (OperationCanceledException) { }
         }
 
         private void T_Elapsed(object sender, ElapsedEventArgs e) {
+            if (!over) {
+                completion -= completionRate() * UNDO_MULTIPLIER;
+                if (completion < 0) completion = 0;
+
+                if (done) {
+                    done = false;
+
+                    try {
+                        this.Dispatcher.Invoke(() => {
+                            borderBox.BorderBrush = new SolidColorBrush(Colors.Teal);
+                            textBox.Foreground = new SolidColorBrush(Colors.Teal);
+                        });
+                    } catch (OperationCanceledException) { }
+                }
+            }
+
+            if (over && !done) {
+                completion += completionRate();
+                if (completion > 1) {
+                    completion = 1;
+                    clicked();
+                }
+            }
+
             try {
                 this.Dispatcher.Invoke(() => {
-                    if (done && !over) {
-                        done = false;
-                        borderBox.BorderBrush = new SolidColorBrush(Colors.Teal);
-                        textBox.Foreground = new SolidColorBrush(Colors.Teal);
-                    }
-
-                    double radius = borderBox.CornerRadius.TopLeft + ((over) ? BOUNCE_RATE : -BOUNCE_RATE);
-                    if (radius < 0) radius = 0;
-                    if (radius > ActualHeight / 2) {
-                        radius = ActualHeight / 2;
-                        clicked();
-                    }
+                    double radius = (ActualHeight/2) * completion;
                     borderBox.CornerRadius = new CornerRadius(radius);
                 });
             } catch (OperationCanceledException) { }
+        }
+
+        private float completionRate() {
+            return 1f / COMPLETION_TIME * 0.05f;
         }
     }
 }

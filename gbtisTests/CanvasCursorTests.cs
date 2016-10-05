@@ -25,7 +25,7 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestMovedEvent() {
+        public void TestMovedMouseEvent() {
             bool passFlag = false;
             cursor.Moved += (s, e) => {
                 if (cursor.Position == Mouse.GetPosition(stub))
@@ -46,7 +46,7 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestDrawEvent() {
+        public void TestDrawMouseEvent() {
             bool passFlag = false;
             cursor.Draw += (s, e) => {
                 if (cursor.Type == CanvasCursor.CursorType.Draw)
@@ -67,7 +67,7 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestEraseEvent() {
+        public void TestEraseMouseEvent() {
             bool passFlag = false;
             cursor.Erase += (s, e) => {
                 if (cursor.Type == CanvasCursor.CursorType.Erase)

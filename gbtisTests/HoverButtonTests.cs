@@ -49,13 +49,13 @@ namespace gbtis.Tests {
             };
 
             button.CursorOver(BUTTON_RECT.TopLeft);
-            Timer t = new Timer(HoverButton.COMPLETION_TIME*1000 + 1000);
+            Timer t = new Timer(60000);
             t.Start();
             t.Elapsed += (s, e) => {
                 t.Stop();
             };
 
-            while (t.Enabled) ;
+            while (!passFlag) ;
             Assert.IsTrue(passFlag);
         }
 

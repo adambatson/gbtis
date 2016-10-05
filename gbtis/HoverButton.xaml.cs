@@ -22,28 +22,41 @@ namespace gbtis {
         public const float COMPLETION_TIME = 0.75f;
         public const float UNDO_MULTIPLIER = 2.0f;
 
+        Timer t;
         private float completion;
         private bool over;
         private bool done;
+        private bool black;
 
         public event EventHandler Clicked;
 
+        /// <summary>
+        /// Register the Text property of the hoverbutton control
+        /// </summary>
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(String), typeof(HoverButton), new PropertyMetadata(""));
         public String Text {
             get { return (String)this.GetValue(TextProperty); }
             set { this.SetValue(TextProperty, value); }
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public HoverButton() {
             InitializeComponent();
-            over = done = false;
+            over = done = black = false;
             completion = 0;
 
-            Timer t = new Timer(50);
+            t = new Timer(50);
             t.Elapsed += T_Elapsed;
             t.Start();
         }
 
+        /// <summary>
+        /// Test the cursor's position against the button
+        /// </summary>
+        /// <param name="cursor">Coordinates of the cursor</param>
+        /// <returns></returns>
         public bool CursorOver(Point cursor) {
             Window parentWindow = Window.GetWindow(this);
             Point self = parentWindow.TransformToDescendant(this).Transform(cursor);
@@ -53,6 +66,9 @@ namespace gbtis {
             return over;
         }
 
+        /// <summary>
+        /// Activates the Clicked event and changes the look of the control
+        /// </summary>
         private void clicked() {
             if (done) return;
             done = true;
@@ -61,29 +77,40 @@ namespace gbtis {
 
             try {
                 this.Dispatcher.Invoke(() => {
-                    borderBox.BorderBrush = new SolidColorBrush(Colors.Black);
-                    textBox.Foreground = new SolidColorBrush(Colors.Black);
+                    if (!black)
+                        textBox.Foreground = new SolidColorBrush(Colors.Black);
+                    black = true;
                 });
             } catch (OperationCanceledException) { }
         }
 
+        /// <summary>
+        /// Timed event to check the button's progress
+        /// </summary>
+        /// <param name="sender">Source of the event</param>
+        /// <param name="e">Event args</param>
         private void T_Elapsed(object sender, ElapsedEventArgs e) {
             if (!over) {
+                // User is not on the button. Reverse progress
                 completion -= completionRate() * UNDO_MULTIPLIER;
                 if (completion < 0) completion = 0;
 
+                // No longer over the button, and finished the animation. Reset.
                 if (done) {
                     done = false;
+                    completion = 0;
 
-                    try {
-                        this.Dispatcher.Invoke(() => {
-                            borderBox.BorderBrush = new SolidColorBrush(Colors.Teal);
-                            textBox.Foreground = new SolidColorBrush(Colors.Teal);
-                        });
-                    } catch (OperationCanceledException) { }
+                    if (black) {
+                        try {
+                            this.Dispatcher.Invoke(() => {
+                                textBox.Foreground = new SolidColorBrush(Colors.Teal);
+                            });
+                        } catch (OperationCanceledException) { }
+                    }
                 }
             }
 
+            // Over the button. Progress towards the event
             if (over && !done) {
                 completion += completionRate();
                 if (completion > 1) {
@@ -92,14 +119,18 @@ namespace gbtis {
                 }
             }
 
+            // Update Button look to reflect progress
             try {
                 this.Dispatcher.Invoke(() => {
-                    double radius = (ActualHeight/2) * completion;
-                    borderBox.CornerRadius = new CornerRadius(radius);
+                    progressBlack.Offset = progressTeal.Offset = 1 - completion;
                 });
             } catch (OperationCanceledException) { }
         }
 
+        /// <summary>
+        /// Turn the completion time from seconds to a delta per tick
+        /// </summary>
+        /// <returns>Completion delta</returns>
         private float completionRate() {
             return 1f / COMPLETION_TIME * 0.05f;
         }

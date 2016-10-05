@@ -28,7 +28,6 @@ namespace gbtis {
 
             //Sarting the timer to shoot out event "TOCK" every 50 ms
             timer = new Timer(TICK);
-            //Either send out events or giving free reign to the clock
             timer.Elapsed += ticker;
             timer.Start();
             ticker(null, null);

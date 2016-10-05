@@ -19,13 +19,7 @@ namespace gbtis {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
 
-            // Start the admin window
-            AdminWindow admin = new AdminWindow();
-            admin.Show();
-
-            // Start the standby window
-            StandbyWindow standby = new StandbyWindow(sensor);
-            standby.Show();
+            UIController uicont = new UIController(sensor);
         }
     }
 }

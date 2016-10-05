@@ -10,11 +10,10 @@ namespace gbtis {
     class UIController {
         // Timer set to tick every 50 ms
         public static int TICK = 50;
-        public event EventHandler Tock;
+        public static event EventHandler Tock;
 
         AdminWindow admin;
         StandbyWindow standby;
-        Timer timer;
 
         public UIController(KinectSensor _sensor) {
             //Starting and showing the standby window
@@ -26,8 +25,12 @@ namespace gbtis {
             adminHandler();
             admin.Show();
 
+            startTimer();
+        }
+
+        public static void startTimer() {
             //Sarting the timer to shoot out event "TOCK" every 50 ms
-            timer = new Timer(TICK);
+            Timer timer = new Timer(TICK);
             timer.Elapsed += ticker;
             timer.Start();
             ticker(null, null);
@@ -35,7 +38,6 @@ namespace gbtis {
 
         private void adminHandler() {
             admin.Exit += (s, e) => { exitAll(); };
-            admin.About += (s, e) => { };
             admin.Standby += (s, e) => { standby.Show(); };
         }
 
@@ -51,8 +53,8 @@ namespace gbtis {
             catch (InvalidOperationException e){}  
         }
 
-        private void ticker(object sender, EventArgs args) {
-            Tock?.Invoke(this, args);
+        private static void ticker(object sender, EventArgs args) {
+            Tock?.Invoke(null, args);
         }
 
     }

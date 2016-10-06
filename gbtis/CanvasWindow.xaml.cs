@@ -27,7 +27,7 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow() {
             InitializeComponent();
-            //Mouse.OverrideCursor = Cursors.None;
+            Mouse.OverrideCursor = Cursors.None;
             drawCursor.Type = CanvasCursor.CursorType.Idle;
 
             // Set up cursor update events

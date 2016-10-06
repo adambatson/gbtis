@@ -27,7 +27,7 @@ namespace gbtis {
         private float completion;
         private bool over;
         private bool done;
-        private bool black;
+        private bool reset;
 
         public event EventHandler Clicked;
 
@@ -55,7 +55,7 @@ namespace gbtis {
         public HoverButton() {
             InitializeComponent();
             (this.Content as FrameworkElement).DataContext = this;
-            over = done = black = false;
+            over = done = reset = false;
             completion = 0;
             
             t = new Timer(50);
@@ -88,10 +88,8 @@ namespace gbtis {
 
             try {
                 this.Dispatcher.Invoke(() => {
-                    if (!black) {
-                        textBox.Foreground = new SolidColorBrush(Colors.Black);
-                        black = true;
-                    }
+                    textBox.Foreground = new SolidColorBrush(Colors.Black);
+                    reset = true;
                 });
             } catch (OperationCanceledException) { }
         }
@@ -111,24 +109,21 @@ namespace gbtis {
                 if (done) {
                     done = false;
                     completion = 0;
+                }
 
-                    if (black) {
-                        try {
-                            this.Dispatcher.Invoke(() => {
-                                if (black) {
-                                    black = false;
-                                    textBox.Foreground = new SolidColorBrush(this.Color);
-                                }
-                            });
-                        } catch (OperationCanceledException) { }
-                    }
+                if (reset) {
+                    try {
+                        this.Dispatcher.Invoke(() => {
+                            textBox.Foreground = new SolidColorBrush(Colors.White);
+                        });
+                    } catch (OperationCanceledException) { }
                 }
             }
 
             // Over the button. Progress towards the event
             if (over && !done) {
                 completion += completionRate();
-                if (completion > 1) {
+                if (completion >= 1) {
                     completion = 1;
                     clicked();
                 }

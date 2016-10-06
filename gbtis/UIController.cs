@@ -14,9 +14,10 @@ namespace gbtis {
 
         AdminWindow admin;
         StandbyWindow standby;
+        CanvasWindow canvas;
 
         public UIController(KinectSensor _sensor) {
-            //Starting and showing the standby window
+            //Starting the standby window
             standby = new StandbyWindow(_sensor);
             standbyHandler();
 
@@ -25,15 +26,23 @@ namespace gbtis {
             adminHandler();
             admin.Show();
 
+            //Starting the canvas screen
+            canvas = new CanvasWindow();
+            canvasHandler();
+
             startTimer();
         }
 
         public static void startTimer() {
             //Sarting the timer to shoot out event "TOCK" every 50 ms
             Timer timer = new Timer(TICK);
-            timer.Elapsed += ticker;
+            timer.Elapsed += (s, e) => Tock?.Invoke(timer, new EventArgs()); ;
             timer.Start();
-            ticker(null, null);
+        }
+
+        private void canvasHandler() {
+            canvas.Cancel += (s, e) => { canvas.Hide(); standby.Show(); };
+            canvas.Continue += (s, e) => { canvas.Hide(); standby.Show(); };
         }
 
         private void adminHandler() {
@@ -52,10 +61,5 @@ namespace gbtis {
             }
             catch (InvalidOperationException e){}  
         }
-
-        private static void ticker(object sender, EventArgs args) {
-            Tock?.Invoke(null, args);
-        }
-
     }
 }

@@ -77,6 +77,34 @@ namespace gbtis {
         }
 
         /// <summary>
+        /// Blank out the canvas
+        /// </summary>
+        public void ClearCanvas() {
+            try {
+                this.Dispatcher.Invoke(() => {
+                    for (int i = 0; i < pixels.Length; i++)
+                        pixels[i] = 0xFF;
+                });
+            } catch (OperationCanceledException) { }
+        }
+
+        /// <summary>
+        /// Get a copy of the canvas image
+        /// </summary>
+        /// <returns>The image</returns>
+        public ImageSource Image() {
+            return content.Source.Clone();
+        }
+
+        /// <summary>
+        /// Get the pixel array for the canvas
+        /// </summary>
+        /// <returns>The array of rgba pixels</returns>
+        public byte[] Pixels() {
+            return (byte[]) pixels.Clone();
+        }
+
+        /// <summary>
         /// Get the slope of the line between 2 points
         /// </summary>
         /// <param name="src">Source point</param>
@@ -155,6 +183,8 @@ namespace gbtis {
                         radialUpdate(new Point(x, y), size, rounded, mode);
                     }
                 }
+            } else {
+                radialUpdate(p, size, rounded, mode);
             }
 
             // Update previous draw position
@@ -174,8 +204,8 @@ namespace gbtis {
                 size /= 2;
 
             // Go over every point in range
-            for (int x = (int)p.X - size; x < (int)p.X + size; x++) {
-                for (int y = (int)p.Y - size; y < (int)p.Y + size; y++) {
+            for (int x = (int)p.X - size; x <= (int)p.X + size; x++) {
+                for (int y = (int)p.Y - size; y <= (int)p.Y + size; y++) {
                     // Check corners
                     if (rounded) {
                         int d = (int)(Math.Pow((int)p.X - x, 2) + Math.Pow((int)p.Y - y, 2));

@@ -27,7 +27,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <local:HoverButton x:Name="clearButton" Margin="10" Grid.Row="0" Grid.Column="0" Text="Clear" />
+        <local:HoverButton x:Name="clearButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="0" Text="Clear" Color="Teal" />
+        <local:HoverButton x:Name="cancelButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="1" Text="Cancel" Color="Crimson" />
+        <local:HoverButton x:Name="continueButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="2" Text="Continue" Color="ForestGreen" />
 
         <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
             <Grid>

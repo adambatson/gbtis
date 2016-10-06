@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,16 @@ namespace gbtis {
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(String), typeof(HoverButton), new PropertyMetadata(""));
         public String Text {
             get { return (String)this.GetValue(TextProperty); }
-            set { this.SetValue(TextProperty, value); }
+            set { SetValue(TextProperty, value); }
+        }
+
+        /// <summary>
+        /// Register the Color property of the hoverbutton control
+        /// </summary>
+        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(HoverButton), new PropertyMetadata(Colors.Black));
+        public Color Color {
+            get { return (Color)this.GetValue(ColorProperty); }
+            set { SetValue(ColorProperty, value); }
         }
 
         /// <summary>
@@ -44,9 +54,10 @@ namespace gbtis {
         /// </summary>
         public HoverButton() {
             InitializeComponent();
+            (this.Content as FrameworkElement).DataContext = this;
             over = done = black = false;
             completion = 0;
-
+            
             t = new Timer(50);
             t.Elapsed += T_Elapsed;
             t.Start();
@@ -77,9 +88,10 @@ namespace gbtis {
 
             try {
                 this.Dispatcher.Invoke(() => {
-                    if (!black)
+                    if (!black) {
                         textBox.Foreground = new SolidColorBrush(Colors.Black);
-                    black = true;
+                        black = true;
+                    }
                 });
             } catch (OperationCanceledException) { }
         }
@@ -103,7 +115,10 @@ namespace gbtis {
                     if (black) {
                         try {
                             this.Dispatcher.Invoke(() => {
-                                textBox.Foreground = new SolidColorBrush(Colors.Teal);
+                                if (black) {
+                                    black = false;
+                                    textBox.Foreground = new SolidColorBrush(this.Color);
+                                }
                             });
                         } catch (OperationCanceledException) { }
                     }
@@ -122,7 +137,7 @@ namespace gbtis {
             // Update Button look to reflect progress
             try {
                 this.Dispatcher.Invoke(() => {
-                    progressBlack.Offset = progressTeal.Offset = 1 - completion;
+                    progressBlack.Offset = progressColor.Offset = 1 - completion;
                 });
             } catch (OperationCanceledException) { }
         }

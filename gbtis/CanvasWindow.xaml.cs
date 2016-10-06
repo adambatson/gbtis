@@ -19,6 +19,9 @@ namespace gbtis {
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
+        public event EventHandler Cancel;
+        public event EventHandler Continue;
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -36,7 +39,25 @@ namespace gbtis {
             drawCursor.Idle += (s, e) => drawCanvas.ClearPrevious();
 
             // Button events
-            clearButton.Clicked += (s, e) => drawCanvas.InitializeCanvas();
+            clearButton.Clicked += (s, e) => drawCanvas.ClearCanvas();
+            cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
+            continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// Get the canvas' current image
+        /// </summary>
+        /// <returns>The canvas ImageSource</returns>
+        public ImageSource Image() {
+            return drawCanvas.Image();
+        }
+
+        /// <summary>
+        /// Get the raw pixel data from the canvas
+        /// </summary>
+        /// <returns>RGBA pixel data</returns>
+        public byte[] Pixels() {
+            return drawCanvas.Pixels();
         }
 
         /// <summary>
@@ -59,6 +80,8 @@ namespace gbtis {
 
                 // Test button
                 clearButton.CursorOver(Mouse.GetPosition(this));
+                cancelButton.CursorOver(Mouse.GetPosition(this));
+                continueButton.CursorOver(Mouse.GetPosition(this));
             });
         }
         

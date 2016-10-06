@@ -19,16 +19,13 @@ namespace gbtis {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
 
-            CanvasWindow canvas = new CanvasWindow();
-            canvas.Show();
-
             // Start the admin window
-            //AdminWindow admin = new AdminWindow();
-            //admin.Show();
+            AdminWindow admin = new AdminWindow();
+            admin.Show();
 
             // Start the standby window
-            //StandbyWindow standby = new StandbyWindow(sensor);
-            //standby.Show();
+            StandbyWindow standby = new StandbyWindow(sensor);
+            standby.Show();
         }
     }
 }

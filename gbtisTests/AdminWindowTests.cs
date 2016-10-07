@@ -64,23 +64,6 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestAboutEvent() {
-            window.About += (s, e) => {
-                eventFlag = true;
-            };
-
-            window.helpAboutButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
-            Timer t = new Timer(100);
-            t.Start();
-            t.Elapsed += (s, e) => {
-                t.Stop();
-            };
-
-            while (t.Enabled) ;
-            Assert.IsTrue(eventFlag);
-        }
-
-        [TestMethod()]
         public void TestStandbyEvent() {
             window.Standby += (s, e) => {
                 eventFlag = true;

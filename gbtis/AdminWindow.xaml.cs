@@ -1,6 +1,8 @@
 ﻿using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,13 +22,14 @@ namespace gbtis {
     public partial class AdminWindow : Window {
 
         public event EventHandler Exit;
-        public event EventHandler About;
         public event EventHandler Standby;
+        public event EventHandler Input;
 
         /// <summary>
         /// Initialize the window
         /// </summary>
         public AdminWindow() {
+            DataContext = this;
             InitializeComponent();
         }
 
@@ -47,67 +50,6 @@ namespace gbtis {
         }
 
         /// <summary>
-        /// Signal that a body has arrived in the status monitor
-        /// </summary>
-        /// <param name="id"></param>
-        public void BodyArrived(uint id) {
-            Border child = GetChild(id);
-            if (child != null) {
-                child.Background = new SolidColorBrush(Colors.Gray);
-            }
-        }
-
-        /// <summary>
-        /// Signal that a body left in the status monitor
-        /// </summary>
-        /// <param name="id"></param>
-        public void BodyLeft(uint id) {
-            Border child = GetChild(id);
-            if (child != null) {
-                child.Background = new SolidColorBrush(Colors.White);
-                DeactivateBody(id);
-            }
-        }
-
-        /// <summary>
-        /// Set the active body in the status monitor
-        /// </summary>
-        /// <param name="id">An ID from 0 to 5</param>
-        public void ActivateBody(uint id) {
-            Border child = GetChild(id);
-            if (child != null) {
-                foreach (Border b in bodyStatus.Children) {
-                    b.BorderBrush = new SolidColorBrush(Colors.Black);
-                }
-
-                child.BorderBrush = new SolidColorBrush(Colors.Red);
-            }
-        }
-
-        /// <summary>
-        /// Deactivate a body in the status monitor
-        /// </summary>
-        /// <param name="id">An ID from 0 to 5</param>
-        public void DeactivateBody(uint id) {
-            Border child = GetChild(id);
-            if (child != null) {
-                child.BorderBrush = new SolidColorBrush(Colors.Black);
-            }
-        }
-
-        /// <summary>
-        /// Get a body monitor
-        /// </summary>
-        /// <param name="id">An ID from 0 to 5</param>
-        /// <returns>The Border object of the child</returns>
-        private Border GetChild(uint id) {
-            if (id >= bodyStatus.Children.Count)
-                return null;
-
-            return (Border)bodyStatus.Children[(int)id];
-        }
-
-        /// <summary>
         /// Close the program
         /// </summary>
         /// <param name="sender">Event source</param>
@@ -122,7 +64,12 @@ namespace gbtis {
         /// <param name="sender">Event source</param>
         /// <param name="args">Event args</param>
         private void HelpAbout_Click(object sender, EventArgs args) {
-            About?.Invoke(this, args);
+            MessageBox.Show(
+                Properties.Resources.aboutText,
+                Properties.Resources.aboutTitle,
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
         }
 
         /// <summary>
@@ -132,6 +79,31 @@ namespace gbtis {
         /// <param name="e">Event args</param>
         private void FileStandby_Click(object sender, EventArgs args) {
             Standby?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Start the input mode
+        /// </summary>
+        /// <param name="sender">Event source</param>
+        /// <param name="e">Event args</param>
+        private void FileInput_Click(object sender, EventArgs args) {
+            Input?.Invoke(this, args);
+        }
+
+        private void Event_Selected(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void NewEvent_Click(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void DeleteEvent_Click(object sender, RoutedEventArgs e) {
+
+        }
+
+        private void NewName_Click(object sender, RoutedEventArgs e) {
+
         }
     }
 }

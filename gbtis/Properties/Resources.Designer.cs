@@ -61,7 +61,8 @@ namespace gbtis.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Gesture based text input system\nAdam Batson, Richard Carson, Maxwell DeMelo.
+        ///   Looks up a localized string similar to Gesture based text input system
+        ///Adam Batson, Richard Carson, Maxwell DeMelo.
         /// </summary>
         internal static string aboutText {
             get {

@@ -9,11 +9,12 @@
         Closing="FileExit_Click"
         Title="Admininstration" Height="600" Width="800">
     <Grid>
-
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem x:Name="fileStandbyButton" x:FieldModifier="public"  Header="_Return To Standby" Click="FileStandby_Click" />
+                    <MenuItem x:Name="fileInputButton" x:FieldModifier="public"  Header="_Start Input" Click="FileInput_Click" />
+                    <Separator />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
                 <MenuItem Header="_Help">
@@ -32,63 +33,29 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Border BorderThickness="1,0,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="0">
-                    <Grid x:Name="bodyStatus">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <GroupBox Header="Events" VerticalAlignment="Top" Margin="2.5">
+                        <StackPanel>
+                            <DockPanel LastChildFill="True" Margin="2.5">
+                                <Button Padding="2" DockPanel.Dock="Right" Content="Delete Current Event" Foreground="Red" Margin="2.5" Click="DeleteEvent_Click" />
+                                <ComboBox x:Name="eventsBox" SelectionChanged="Event_Selected" Margin="2.5" />
+                            </DockPanel>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                            <DockPanel LastChildFill="True" Margin="2.5">
+                                <Button Padding="2" Content="Add" DockPanel.Dock="Right" Click="NewEvent_Click" />
+                                <TextBox x:Name="txtEvent" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,5,0" />
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
 
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="0" Grid.Row="0" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="1" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="1" Grid.Row="0" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="2" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="2" Grid.Row="0" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="3" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="0" Grid.Row="1" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="4" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="6" BorderBrush="Black" Grid.Column="1" Grid.Row="1" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="5" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="6" BorderBrush="Black" Grid.Column="2" Grid.Row="1" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="6" />
-                            </Viewbox>
-                        </Border>
-                    </Grid>
-                </Border>
-
+                <local:BodyCounter x:Name="bodies" Grid.Column="1" Grid.Row="0" />
                 <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
                     <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>

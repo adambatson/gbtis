@@ -24,8 +24,8 @@ namespace gbtis {
             admin.Show();
 
             // Start the standby window
-            StandbyWindow standby = new StandbyWindow(sensor);
-            standby.Show();
+            //StandbyWindow standby = new StandbyWindow(sensor);
+            //standby.Show();
         }
     }
 }

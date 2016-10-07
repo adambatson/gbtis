@@ -53,6 +53,17 @@
                             </DockPanel>
                         </StackPanel>
                     </GroupBox>
+
+                    <GroupBox Header="Names" Margin="2.5">
+                        <StackPanel>
+                            <ListBox x:Name="pendingBox" SelectionMode="Single" FontWeight="Bold" BorderThickness="1,1,1,0" />
+                            <ListBox x:Name="namesBox" SelectionChanged="namesBox_SelectionChanged" SelectionMode="Single" BorderThickness="1,0,1,1" />
+                            <DockPanel LastChildFill="False">
+                                <Button x:Name="deleteNameButton" Padding="2" Content="Remove Selected" Click="DeleteName_Click" />
+                                <Button x:Name="approveNameButton" Padding="2" Content="Approve Selected" Click="ApproveName_Click" />
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
                 </StackPanel>
 
                 <local:BodyCounter x:Name="bodies" Grid.Column="1" Grid.Row="0" />

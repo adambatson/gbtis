@@ -1,56 +1,30 @@
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\gbtis.exe.config
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\gbtis.exe
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\gbtis.pdb
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\MainWindow.g.cs
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\App.g.cs
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\MainWindow.baml
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.g.resources
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.exe
-c:\users\adambatson\documents\visual studio 2015\Projects\gbtis\gbtis\obj\Debug\gbtis.pdb
 D:\repositories\gbtis\gbtis\bin\Debug\gbtis.exe.config
 D:\repositories\gbtis\gbtis\bin\Debug\gbtis.exe
 D:\repositories\gbtis\gbtis\bin\Debug\gbtis.pdb
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
+D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\Canvas.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\CanvasWindow.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\CanvasCursor.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\HoverButton.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\App.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\GeneratedInternalTypeHelper.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
+D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.baml
+D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.baml
 D:\repositories\gbtis\gbtis\obj\Debug\StandbyWindow.baml
+D:\repositories\gbtis\gbtis\obj\Debug\Canvas.baml
+D:\repositories\gbtis\gbtis\obj\Debug\CanvasWindow.baml
+D:\repositories\gbtis\gbtis\obj\Debug\CanvasCursor.baml
+D:\repositories\gbtis\gbtis\obj\Debug\HoverButton.baml
+D:\repositories\gbtis\gbtis\obj\Debug\Themes\Generic.baml
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.g.resources
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.exe
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.pdb
-D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
-D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.config
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.pdb
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\App.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.CodeAnalysisLog.xml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.lastcodeanalysissucceeded
-D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.g.cs
-D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.baml
-D:\repositories\gbtis\gbtis\obj\Debug\GeneratedInternalTypeHelper.g.cs
-D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache

@@ -9,13 +9,15 @@
         Closing="FileExit_Click"
         Title="Admininstration" Height="600" Width="800">
     <Grid>
-
         <DockPanel LastChildFill="True">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem x:Name="fileStandbyButton" x:FieldModifier="public"  Header="_Return To Standby" Click="FileStandby_Click" />
+                    <MenuItem x:Name="fileInputButton" x:FieldModifier="public"  Header="_Start Input" Click="FileInput_Click" />
+                    <Separator />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
+
                 <MenuItem Header="_Help">
                     <MenuItem x:Name="helpAboutButton" x:FieldModifier="public" Header="_About" Click="HelpAbout_Click" />
                 </MenuItem>
@@ -32,63 +34,15 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Border BorderThickness="1,0,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="0">
-                    <Grid x:Name="bodyStatus">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <local:NameControl x:Name="nameControl" Grid.RowSpan="2" />
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="0" Grid.Row="0" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="1" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="1" Grid.Row="0" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="2" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="2" Grid.Row="0" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="3" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="5" BorderBrush="Black" Grid.Column="0" Grid.Row="1" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="4" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="6" BorderBrush="Black" Grid.Column="1" Grid.Row="1" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="5" />
-                            </Viewbox>
-                        </Border>
-
-                        <Border BorderThickness="1" CornerRadius="6" BorderBrush="Black" Grid.Column="2" Grid.Row="1" Margin="15">
-                            <Viewbox HorizontalAlignment="Stretch">
-                                <TextBlock FontWeight="Bold" Text="6" />
-                            </Viewbox>
-                        </Border>
-                    </Grid>
-                </Border>
-
+                <local:BodyCounter x:Name="bodies" Grid.Column="1" Grid.Row="0" />
                 <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
                     <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>

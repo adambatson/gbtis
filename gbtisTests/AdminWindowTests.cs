@@ -64,12 +64,12 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestAboutEvent() {
-            window.About += (s, e) => {
+        public void TestStandbyEvent() {
+            window.Standby += (s, e) => {
                 eventFlag = true;
             };
 
-            window.helpAboutButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            window.fileStandbyButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Timer t = new Timer(100);
             t.Start();
             t.Elapsed += (s, e) => {
@@ -81,12 +81,12 @@ namespace gbtis.Tests {
         }
 
         [TestMethod()]
-        public void TestStandbyEvent() {
-            window.Standby += (s, e) => {
+        public void TestInputEvent() {
+            window.Input += (s, e) => {
                 eventFlag = true;
             };
 
-            window.fileStandbyButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            window.fileInputButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Timer t = new Timer(100);
             t.Start();
             t.Elapsed += (s, e) => {

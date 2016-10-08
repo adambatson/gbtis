@@ -56,6 +56,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,6 +79,9 @@
     <Compile Include="AdminWindow.xaml.cs">
       <DependentUpon>AdminWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BodyCounter.xaml.cs">
+      <DependentUpon>BodyCounter.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Canvas.xaml.cs">
       <DependentUpon>Canvas.xaml</DependentUpon>
     </Compile>
@@ -90,6 +94,9 @@
     <Compile Include="HoverButton.xaml.cs">
       <DependentUpon>HoverButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NameControl.xaml.cs">
+      <DependentUpon>NameControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StandbyWindow.xaml.cs">
       <DependentUpon>StandbyWindow.xaml</DependentUpon>
     </Compile>
@@ -99,6 +106,10 @@
     </Compile>
     <Compile Include="TextBlockFadeAnimation.cs" />
     <Page Include="AdminWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BodyCounter.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -115,6 +126,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="HoverButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

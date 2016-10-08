@@ -8,8 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace gbtis {
     //Deleagtes for custom event handlers
-    public delegate void BitMapReadyHandler(Object sender,
-        ImageSource img);
+    public delegate void BitMapReadyHandler(ImageSource img);
     public delegate void WaveGestureHandler();
     public delegate void EasterEggHandler();
 
@@ -74,7 +73,7 @@ namespace gbtis {
                     ImageSource img = ToBitmap(frame);
                     //Allow the image to be accessible outside this thread
                     img.Freeze();
-                    handler?.Invoke(this, img);
+                    handler?.Invoke(img);
                 }
             }
         }

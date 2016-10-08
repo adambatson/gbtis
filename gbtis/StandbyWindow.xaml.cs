@@ -51,9 +51,8 @@ namespace gbtis {
         /// <summary>
         /// Update the camera feed from the sensor
         /// </summary>
-        /// <param name="sender">Object sending the event</param>
-        /// <param name="e">The latest ImageSource</param>
-        void BitMapArrived(object sender, ImageSource img) {
+        /// <param name="img">The latest ImageSource</param>
+        void BitMapArrived(ImageSource img) {
             this.Dispatcher.Invoke(new Action(() =>
                 sensorFeed.Source = img));
         }

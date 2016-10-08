@@ -42,18 +42,23 @@ namespace gbtis {
             DataContext = this;
             InitializeComponent();
 
-            // Force button update
-            namesBox.RaiseEvent(new SelectionChangedEventArgs(
-                ListBox.SelectionChangedEvent, new List<string>(), new List<string>()));
+            nameControl.AddEvent += (s, e) => AddEvent?.Invoke(this, e);
+            nameControl.SelectEvent += (s, e) => SelectEvent?.Invoke(this, e);
+            nameControl.DeleteEvent += (s, e) => DeleteEvent?.Invoke(this, e);
+
+            nameControl.ApproveName += (s, e) => ApproveName?.Invoke(this, e);
+            nameControl.DeleteName += (s, e) => DeleteName?.Invoke(this, e);
         }
 
-        public void bindEventsSource(ObservableCollection<string> src) {
-            eventsBox.ItemsSource = src;
-        }
-
-        public void bindNameSources(ObservableCollection<string> srcPending, ObservableCollection<string> srcApproved) {
-            pendingBox.ItemsSource = srcPending;
-            namesBox.ItemsSource = srcApproved;
+        /// <summary>
+        /// Bind the lists for the window's database manager
+        /// </summary>
+        /// <param name="events">List of events</param>
+        /// <param name="namesPending">List of pendiing names</param>
+        /// <param name="namesApproved">List of approved names</param>
+        public void BindDataSources(ObservableCollection<string> events, ObservableCollection<string> namesPending, ObservableCollection<string> namesApproved) {
+            nameControl.bindEventsSource(events);
+            nameControl.bindNameSources(namesPending, namesApproved);
         }
 
         /// <summary>
@@ -113,69 +118,7 @@ namespace gbtis {
             Input?.Invoke(this, args);
         }
 
-        private void Event_Selected(object sender, RoutedEventArgs e) {
-            ComboBox box = (ComboBox)sender;
-            string eventName = (String)box.SelectedItem;
-
-            SelectEvent?.Invoke(this, new NamedEventArgs(eventName));
-        }
-
-        private void NewEvent_Click(object sender, RoutedEventArgs e) {
-            string eventName = txtEvent.Text;
-            if (eventName.Trim().Length > 0) {
-                AddEvent?.Invoke(this, new NamedEventArgs(eventName));
-            }
-        }
-
-        private void DeleteEvent_Click(object sender, RoutedEventArgs e) {
-            string eventName = (String)eventsBox.SelectedItem;
-            if (eventName == null) return;
-
-            MessageBoxResult result = MessageBox.Show(
-                string.Format("Really delete event {0} and all associated names?\nThis cannot be undone.", eventName),
-                "Confirm event deletion",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning,
-                MessageBoxResult.No);
-
-            if (result == MessageBoxResult.Yes)
-                DeleteEvent?.Invoke(this, new NamedEventArgs(eventName));
-        }
-
-        private void DeleteName_Click(object sender, RoutedEventArgs e) {
-            string name = (String)namesBox.SelectedItem;
-            if (name == null) return;
-
-            MessageBoxResult result = MessageBox.Show(
-                string.Format("Remove '{0}' from the current event?", name),
-                "Confirm name deletion",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning,
-                MessageBoxResult.No);
-
-            if (result == MessageBoxResult.Yes)
-                DeleteName?.Invoke(this, new NamedEventArgs(name));
-        }
-
-        private void ApproveName_Click(object sender, RoutedEventArgs e) {
-            string name = (String)pendingBox.SelectedItem;
-            if (name == null) return;
-
-            ApproveName?.Invoke(this, new NamedEventArgs(name));
-        }
-
-        private void namesBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            ListBox box = (ListBox)sender;
-            deleteNameButton.IsEnabled = (box.SelectedIndex != -1) ? true : false;
-            approveNameButton.IsEnabled = (box.SelectedIndex != -1) ? true : false;
-        }
-
+        // Events that pass along a string
         public delegate void NamedEventHandler(object sender, NamedEventArgs args);
-        public class NamedEventArgs : EventArgs {
-            public String Text { get; set; }
-            public NamedEventArgs(String text) : base() {
-                Text = text;
-            }
-        }
     }
 }

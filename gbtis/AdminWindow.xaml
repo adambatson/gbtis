@@ -17,6 +17,7 @@
                     <Separator />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
+
                 <MenuItem Header="_Help">
                     <MenuItem x:Name="helpAboutButton" x:FieldModifier="public" Header="_About" Click="HelpAbout_Click" />
                 </MenuItem>
@@ -39,32 +40,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <StackPanel>
-                    <GroupBox Header="Events" VerticalAlignment="Top" Margin="2.5">
-                        <StackPanel>
-                            <DockPanel LastChildFill="True" Margin="2.5">
-                                <Button Padding="2" DockPanel.Dock="Right" Content="Delete Current Event" Foreground="Red" Margin="2.5" Click="DeleteEvent_Click" />
-                                <ComboBox x:Name="eventsBox" SelectionChanged="Event_Selected" Margin="2.5" />
-                            </DockPanel>
-
-                            <DockPanel LastChildFill="True" Margin="2.5">
-                                <Button Padding="2" Content="Add" DockPanel.Dock="Right" Click="NewEvent_Click" />
-                                <TextBox x:Name="txtEvent" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,5,0" />
-                            </DockPanel>
-                        </StackPanel>
-                    </GroupBox>
-
-                    <GroupBox Header="Names" Margin="2.5">
-                        <StackPanel>
-                            <ListBox x:Name="pendingBox" SelectionMode="Single" FontWeight="Bold" BorderThickness="1,1,1,0" />
-                            <ListBox x:Name="namesBox" SelectionChanged="namesBox_SelectionChanged" SelectionMode="Single" BorderThickness="1,0,1,1" />
-                            <DockPanel LastChildFill="False">
-                                <Button x:Name="deleteNameButton" Padding="2" Content="Remove Selected" Click="DeleteName_Click" />
-                                <Button x:Name="approveNameButton" Padding="2" Content="Approve Selected" Click="ApproveName_Click" />
-                            </DockPanel>
-                        </StackPanel>
-                    </GroupBox>
-                </StackPanel>
+                <local:NameControl x:Name="nameControl" Grid.RowSpan="2" />
 
                 <local:BodyCounter x:Name="bodies" Grid.Column="1" Grid.Row="0" />
                 <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="1">

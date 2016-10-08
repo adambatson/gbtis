@@ -79,5 +79,22 @@ namespace gbtis.Tests {
             while (t.Enabled) ;
             Assert.IsTrue(eventFlag);
         }
+
+        [TestMethod()]
+        public void TestInputEvent() {
+            window.Input += (s, e) => {
+                eventFlag = true;
+            };
+
+            window.fileInputButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Timer t = new Timer(100);
+            t.Start();
+            t.Elapsed += (s, e) => {
+                t.Stop();
+            };
+
+            while (t.Enabled) ;
+            Assert.IsTrue(eventFlag);
+        }
     }
 }

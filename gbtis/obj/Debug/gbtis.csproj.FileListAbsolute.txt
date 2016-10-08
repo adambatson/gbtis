@@ -3,7 +3,6 @@ D:\repositories\gbtis\gbtis\bin\Debug\gbtis.exe
 D:\repositories\gbtis\gbtis\bin\Debug\gbtis.pdb
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
-D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
 D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\Canvas.g.cs
@@ -58,3 +57,6 @@ C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Themes\Generic.baml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
+D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+D:\repositories\gbtis\gbtis\obj\Debug\NameControl.g.cs
+D:\repositories\gbtis\gbtis\obj\Debug\NameControl.baml

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Kinect;
+using Microsoft.Kinect.VisualGestureBuilder;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -8,6 +10,8 @@ namespace gbtis {
     //Deleagtes for custom event handlers
     public delegate void BitMapReadyHandler(Object sender,
         ImageSource img);
+    public delegate void WaveGestureHandler();
+    public delegate void EasterEggHandler();
 
     /// <summary>
     /// Kinect Wrapper Class
@@ -16,9 +20,19 @@ namespace gbtis {
 
         //Events
         public event BitMapReadyHandler BitMapReady;
+        public event WaveGestureHandler WaveGestureOccured;
+        public event EasterEggHandler EasterEggGestureOccured;
 
         private KinectSensor sensor;
         private MultiSourceFrameReader frameReader;
+
+        //Gestures
+        private Gesture waveGesture, easterEgg;
+        private VisualGestureBuilderDatabase db;
+        private Body[] bodies;
+        private BodyFrameReader bodyReader;
+        private VisualGestureBuilderFrameSource gestureSource;
+        private VisualGestureBuilderFrameReader gestureReader;
 
         public Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -32,6 +46,10 @@ namespace gbtis {
             // Prepare sensor feed
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
             frameReader.MultiSourceFrameArrived += frameReader_frameArrived;
+
+            OpenBodyReader();
+            OpenGestureReader();
+
         }
 
         /// <summary>
@@ -82,6 +100,84 @@ namespace gbtis {
 
             int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
+        }
+
+        private void OpenBodyReader() {
+            if (bodies == null) {
+                bodies = new Body[this.sensor.BodyFrameSource.BodyCount];
+            }
+            bodyReader = this.sensor.BodyFrameSource.OpenReader();
+            bodyReader.FrameArrived += OnBodyFrameArrived;
+        }
+
+        private void OpenGestureReader() {
+
+            // we assume that this file exists and will load
+            db = new VisualGestureBuilderDatabase(
+              @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\gbtisg.gbd");
+
+            // we assume that this gesture is in that database (it should be, it's the only
+            // gesture in there).
+            waveGesture = db.AvailableGestures.Where(g => g.Name == "wave").Single();
+
+            easterEgg = db.AvailableGestures.Where(g => g.Name == "dab").Single();
+            gestureSource = new VisualGestureBuilderFrameSource(sensor, 0);
+            gestureReader = this.gestureSource.OpenReader();
+
+            gestureSource.AddGestures(db.AvailableGestures);
+            gestureSource.TrackingIdLost += OnTrackingIdLost;
+
+            gestureReader.IsPaused = true;
+            gestureReader.FrameArrived += OnGestureFrameArrived;
+        }
+
+        private void OnBodyFrameArrived(object sender, BodyFrameArrivedEventArgs e) {
+            using (var frame = e.FrameReference.AcquireFrame()) {
+                if (frame != null) {
+                    frame.GetAndRefreshBodyData(bodies);
+
+                    var trackedBody = bodies.Where(b => b.IsTracked).FirstOrDefault();
+
+                    if (trackedBody != null) {
+                        if (gestureReader.IsPaused) {
+                            gestureSource.TrackingId = trackedBody.TrackingId;
+                            gestureReader.IsPaused = false;
+                        }
+                    } else {
+                        OnTrackingIdLost(null, null);
+                    }
+                }
+            }
+        }
+
+        private void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
+            gestureReader.IsPaused = true;
+        }
+
+        private void OnGestureFrameArrived(object sender,
+            VisualGestureBuilderFrameArrivedEventArgs e) {
+            using (var frame = e.FrameReference.AcquireFrame()) {
+                if (frame != null) {
+                    var result = frame.DiscreteGestureResults;
+
+                    if (result != null) {
+                        if (result.ContainsKey(waveGesture)) {
+                            var gesture = result[waveGesture];
+                            if (gesture.Confidence > 0.5) {
+                                WaveGestureHandler handler = WaveGestureOccured;
+                                handler?.Invoke();
+                            }
+                        }
+                        if (result.ContainsKey(easterEgg)) {
+                            var gesture = result[easterEgg];
+                            if (gesture.Confidence > 0.5) {
+                                EasterEggHandler handler = EasterEggGestureOccured;
+                                handler?.Invoke();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

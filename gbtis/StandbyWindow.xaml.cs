@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Media;
 using System.Timers;
 using System.Windows;
 using System.Windows.Media;
@@ -32,6 +33,8 @@ namespace gbtis {
                 gbtis.Properties.Resources.msgNoSensor;
 
             kinect.BitMapReady += BitMapArrived;
+            kinect.WaveGestureOccured += WaveGestureArrived;
+            kinect.EasterEggGestureOccured += EasterEggArrived;
 
             // Initialize the names
             topName.Text = "";
@@ -53,6 +56,21 @@ namespace gbtis {
         void BitMapArrived(object sender, ImageSource img) {
             this.Dispatcher.Invoke(new Action(() =>
                 sensorFeed.Source = img));
+        }
+
+        private void WaveGestureArrived() {
+            this.Dispatcher.Invoke(() => {
+                standbyMsg.Text = "You just waved!";
+            });
+        }
+
+        private void EasterEggArrived() {
+            this.Dispatcher.Invoke(() => {
+                standbyMsg.Text = "Bruh.";
+                SoundPlayer player = new SoundPlayer(
+                    @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\excellent.wav");
+                player.Play();
+            });
         }
 
         /// <summary>

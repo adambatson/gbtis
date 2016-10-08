@@ -26,24 +26,24 @@ namespace gbtis {
         public event EventHandler Exit;
 
         // For the kinect display
-        KinectSensor sensor;
+        Kinect kinect;
         MultiSourceFrameReader frameReader;
 
         /// <summary>
         /// Constructor for the standby window
         /// </summary>
         /// <param name="_sensor">An open kinect sensor, or null</param>
-        public StandbyWindow(KinectSensor _sensor) {
+        public StandbyWindow(Kinect kinect) {
             InitializeComponent();
+            this.kinect = kinect;
 
             // Initialize load text
-            standbyMsg.Text = (_sensor.IsAvailable) ? 
+            standbyMsg.Text = (kinect.isAvailable()) ? 
                 gbtis.Properties.Resources.msgStart :
                 gbtis.Properties.Resources.msgNoSensor;
 
             // Prepare sensor feed
-            this.sensor = _sensor;
-            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
+            frameReader = kinect.sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
             frameReader.MultiSourceFrameArrived += FrameReader_MultiSourceFrameArrived;
 
             // Initialize the names

@@ -1,21 +1,24 @@
 ﻿using Microsoft.Kinect;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace gbtis {
+    //Deleagtes for custom event handlers
+    public delegate void BitMapReadyHandler(Object sender,
+        ImageSource img);
 
     /// <summary>
     /// Kinect Wrapper Class
     /// </summary>
     public class Kinect {
 
-        public KinectSensor sensor {
-            get;
-        }
+        //Events
+        public event BitMapReadyHandler BitMapReady;
+
+        private KinectSensor sensor;
+        private MultiSourceFrameReader frameReader;
 
         public Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -25,10 +28,60 @@ namespace gbtis {
             //that IsAvailable becomes true before anyone calls the
             //isAvailable() method.
             Thread.Sleep(500);
+
+            // Prepare sensor feed
+            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
+            frameReader.MultiSourceFrameArrived += frameReader_frameArrived;
         }
 
+        /// <summary>
+        /// Determines if the Kinect Sensor if available for use
+        /// </summary>
+        /// <returns>true if the sensor is available else false</returns>
         public Boolean isAvailable() {
             return sensor != null && sensor.IsAvailable;
+        }
+
+        /// <summary>
+        /// Generates an ImageSource based on the latest MultiSourceFrame
+        /// and triggers a BitMapReady event
+        /// </summary>
+        /// <param name="sender">The Sender of the frame (Kinect.sensor)</param>
+        /// <param name="e">The MultiSourceFrameEventArgs</param>
+        private void frameReader_frameArrived(Object sender, MultiSourceFrameArrivedEventArgs e) {
+            var reference = e.FrameReference.AcquireFrame();
+            using (var frame = reference.ColorFrameReference.AcquireFrame()) {
+                if (frame != null) {
+                    BitMapReadyHandler handler = BitMapReady;
+                    ImageSource img = ToBitmap(frame);
+                    //Allow the image to be accessible outside this thread
+                    img.Freeze();
+                    handler?.Invoke(this, img);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Convert a frame of kinect color video to bitmap for display
+        /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
+        /// Under Apache License 2.0
+        /// </summary>
+        /// <param name="frame">The frame received from the kinect</param>
+        /// <returns>A bitmap format source for a WPF image control</returns>
+        public static ImageSource ToBitmap(ColorFrame frame) {
+            int width = frame.FrameDescription.Width;
+            int height = frame.FrameDescription.Height;
+
+            byte[] pixels = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
+
+            if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
+                frame.CopyRawFrameDataToArray(pixels);
+            } else {
+                frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
+            }
+
+            int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
+            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
     }
 }

@@ -101,6 +101,9 @@ namespace gbtis {
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
 
+        /// <summary>
+        /// Opens the BodyReader
+        /// </summary>
         private void OpenBodyReader() {
             if (bodies == null) {
                 bodies = new Body[this.sensor.BodyFrameSource.BodyCount];
@@ -109,6 +112,9 @@ namespace gbtis {
             bodyReader.FrameArrived += OnBodyFrameArrived;
         }
 
+        /// <summary>
+        /// Opens the GestureReader and loads the Gestures
+        /// </summary>
         private void OpenGestureReader() {
 
             // we assume that this file exists and will load
@@ -130,6 +136,13 @@ namespace gbtis {
             gestureReader.FrameArrived += OnGestureFrameArrived;
         }
 
+        /// <summary>
+        /// Registers that a new body has entered the frame
+        /// TODO: This will need to be modified to support the body tracking
+        ///     that we want to do in the Admin Window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnBodyFrameArrived(object sender, BodyFrameArrivedEventArgs e) {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
@@ -149,10 +162,22 @@ namespace gbtis {
             }
         }
 
+        /// <summary>
+        /// All bodies have left the frame, therefore stop reading gestures for now
+        /// TODO: Again this will need to be modified to support the body tracking
+        ///     in Admin Window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
             gestureReader.IsPaused = true;
         }
 
+        /// <summary>
+        /// Parse the Gesture that arrived and trigger the appropriate event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnGestureFrameArrived(object sender,
             VisualGestureBuilderFrameArrivedEventArgs e) {
             using (var frame = e.FrameReference.AcquireFrame()) {

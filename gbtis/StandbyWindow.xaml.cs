@@ -58,12 +58,18 @@ namespace gbtis {
                 sensorFeed.Source = img));
         }
 
+        /// <summary>
+        /// Handles the occurence of a wave gesture
+        /// </summary>
         private void WaveGestureArrived() {
             this.Dispatcher.Invoke(() => {
                 standbyMsg.Text = "You just waved!";
             });
         }
 
+        /// <summary>
+        /// Handles the occurence of a easter egg gesture
+        /// </summary>
         private void EasterEggArrived() {
             this.Dispatcher.Invoke(() => {
                 standbyMsg.Text = "Bruh.";
@@ -73,6 +79,10 @@ namespace gbtis {
             });
         }
 
+        /// <summary>
+        /// Hanldes a change in the  availability status of the kinect
+        /// </summary>
+        /// <param name="IsAvailable"></param>
         private void OnSensorStatusChanged(Boolean IsAvailable) {
             this.Dispatcher.Invoke(() => {
                 if (IsAvailable) {

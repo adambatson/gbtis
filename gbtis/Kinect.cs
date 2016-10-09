@@ -19,7 +19,6 @@ namespace gbtis {
     public class Kinect {
 
         //Constants
-        private const int WAIT_SENSOR_ACTIVE = 600;
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
 
@@ -131,7 +130,7 @@ namespace gbtis {
 
             easterEgg = db.AvailableGestures.Where(g => g.Name == "dab").Single();
             gestureSource = new VisualGestureBuilderFrameSource(sensor, 0);
-            gestureReader = this.gestureSource.OpenReader();
+            gestureReader = gestureSource.OpenReader();
 
             gestureSource.AddGestures(db.AvailableGestures);
             gestureSource.TrackingIdLost += OnTrackingIdLost;
@@ -191,14 +190,14 @@ namespace gbtis {
                     if (result != null) {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
-                            if (gesture.Confidence > 0.5) {
+                            if (gesture.Confidence > WAVE_CONFIDENCE) {
                                 WaveGestureHandler handler = WaveGestureOccured;
                                 handler?.Invoke();
                             }
                         }
                         if (result.ContainsKey(easterEgg)) {
                             var gesture = result[easterEgg];
-                            if (gesture.Confidence > 0.5) {
+                            if (gesture.Confidence > EASTER_EGG_CONFIDENCE) {
                                 EasterEggHandler handler = EasterEggGestureOccured;
                                 handler?.Invoke();
                             }

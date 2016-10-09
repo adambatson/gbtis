@@ -67,7 +67,7 @@ namespace gbtis {
             this.Dispatcher.Invoke(() => {
                 standbyMsg.Text = "Bruh.";
                 SoundPlayer player = new SoundPlayer(
-                    @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\excellent.wav");
+                    @"..\..\Resources\excellent.wav");
                 player.Play();
             });
         }

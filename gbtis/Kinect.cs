@@ -17,6 +17,11 @@ namespace gbtis {
     /// </summary>
     public class Kinect {
 
+        //Constants
+        private const int WAIT_SENSOR_ACTIVE = 600;
+        private const double WAVE_CONFIDENCE = 0.5;
+        private const double EASTER_EGG_CONFIDENCE = 0.5;
+
         //Events
         public event BitMapReadyHandler BitMapReady;
         public event WaveGestureHandler WaveGestureOccured;
@@ -40,7 +45,9 @@ namespace gbtis {
             //and when IsAvailable is set to true.  We need to ensure
             //that IsAvailable becomes true before anyone calls the
             //isAvailable() method.
-            Thread.Sleep(500);
+            //TODO: If we implement Kinect plugged / unplugged events
+            //this should become unnecesary
+            Thread.Sleep(WAIT_SENSOR_ACTIVE);
 
             // Prepare sensor feed
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
@@ -119,7 +126,7 @@ namespace gbtis {
 
             // we assume that this file exists and will load
             db = new VisualGestureBuilderDatabase(
-              @"C:\Users\adambatson\Documents\Visual Studio 2015\Projects\gbtis\gbtis\Resources\gbtisg.gbd");
+              @"..\..\Resources\gbtisg.gbd");
 
             // we assume that this gesture is in that database (it should be, it's the only
             // gesture in there).

@@ -11,6 +11,7 @@ namespace gbtis {
     public delegate void BitMapReadyHandler(ImageSource img);
     public delegate void WaveGestureHandler();
     public delegate void EasterEggHandler();
+    public delegate void SensorStatusHandler(Boolean isAvailable);
 
     /// <summary>
     /// Kinect Wrapper Class
@@ -26,6 +27,7 @@ namespace gbtis {
         public event BitMapReadyHandler BitMapReady;
         public event WaveGestureHandler WaveGestureOccured;
         public event EasterEggHandler EasterEggGestureOccured;
+        public event SensorStatusHandler SensorStatusChanged;
 
         private KinectSensor sensor;
         private MultiSourceFrameReader frameReader;
@@ -41,13 +43,6 @@ namespace gbtis {
         public Kinect() {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
-            //There is a slight delay between when the sensor is opened
-            //and when IsAvailable is set to true.  We need to ensure
-            //that IsAvailable becomes true before anyone calls the
-            //isAvailable() method.
-            //TODO: If we implement Kinect plugged / unplugged events
-            //this should become unnecesary
-            Thread.Sleep(WAIT_SENSOR_ACTIVE);
 
             // Prepare sensor feed
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
@@ -55,6 +50,8 @@ namespace gbtis {
 
             OpenBodyReader();
             OpenGestureReader();
+
+            sensor.IsAvailableChanged += OnIsAvailableChanged;
 
         }
 
@@ -209,6 +206,16 @@ namespace gbtis {
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Triggered when the KinectSensors availability changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnIsAvailableChanged(Object sender, EventArgs e) {
+            SensorStatusHandler handler = SensorStatusChanged;
+            handler?.Invoke(isAvailable());
         }
     }
 }

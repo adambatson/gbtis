@@ -35,6 +35,7 @@ namespace gbtis {
             kinect.BitMapReady += BitMapArrived;
             kinect.WaveGestureOccured += WaveGestureArrived;
             kinect.EasterEggGestureOccured += EasterEggArrived;
+            kinect.SensorStatusChanged += OnSensorStatusChanged;
 
             // Initialize the names
             topName.Text = "";
@@ -69,6 +70,17 @@ namespace gbtis {
                 SoundPlayer player = new SoundPlayer(
                     @"..\..\Resources\excellent.wav");
                 player.Play();
+            });
+        }
+
+        private void OnSensorStatusChanged(Boolean IsAvailable) {
+            this.Dispatcher.Invoke(() => {
+                if (IsAvailable) {
+                    standbyMsg.Text = gbtis.Properties.Resources.msgStart;
+                } else {
+                    standbyMsg.Text = gbtis.Properties.Resources.msgNoSensor;
+                    sensorFeed.Source = null;
+                }
             });
         }
 

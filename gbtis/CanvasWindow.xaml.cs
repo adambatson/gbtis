@@ -25,10 +25,15 @@ namespace gbtis {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CanvasWindow() {
+        public CanvasWindow(Kinect kinect) {
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.None;
             drawCursor.Type = CanvasCursor.CursorType.Idle;
+
+            while (!kinect.isAvailable()) ;
+            drawCursor.setKinect(kinect);
+
+            kinect.BitMapReady += BitMapArrived;
 
             // Set up cursor update events
             drawCursor.Moved += DrawCursor_Moved;
@@ -61,6 +66,15 @@ namespace gbtis {
         }
 
         /// <summary>
+        /// Update the camera feed from the sensor
+        /// </summary>
+        /// <param name="img">The latest ImageSource</param>
+        void BitMapArrived(ImageSource img) {
+            this.Dispatcher.Invoke(new Action(() =>
+                sensorOverlay.Source = img));
+        }
+
+        /// <summary>
         /// Cursor moved. Update position
         /// </summary>
         /// <param name="sender">Source of the event</param>
@@ -68,7 +82,7 @@ namespace gbtis {
         private void DrawCursor_Moved(object sender, EventArgs e) {
             this.Dispatcher.Invoke(() => {
                 // Update cursor position
-                Point p = drawCursor.RelativePosition(drawCanvas);
+                Point p = drawCursor.RelativePosition(this);
                 drawCursor.Position = p;
 
                 // Test canvas borders
@@ -79,9 +93,9 @@ namespace gbtis {
                 }
 
                 // Test button
-                clearButton.CursorOver(Mouse.GetPosition(this));
-                cancelButton.CursorOver(Mouse.GetPosition(this));
-                continueButton.CursorOver(Mouse.GetPosition(this));
+                clearButton.CursorOver(p);
+                cancelButton.CursorOver(p);
+                continueButton.CursorOver(p);
             });
         }
         

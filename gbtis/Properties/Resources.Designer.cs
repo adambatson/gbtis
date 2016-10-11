@@ -61,6 +61,13 @@ namespace gbtis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream excellent {
+            get {
+                return ResourceManager.GetStream("excellent", resourceCulture);
+            }
+        }
         ///   Looks up a localized string similar to Gesture based text input system\nAdam Batson, Richard Carson, Maxwell DeMelo.
         /// </summary>
         internal static string aboutText {
@@ -70,6 +77,14 @@ namespace gbtis.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] gbtisg {
+            get {
+                object obj = ResourceManager.GetObject("gbtisg", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
         ///   Looks up a localized string similar to About GBTIS.
         /// </summary>
         internal static string aboutTitle {

@@ -86,7 +86,7 @@ namespace gbtis.Tests {
                 eventFlag = true;
             };
 
-            window.fileStandbyButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            window.fileStandbyButton.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Timer t = new Timer(100);
             t.Start();
             t.Elapsed += (s, e) => {

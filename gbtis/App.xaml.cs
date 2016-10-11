@@ -8,9 +8,7 @@ namespace gbtis {
         private Kinect kinect;
 
         public App() {
-            kinect = new Kinect();
-
-            UIController uicont = new UIController(sensor);
+            UIController uicont = new UIController();
         }
     }
 }

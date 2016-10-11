@@ -15,10 +15,15 @@ namespace gbtis {
         AdminWindow admin;
         StandbyWindow standby;
         CanvasWindow canvas;
+        Kinect kinect;
 
-        public UIController(KinectSensor _sensor) {
+        public UIController() {
+            //Making the kinect Controller
+            kinect = new Kinect();
+            kinectHandler();
+
             //Starting the standby window
-            standby = new StandbyWindow(_sensor);
+            standby = new StandbyWindow(kinect);
             standbyHandler();
 
             //Starting and showing the admin window
@@ -38,6 +43,18 @@ namespace gbtis {
             Timer timer = new Timer(TICK);
             timer.Elapsed += (s, e) => Tock?.Invoke(timer, new EventArgs()); ;
             timer.Start();
+        }
+
+        private void kinectHandler() {
+            kinect.WaveGestureOccured += (s,e) => { standby.hide(); cavas.Show(); };
+            kinect.EasterEggGestureOccured += (s,e) => { 
+                standby.changeText("Bruh!");
+                SoundPlayer player = new SoundPlayer(
+                    @"..\..\Resources\excellent.wav");
+                player.Play();
+                standby.hide(); cavas.Show(); 
+                standby.changeText(""); //change to whatever it was before
+            };
         }
 
         private void canvasHandler() {

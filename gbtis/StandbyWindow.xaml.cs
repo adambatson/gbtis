@@ -79,6 +79,12 @@ namespace gbtis {
             });
         }
 
+        private void changeText(String newText) {
+            this.Dispatcher(() => {
+                standbyMsg.Text = newText;
+            }
+        }
+
         /// <summary>
         /// Hanldes a change in the  availability status of the kinect
         /// </summary>

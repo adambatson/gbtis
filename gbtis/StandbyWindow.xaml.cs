@@ -79,10 +79,10 @@ namespace gbtis {
             });
         }
 
-        private void changeText(String newText) {
-            this.Dispatcher(() => {
+        public void changeText(String newText) {
+            this.Dispatcher.Invoke(new Action(() => {
                 standbyMsg.Text = newText;
-            }
+            }));
         }
 
         /// <summary>

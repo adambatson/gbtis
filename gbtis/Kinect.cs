@@ -2,9 +2,10 @@
 using Microsoft.Kinect.VisualGestureBuilder;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Collections.Generic;
+using System.Windows;
 
 namespace gbtis {
     //Deleagtes for custom event handlers
@@ -12,6 +13,8 @@ namespace gbtis {
     public delegate void WaveGestureHandler();
     public delegate void EasterEggHandler();
     public delegate void SensorStatusHandler(Boolean isAvailable);
+    public delegate void ModeChangedHandler(CanvasCursor.CursorType mode);
+    public delegate void FingerPositionHandler(Point point);
 
     /// <summary>
     /// Kinect Wrapper Class
@@ -27,6 +30,9 @@ namespace gbtis {
         public event WaveGestureHandler WaveGestureOccured;
         public event EasterEggHandler EasterEggGestureOccured;
         public event SensorStatusHandler SensorStatusChanged;
+        public event ModeChangedHandler ModeStart;
+        public event ModeChangedHandler ModeEnd;
+        public event FingerPositionHandler FingerPositionChanged;
 
         private KinectSensor sensor;
         private MultiSourceFrameReader frameReader;
@@ -35,9 +41,15 @@ namespace gbtis {
         private Gesture waveGesture, easterEgg;
         private VisualGestureBuilderDatabase db;
         private Body[] bodies;
+        private Body activeBody;
         private BodyFrameReader bodyReader;
         private VisualGestureBuilderFrameSource gestureSource;
         private VisualGestureBuilderFrameReader gestureReader;
+
+        //Just the tip
+        private Point? prevPoint;
+        private CoordinateMapper coordinateMapper;
+        private HandState lastRightHandState;
 
         public Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -49,8 +61,12 @@ namespace gbtis {
 
             OpenBodyReader();
             OpenGestureReader();
+            bodies = new Body[this.sensor.BodyFrameSource.BodyCount];
 
-            sensor.IsAvailableChanged += OnIsAvailableChanged;
+            //Coordinate Mapping
+            coordinateMapper = sensor.CoordinateMapper;
+
+            //sensor.IsAvailableChanged += OnIsAvailableChanged;
 
         }
 
@@ -77,6 +93,35 @@ namespace gbtis {
                     //Allow the image to be accessible outside this thread
                     img.Freeze();
                     handler?.Invoke(img);
+                }
+            }
+            if(activeBody != null && activeBody.IsTracked) {
+                var rightHand = activeBody.Joints[JointType.HandTipRight];
+                var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
+                    rightHand.Position);
+                Point point = new Point(
+                    colorPoint.X,
+                    colorPoint.Y
+                );
+                if (!point.Equals(prevPoint)) {
+                    FingerPositionChanged?.Invoke(point);
+                    prevPoint = point;
+                }
+                if(activeBody.HandRightState != lastRightHandState) {
+                    switch(activeBody.HandRightState) {
+                        case HandState.NotTracked:
+                            ModeStart?.Invoke(CanvasCursor.CursorType.Missing);
+                            break;
+                        case HandState.Closed:
+                            ModeStart?.Invoke(CanvasCursor.CursorType.Idle);
+                            break;
+                        case HandState.Open:
+                            ModeStart?.Invoke(CanvasCursor.CursorType.Erase);
+                            break;
+                        default:
+                            ModeStart?.Invoke(CanvasCursor.CursorType.Draw);
+                            break;
+                    }
                 }
             }
         }
@@ -108,9 +153,6 @@ namespace gbtis {
         /// Opens the BodyReader
         /// </summary>
         private void OpenBodyReader() {
-            if (bodies == null) {
-                bodies = new Body[this.sensor.BodyFrameSource.BodyCount];
-            }
             bodyReader = this.sensor.BodyFrameSource.OpenReader();
             bodyReader.FrameArrived += OnBodyFrameArrived;
         }
@@ -151,15 +193,19 @@ namespace gbtis {
                 if (frame != null) {
                     frame.GetAndRefreshBodyData(bodies);
 
-                    var trackedBody = bodies.Where(b => b.IsTracked).FirstOrDefault();
-
-                    if (trackedBody != null) {
-                        if (gestureReader.IsPaused) {
-                            gestureSource.TrackingId = trackedBody.TrackingId;
-                            gestureReader.IsPaused = false;
-                        }
-                    } else {
+                    var trackedBodies = bodies.Where(b => b.IsTracked);
+                    if (trackedBodies.Count() == 0) {
                         OnTrackingIdLost(null, null);
+                        return;
+                    }
+
+                    if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
+                        activeBody = trackedBodies.FirstOrDefault();                       
+                    }
+                    
+                    if (gestureReader.IsPaused) {
+                        gestureSource.TrackingId = activeBody.TrackingId;
+                        gestureReader.IsPaused = false;
                     }
                 }
             }

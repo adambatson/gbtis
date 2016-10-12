@@ -58,5 +58,3 @@ C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
-D:\repositories\gbtis\gbtis\obj\Debug\NameControl.g.cs
-D:\repositories\gbtis\gbtis\obj\Debug\NameControl.baml

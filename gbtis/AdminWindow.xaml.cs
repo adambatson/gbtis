@@ -26,39 +26,12 @@ namespace gbtis {
         public event EventHandler Standby;
         public event EventHandler Input;
 
-        // Event events
-        public event NamedEventHandler AddEvent;
-        public event NamedEventHandler SelectEvent;
-        public event NamedEventHandler DeleteEvent;
-
-        // Name events
-        public event NamedEventHandler ApproveName;
-        public event NamedEventHandler DeleteName;
-
         /// <summary>
         /// Initialize the window
         /// </summary>
         public AdminWindow() {
             DataContext = this;
             InitializeComponent();
-
-            nameControl.AddEvent += (s, e) => AddEvent?.Invoke(this, e);
-            nameControl.SelectEvent += (s, e) => SelectEvent?.Invoke(this, e);
-            nameControl.DeleteEvent += (s, e) => DeleteEvent?.Invoke(this, e);
-
-            nameControl.ApproveName += (s, e) => ApproveName?.Invoke(this, e);
-            nameControl.DeleteName += (s, e) => DeleteName?.Invoke(this, e);
-        }
-
-        /// <summary>
-        /// Bind the lists for the window's database manager
-        /// </summary>
-        /// <param name="events">List of events</param>
-        /// <param name="namesPending">List of pendiing names</param>
-        /// <param name="namesApproved">List of approved names</param>
-        public void BindDataSources(ObservableCollection<string> events, ObservableCollection<string> namesPending, ObservableCollection<string> namesApproved) {
-            nameControl.bindEventsSource(events);
-            nameControl.bindNameSources(namesPending, namesApproved);
         }
 
         /// <summary>
@@ -117,8 +90,5 @@ namespace gbtis {
         private void FileInput_Click(object sender, EventArgs args) {
             Input?.Invoke(this, args);
         }
-
-        // Events that pass along a string
-        public delegate void NamedEventHandler(object sender, NamedEventArgs args);
     }
 }

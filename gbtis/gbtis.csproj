@@ -94,9 +94,6 @@
     <Compile Include="HoverButton.xaml.cs">
       <DependentUpon>HoverButton.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NameControl.xaml.cs">
-      <DependentUpon>NameControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="StandbyWindow.xaml.cs">
       <DependentUpon>StandbyWindow.xaml</DependentUpon>
     </Compile>
@@ -126,10 +123,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="HoverButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

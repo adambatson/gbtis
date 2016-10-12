@@ -27,10 +27,9 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow(Kinect kinect) {
             InitializeComponent();
-            Mouse.OverrideCursor = Cursors.None;
-            drawCursor.Type = CanvasCursor.CursorType.Idle;
 
-            while (!kinect.isAvailable()) ;
+            // Set up the cursor
+            drawCursor.Type = CanvasCursor.CursorType.Idle;
             drawCursor.setKinect(kinect);
 
             kinect.BitMapReady += BitMapArrived;
@@ -82,7 +81,7 @@ namespace gbtis {
         private void DrawCursor_Moved(object sender, EventArgs e) {
             this.Dispatcher.Invoke(() => {
                 // Update cursor position
-                Point p = drawCursor.RelativePosition(this);
+                Point p = drawCursor.RelativePosition(drawCanvas);
                 drawCursor.Position = p;
 
                 // Test canvas borders
@@ -147,15 +146,6 @@ namespace gbtis {
         /// <returns>True if in range</returns>
         private bool isInRange(double n, double min, double max) {
             return (n >= min) && (n <= max);
-        }
-
-        /// <summary>
-        /// Get a cursor position on the canvas
-        /// </summary>
-        /// <returns>The cursor position</returns>
-        private Point CursorPosition() {
-            Point p = Mouse.GetPosition(drawCanvas);
-            return p;
         }
     }
 }

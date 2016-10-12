@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Media;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Microsoft.Kinect;
 
 namespace gbtis {
     /// <summary>
@@ -26,25 +17,25 @@ namespace gbtis {
         public event EventHandler Exit;
 
         // For the kinect display
-        KinectSensor sensor;
-        MultiSourceFrameReader frameReader;
+        Kinect kinect;
 
         /// <summary>
         /// Constructor for the standby window
         /// </summary>
         /// <param name="_sensor">An open kinect sensor, or null</param>
-        public StandbyWindow(KinectSensor _sensor) {
+        public StandbyWindow(Kinect kinect) {
             InitializeComponent();
+            this.kinect = kinect;
 
             // Initialize load text
-            standbyMsg.Text = (_sensor.IsAvailable) ? 
+            standbyMsg.Text = (kinect.isAvailable()) ? 
                 gbtis.Properties.Resources.msgStart :
                 gbtis.Properties.Resources.msgNoSensor;
 
-            // Prepare sensor feed
-            this.sensor = _sensor;
-            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
-            frameReader.MultiSourceFrameArrived += FrameReader_MultiSourceFrameArrived;
+            kinect.BitMapReady += BitMapArrived;
+            kinect.WaveGestureOccured += WaveGestureArrived;
+            kinect.EasterEggGestureOccured += EasterEggArrived;
+            kinect.SensorStatusChanged += OnSensorStatusChanged;
 
             // Initialize the names
             topName.Text = "";
@@ -61,16 +52,52 @@ namespace gbtis {
         /// <summary>
         /// Update the camera feed from the sensor
         /// </summary>
-        /// <param name="sender">Object sending the event</param>
-        /// <param name="e">Arguments for the event object</param>
-        void FrameReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
-            var reference = e.FrameReference.AcquireFrame();
-            using (var frame = reference.ColorFrameReference.AcquireFrame()) {
-                if (frame != null) {
-                    this.Dispatcher.Invoke(new Action(() =>
-                    sensorFeed.Source = ToBitmap(frame)));
+        /// <param name="img">The latest ImageSource</param>
+        void BitMapArrived(ImageSource img) {
+            this.Dispatcher.Invoke(new Action(() =>
+                sensorFeed.Source = img));
+        }
+
+        /// <summary>
+        /// Handles the occurence of a wave gesture
+        /// </summary>
+        private void WaveGestureArrived() {
+            this.Dispatcher.Invoke(() => {
+                standbyMsg.Text = "You just waved!";
+            });
+        }
+
+        /// <summary>
+        /// Handles the occurence of a easter egg gesture
+        /// </summary>
+        private void EasterEggArrived() {
+            this.Dispatcher.Invoke(() => {
+                standbyMsg.Text = "Bruh.";
+                SoundPlayer player = new SoundPlayer(
+                    @"..\..\Resources\excellent.wav");
+                player.Play();
+            });
+        }
+
+        public void changeText(String newText) {
+            this.Dispatcher.Invoke(new Action(() => {
+                standbyMsg.Text = newText;
+            }));
+        }
+
+        /// <summary>
+        /// Hanldes a change in the  availability status of the kinect
+        /// </summary>
+        /// <param name="IsAvailable"></param>
+        private void OnSensorStatusChanged(Boolean IsAvailable) {
+            this.Dispatcher.Invoke(() => {
+                if (IsAvailable) {
+                    standbyMsg.Text = gbtis.Properties.Resources.msgStart;
+                } else {
+                    standbyMsg.Text = gbtis.Properties.Resources.msgNoSensor;
+                    sensorFeed.Source = null;
                 }
-            }
+            });
         }
 
         /// <summary>
@@ -88,29 +115,6 @@ namespace gbtis {
                     new TextBlockFadeAnimation(bottomName, names[(i + 2) % names.Count()]);
                 });
             } catch (OperationCanceledException) { }
-        }
-
-        /// <summary>
-        /// Convert a frame of kinect color video to bitmap for display
-        /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
-        /// Under Apache License 2.0
-        /// </summary>
-        /// <param name="frame">The frame received from the kinect</param>
-        /// <returns>A bitmap format source for a WPF image control</returns>
-        private static ImageSource ToBitmap(ColorFrame frame) {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-            
-            byte[] pixels = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
-
-            if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
-                frame.CopyRawFrameDataToArray(pixels);
-            } else {
-                frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
-            }
-
-            int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
-            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
 
         /// <summary>

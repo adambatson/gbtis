@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,12 @@ using System.Windows.Shapes;
 
 namespace gbtis {
     public partial class CanvasCursor : UserControl {
-        private bool motionOn;
-
         public event EventHandler Moved;
         public event EventHandler Draw;
         public event EventHandler Erase;
         public event EventHandler Idle;
+
+        private Kinect kinect;
 
         // Size of the cursor brush
         public int Size { get; set; }
@@ -56,12 +57,38 @@ namespace gbtis {
         /// </summary>
         public CanvasCursor() {
             InitializeComponent();
-            Type = CursorType.Missing;
+            Type = CursorType.Idle;
+        }
 
-            if (motionOn) {
-                throw new NotImplementedException();
+        public void setKinect(Kinect kinect) {
+            this.kinect = kinect;
+            if (true || kinect.isAvailable()) {
+                kinect.FingerPositionChanged += (p) => {
+                    this.Dispatcher.Invoke(new Action(() => {
+                        Position = p;
+                        if (Type == CursorType.Draw)
+                            cursorDraw();
+                        else if (Type == CursorType.Erase)
+                            cursorErase();
+                        else if (Type == CursorType.Idle)
+                            cursorIdle();
+                    }));
+
+                    Moved?.Invoke(this, new EventArgs());
+
+                    kinect.ModeStart += (m) => {
+                        if (m == CursorType.Draw)
+                            cursorDraw();
+                        else if (m == CursorType.Erase)
+                            cursorErase();
+                        else if (m == CursorType.Idle)
+                            cursorIdle();
+                    };
+
+                    kinect.ModeEnd += (m) => cursorIdle();
+                };
             } else {
-                Loaded += (ls, le) => {
+                this.Dispatcher.Invoke(new Action(() => {
                     Window parentWindow = Window.GetWindow(this);
                     parentWindow.MouseMove += (s, e) => {
                         Position = RelativePosition(parentWindow);
@@ -73,13 +100,13 @@ namespace gbtis {
 
                         Moved?.Invoke(this, new EventArgs());
                     };
+                }));
 
-                    MouseLeftButtonDown += (s, e) => cursorDraw();
-                    MouseRightButtonDown += (s, e) => cursorErase();
+                MouseLeftButtonDown += (s, e) => cursorDraw();
+                MouseRightButtonDown += (s, e) => cursorErase();
 
-                    MouseLeftButtonUp += (s, e) => cursorIdle();
-                    MouseRightButtonUp += (s, e) => cursorIdle();
-                };
+                MouseLeftButtonUp += (s, e) => cursorIdle();
+                MouseRightButtonUp += (s, e) => cursorIdle();
             }
         }
 
@@ -88,12 +115,15 @@ namespace gbtis {
         /// </summary>
         /// <param name="relativeTo">Relative element</param>
         /// <returns>Coordinates of the cursor</returns>
-        public Point RelativePosition(IInputElement relativeTo) {
-            if (motionOn) {
-                throw new NotImplementedException();
-            } else {
-                return Mouse.GetPosition(relativeTo);
+        public Point RelativePosition(FrameworkElement relativeTo) {
+            if (kinect.isAvailable()) { // 1920 x 1080
+                return new Point(
+                    relativeTo.ActualWidth * Position.X / 1920,
+                    relativeTo.ActualHeight * Position.Y / 1080
+                );
             }
+
+            return Mouse.GetPosition(relativeTo);
         }
 
         /// <summary>
@@ -173,7 +203,7 @@ namespace gbtis {
             public static readonly CursorType Missing = Create(Colors.White, Colors.White, 0, false);
             public static readonly CursorType Idle = Create(Colors.Gray, Colors.DarkSlateGray, 15, true);
             public static readonly CursorType Draw = Create(Colors.Black, Colors.White, 10, true);
-            public static readonly CursorType Erase = Create(Colors.White, Colors.Black, 50, false);
+            public static readonly CursorType Erase = Create(Colors.White, Colors.Black, 100, false);
         }
     }
 }

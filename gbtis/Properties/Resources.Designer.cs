@@ -69,8 +69,25 @@ namespace gbtis.Properties {
                 return ResourceManager.GetString("aboutText", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream excellent {
+            get {
+                return ResourceManager.GetStream("excellent", resourceCulture);
+            }
+        }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] gbtisg {
+            get {
+                object obj = ResourceManager.GetObject("gbtisg", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
         ///   Looks up a localized string similar to About GBTIS.
         /// </summary>
         internal static string aboutTitle {

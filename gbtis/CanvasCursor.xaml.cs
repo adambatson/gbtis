@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 
 namespace gbtis {
     public partial class CanvasCursor : UserControl {
+        public readonly Point COLOR_SIZE = new Point { X=1920, Y=1080 };
+
         public event EventHandler Moved;
         public event EventHandler Draw;
         public event EventHandler Erase;
@@ -60,54 +62,36 @@ namespace gbtis {
             Type = CursorType.Idle;
         }
 
+        /// <summary>
+        /// Set up the kinect events
+        /// </summary>
+        /// <param name="kinect"></param>
         public void setKinect(Kinect kinect) {
             this.kinect = kinect;
-            if (true || kinect.isAvailable()) {
-                kinect.FingerPositionChanged += (p) => {
-                    this.Dispatcher.Invoke(new Action(() => {
-                        Position = p;
-                        if (Type == CursorType.Draw)
-                            cursorDraw();
-                        else if (Type == CursorType.Erase)
-                            cursorErase();
-                        else if (Type == CursorType.Idle)
-                            cursorIdle();
-                    }));
 
-                    Moved?.Invoke(this, new EventArgs());
+            kinect.FingerPositionChanged += (p) => {
+                Position = p;
+                cursorAction(Type);
 
-                    kinect.ModeStart += (m) => {
-                        if (m == CursorType.Draw)
-                            cursorDraw();
-                        else if (m == CursorType.Erase)
-                            cursorErase();
-                        else if (m == CursorType.Idle)
-                            cursorIdle();
-                    };
+                Moved?.Invoke(this, new EventArgs());
+            };
 
-                    kinect.ModeEnd += (m) => cursorIdle();
-                };
-            } else {
-                this.Dispatcher.Invoke(new Action(() => {
-                    Window parentWindow = Window.GetWindow(this);
-                    parentWindow.MouseMove += (s, e) => {
-                        Position = RelativePosition(parentWindow);
+            kinect.ModeStart += (m) => {
+                cursorAction(m);
+            };
+        }
 
-                        if (Mouse.LeftButton == MouseButtonState.Pressed)
-                            cursorDraw();
-                        else if (Mouse.RightButton == MouseButtonState.Pressed)
-                            cursorErase();
-
-                        Moved?.Invoke(this, new EventArgs());
-                    };
-                }));
-
-                MouseLeftButtonDown += (s, e) => cursorDraw();
-                MouseRightButtonDown += (s, e) => cursorErase();
-
-                MouseLeftButtonUp += (s, e) => cursorIdle();
-                MouseRightButtonUp += (s, e) => cursorIdle();
-            }
+        /// <summary>
+        /// Perform an action based on cursor mode
+        /// </summary>
+        /// <param name="mode">Current mode</param>
+        private void cursorAction(CursorType mode) {
+            if (mode == CursorType.Draw)
+                cursorDraw();
+            else if (mode == CursorType.Erase)
+                cursorErase();
+            else
+                cursorIdle();
         }
 
         /// <summary>
@@ -116,14 +100,10 @@ namespace gbtis {
         /// <param name="relativeTo">Relative element</param>
         /// <returns>Coordinates of the cursor</returns>
         public Point RelativePosition(FrameworkElement relativeTo) {
-            if (kinect.isAvailable()) { // 1920 x 1080
-                return new Point(
-                    relativeTo.ActualWidth * Position.X / 1920,
-                    relativeTo.ActualHeight * Position.Y / 1080
-                );
-            }
-
-            return Mouse.GetPosition(relativeTo);
+            return new Point(
+                relativeTo.ActualWidth * Position.X / COLOR_SIZE.X,
+                relativeTo.ActualHeight * Position.Y / COLOR_SIZE.Y
+            );
         }
 
         /// <summary>

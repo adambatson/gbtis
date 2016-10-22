@@ -32,13 +32,14 @@
         <local:HoverButton x:Name="continueButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="2" Text="Continue" Color="ForestGreen" />
 
         <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
-            <local:Canvas x:Name="drawCanvas" />
+            <Grid>
+                <local:Canvas x:Name="drawCanvas" />
+                <local:CanvasCursor x:Name="drawCursor" />
+            </Grid>
         </Border>
 
         <Image x:Name="sensorOverlay" Opacity="0.2" 
                Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
                Grid.ColumnSpan="3" Grid.RowSpan="10" />
-
-        <local:CanvasCursor x:Name="drawCursor" Grid.ColumnSpan="3" Grid.RowSpan="8" />
     </Grid>
 </Window>

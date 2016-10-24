@@ -8,7 +8,11 @@ namespace gbtis {
         private Kinect kinect;
 
         public App() {
-            UIController uicont = new UIController();
+            //UIController uicont = new UIController();
+
+            kinect = new Kinect();
+            CanvasWindow canvas = new CanvasWindow(kinect);
+            canvas.Show();
         }
     }
 }

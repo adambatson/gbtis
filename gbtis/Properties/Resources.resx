@@ -137,4 +137,7 @@ Adam Batson, Richard Carson, Maxwell DeMelo</value>
   <data name="msgStart" xml:space="preserve">
     <value>Wave at me to start!</value>
   </data>
+  <data name="noString" xml:space="preserve">
+    <value>Write your name or a short message in the space above!</value>
+  </data>
 </root>

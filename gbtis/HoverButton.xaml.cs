@@ -57,7 +57,10 @@ namespace gbtis {
             (this.Content as FrameworkElement).DataContext = this;
             over = done = reset = false;
             completion = 0;
-            
+
+            MouseEnter += (s, e) => over = true;
+            MouseLeave += (s, e) => over = false;
+
             t = new Timer(50);
             t.Elapsed += T_Elapsed;
             t.Start();

@@ -13,12 +13,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Ink;
+using System.Windows.Ink;
+using System.IO;
 
 namespace gbtis {
     /// <summary>
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
+        public const int ERASER_SIZE = 50;
         public event EventHandler Cancel;
         public event EventHandler Continue;
 
@@ -27,41 +31,54 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow(Kinect kinect) {
             InitializeComponent();
+            canvas.EraserShape = new RectangleStylusShape(ERASER_SIZE, ERASER_SIZE);
 
-            // Set up the cursor
-            drawCursor.Type = CanvasCursor.CursorType.Idle;
-            drawCursor.setKinect(kinect);
+            canvas.PreviewMouseDown += (s, e) => {
+                canvas.EditingMode = (Mouse.RightButton == MouseButtonState.Pressed) ?
+                InkCanvasEditingMode.EraseByPoint : InkCanvasEditingMode.Ink;
+            };
 
-            kinect.BitMapReady += BitMapArrived;
+            canvas.MouseUp += (s, e) => {
+                if (e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
+                    canvas.EditingMode = InkCanvasEditingMode.Select;
+            };
 
-            // Set up cursor update events
-            drawCursor.Moved += DrawCursor_Moved;
-            drawCursor.Draw += (s, e) => drawCanvas.Mark(
-                drawCursor.RelativePosition(drawCanvas), drawCursor.Size, drawCursor.Type.round);
-            drawCursor.Erase += (s, e) => drawCanvas.Erase(
-                drawCursor.RelativePosition(drawCanvas), drawCursor.Size, drawCursor.Type.round);
-            drawCursor.Idle += (s, e) => drawCanvas.ClearPrevious();
+            recognize();
+            MouseLeftButtonUp += (s, e) => recognize();
+            MouseRightButtonUp += (s, e) => recognize();
 
             // Button events
-            clearButton.Clicked += (s, e) => drawCanvas.ClearCanvas();
+            clearButton.Clicked += (s, e) => this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
             cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
             continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
         }
 
-        /// <summary>
-        /// Get the canvas' current image
-        /// </summary>
-        /// <returns>The canvas ImageSource</returns>
-        public ImageSource Image() {
-            return drawCanvas.Image();
-        }
+        public void recognize() {
+            using (MemoryStream ms = new MemoryStream()) {
+                canvas.Strokes.Save(ms);
+                var myInkCollector = new InkCollector();
+                var ink = new Ink();
+                ink.Load(ms.ToArray());
 
-        /// <summary>
-        /// Get the raw pixel data from the canvas
-        /// </summary>
-        /// <returns>RGBA pixel data</returns>
-        public byte[] Pixels() {
-            return drawCanvas.Pixels();
+                using (RecognizerContext recognizer = new RecognizerContext()) {
+                    RecognitionStatus status;
+                    recognizer.Strokes = ink.Strokes;
+
+                    if (ink.Strokes.Count > 0) {
+                        var results = recognizer.Recognize(out status);
+                        if (status == RecognitionStatus.NoError) {
+                            if (results.TopString.Length > 0) {
+                                previewText.Text = results.TopString;
+                                previewText.Foreground = new SolidColorBrush(Colors.Black);
+                                return;
+                            }
+                        }
+                    }
+
+                    previewText.Text = gbtis.Properties.Resources.noString;
+                    previewText.Foreground = new SolidColorBrush(Colors.Gray);
+                }
+            }
         }
 
         /// <summary>
@@ -71,31 +88,6 @@ namespace gbtis {
         void BitMapArrived(ImageSource img) {
             this.Dispatcher.Invoke(new Action(() =>
                 sensorOverlay.Source = img));
-        }
-
-        /// <summary>
-        /// Cursor moved. Update position
-        /// </summary>
-        /// <param name="sender">Source of the event</param>
-        /// <param name="e">Event parameters</param>
-        private void DrawCursor_Moved(object sender, EventArgs e) {
-            this.Dispatcher.Invoke(() => {
-                // Update cursor position
-                Point p = drawCursor.RelativePosition(drawCanvas);
-                drawCursor.Position = p;
-
-                // Test canvas borders
-                if (!isInRange(p.X, 0, drawCanvas.ActualWidth - 1) || !isInRange(p.Y, 0, drawCanvas.ActualHeight - 1)) {
-                    drawCursor.Type = CanvasCursor.CursorType.Missing;
-                } else if (drawCursor.Type == CanvasCursor.CursorType.Missing) {
-                    drawCursor.Type = CanvasCursor.CursorType.Idle;
-                }
-
-                // Test button
-                clearButton.CursorOver(p);
-                cancelButton.CursorOver(p);
-                continueButton.CursorOver(p);
-            });
         }
         
         /// <summary>
@@ -135,17 +127,6 @@ namespace gbtis {
             int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
 
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
-        }
-
-        /// <summary>
-        /// Test a value for a range
-        /// </summary>
-        /// <param name="n">The value</param>
-        /// <param name="min">Minimum value</param>
-        /// <param name="max">Maximum value</param>
-        /// <returns>True if in range</returns>
-        private bool isInRange(double n, double min, double max) {
-            return (n >= min) && (n <= max);
         }
     }
 }

@@ -69,7 +69,16 @@ namespace gbtis.Properties {
                 return ResourceManager.GetString("aboutText", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to About GBTIS.
+        /// </summary>
+        internal static string aboutTitle {
+            get {
+                return ResourceManager.GetString("aboutTitle", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
@@ -88,13 +97,6 @@ namespace gbtis.Properties {
                 return ((byte[])(obj));
             }
         }
-        ///   Looks up a localized string similar to About GBTIS.
-        /// </summary>
-        internal static string aboutTitle {
-            get {
-                return ResourceManager.GetString("aboutTitle", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to No Kinect found!.
@@ -111,6 +113,15 @@ namespace gbtis.Properties {
         internal static string msgStart {
             get {
                 return ResourceManager.GetString("msgStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write your name or a short message in the space above!.
+        /// </summary>
+        internal static string noString {
+            get {
+                return ResourceManager.GetString("noString", resourceCulture);
             }
         }
     }

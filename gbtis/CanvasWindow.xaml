@@ -33,10 +33,17 @@
 
         <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
             <Grid>
-                <local:Canvas x:Name="drawCanvas" />
-                <local:CanvasCursor x:Name="drawCursor" />
+                <InkCanvas x:Name="canvas" EditingMode="Select">
+                    <InkCanvas.DefaultDrawingAttributes>
+                        <DrawingAttributes Color="Black" FitToCurve="true" Width="10" Height="10"/>
+                    </InkCanvas.DefaultDrawingAttributes>
+                </InkCanvas>
             </Grid>
         </Border>
+
+        <Viewbox HorizontalAlignment="Stretch" Grid.Row="9" Grid.ColumnSpan="3">
+            <TextBlock Margin="10,0,10,0" x:Name="previewText" />
+        </Viewbox>
 
         <Image x:Name="sensorOverlay" Opacity="0.2" 
                Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 

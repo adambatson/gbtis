@@ -45,7 +45,7 @@ namespace gbtis {
         /// <summary>
         /// Register the Color property of the hoverbutton control
         /// </summary>
-        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(HoverButton), new PropertyMetadata(Colors.Black));
+        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(HoverButton), new PropertyMetadata(Colors.Gray));
         public Color Color {
             get { return (Color)GetValue(ColorProperty); }
             set { SetValue(ColorProperty, value); }
@@ -56,7 +56,8 @@ namespace gbtis {
         /// </summary>
         public HoverButton() {
             InitializeComponent();
-            (this.Content as FrameworkElement).DataContext = this;
+            this.DataContext = this;
+
             over = done = reset = disabled = false;
             completion = 0;
 

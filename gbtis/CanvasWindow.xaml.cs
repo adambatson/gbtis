@@ -52,7 +52,7 @@ namespace gbtis {
 
             // Init canvas
             canvas.EraserShape = new RectangleStylusShape(ERASER_SIZE, ERASER_SIZE);
-            recognize();
+            this.Dispatcher.Invoke(new Action(() => recognize())); 
 
             // Kinect controls
             kinect.FingerPositionChanged += (p) => {
@@ -81,7 +81,7 @@ namespace gbtis {
 
             // Button events
             clearButton.Clicked += (s, e) => {
-                recognize();
+                this.Dispatcher.Invoke(new Action(() => recognize()));
                 this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
             };
             cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
@@ -146,7 +146,7 @@ namespace gbtis {
                 canvas.EditingMode = InkCanvasEditingMode.Select;
 
             // Recognize input and clear set of points
-            recognize();
+            this.Dispatcher.Invoke(new Action(() => recognize()));
             stylusPoints = null;
         }
 

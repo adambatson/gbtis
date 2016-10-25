@@ -5,9 +5,7 @@ D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
 D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.g.cs
-D:\repositories\gbtis\gbtis\obj\Debug\Canvas.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\CanvasWindow.g.cs
-D:\repositories\gbtis\gbtis\obj\Debug\CanvasCursor.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\HoverButton.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
 D:\repositories\gbtis\gbtis\obj\Debug\App.g.cs
@@ -17,9 +15,7 @@ D:\repositories\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
 D:\repositories\gbtis\gbtis\obj\Debug\AdminWindow.baml
 D:\repositories\gbtis\gbtis\obj\Debug\BodyCounter.baml
 D:\repositories\gbtis\gbtis\obj\Debug\StandbyWindow.baml
-D:\repositories\gbtis\gbtis\obj\Debug\Canvas.baml
 D:\repositories\gbtis\gbtis\obj\Debug\CanvasWindow.baml
-D:\repositories\gbtis\gbtis\obj\Debug\CanvasCursor.baml
 D:\repositories\gbtis\gbtis\obj\Debug\HoverButton.baml
 D:\repositories\gbtis\gbtis\obj\Debug\Themes\Generic.baml
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.g.resources

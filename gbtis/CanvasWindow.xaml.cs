@@ -22,48 +22,150 @@ namespace gbtis {
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
-        public const int ERASER_SIZE = 50;
+        public const int ERASER_SIZE = 100;
+
         public event EventHandler Cancel;
         public event EventHandler Continue;
+        
+        private StylusPointCollection stylusPoints;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public CanvasWindow(Kinect kinect) {
             InitializeComponent();
+
+            // Init canvas
             canvas.EraserShape = new RectangleStylusShape(ERASER_SIZE, ERASER_SIZE);
-
-            canvas.PreviewMouseDown += (s, e) => {
-                canvas.EditingMode = (Mouse.RightButton == MouseButtonState.Pressed) ?
-                InkCanvasEditingMode.EraseByPoint : InkCanvasEditingMode.Ink;
-            };
-
-            canvas.MouseUp += (s, e) => {
-                if (e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
-                    canvas.EditingMode = InkCanvasEditingMode.Select;
-            };
-
             recognize();
-            MouseLeftButtonUp += (s, e) => recognize();
-            MouseRightButtonUp += (s, e) => recognize();
 
+            // Kinect controls
+            kinect.FingerPositionChanged += (p) => {
+                cursorMove(p, kinect.CursorMode);
+            };
+            kinect.ModeEnd += (m) => {
+                cursorMove(kinect.FingerPosition, m);
+            };
+            kinect.ModeStart += (m) => {
+                cursorMove(kinect.FingerPosition, m);
+            };
+
+            // Mouse controls
+            canvas.MouseMove += (s, e) => {
+                cursorMove(Mouse.GetPosition(canvas), mouseMode());
+                e.Handled = true;
+            };
+            canvas.PreviewMouseDown += (s, e) => {
+                cursorDown(Mouse.GetPosition(canvas), mouseMode());
+                e.Handled = true;
+            };
+            canvas.PreviewMouseUp += (s, e) => {
+                cursorUp(Mouse.GetPosition(canvas), mouseMode());
+                e.Handled = true;
+            };
+            
             // Button events
             clearButton.Clicked += (s, e) => this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
             cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
             continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
         }
 
-        public void recognize() {
+        /// <summary>
+        /// Mouse based cursor mode
+        /// </summary>
+        /// <returns></returns>
+        private CursorModes mouseMode() {
+            bool leftDown = Mouse.LeftButton == MouseButtonState.Pressed;
+            bool rightDown = Mouse.RightButton == MouseButtonState.Pressed;
+
+            if (leftDown) return CursorModes.Draw;
+            if (rightDown) return CursorModes.Erase;
+            return CursorModes.Idle;
+        }
+
+        /// <summary>
+        /// Cursor has been moved
+        /// </summary>
+        /// <param name="cursor">Position</param>
+        /// <param name="mode">State</param>
+        private void cursorMove(Point cursor, CursorModes mode) {
+            // Stop if input capture isn't ready
+            if (stylusPoints == null) return;
+
+            // Erase points if need be
+            stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
+            if (mode == CursorModes.Erase) erase(cursor);
+        }
+
+        /// <summary>
+        /// Cursor pressed
+        /// </summary>
+        /// <param name="cursor">Position</param>
+        /// <param name="mode">State</param>
+        private void cursorDown(Point cursor, CursorModes mode) {
+            // Start input capture
+            if (stylusPoints == null)
+                stylusPoints = new StylusPointCollection(); ;
+
+            // Draw points if need be
+            stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
+            if (mode == CursorModes.Draw) draw();
+        }
+
+        /// <summary>
+        /// Cursor released
+        /// </summary>
+        /// <param name="cursor">Position</param>
+        /// <param name="mode">State</param>
+        private void cursorUp(Point cursor, CursorModes mode) {
+            // Revert to standby cursor
+            if (mode == CursorModes.Idle)
+                canvas.EditingMode = InkCanvasEditingMode.Select;
+
+            // Recognize input and clear set of points
+            recognize();
+            stylusPoints = null;
+        }
+
+        /// <summary>
+        /// Draw the strokes saved up
+        /// </summary>
+        private void draw() {
+            canvas.EditingMode = InkCanvasEditingMode.Ink;
+
+            System.Windows.Ink.Stroke stroke = new System.Windows.Ink.Stroke(stylusPoints, canvas.DefaultDrawingAttributes);
+            canvas.Strokes.Add(stroke);
+        }
+        
+        /// <summary>
+        /// Erase at a point
+        /// </summary>
+        /// <param name="cursor">Cursor location</param>
+        private void erase(Point cursor) {
+            canvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+
+            Rect eraser = new Rect(
+                new Point(cursor.X - ERASER_SIZE / 2, cursor.Y - ERASER_SIZE / 2),
+                new Size(ERASER_SIZE, ERASER_SIZE));
+            canvas.Strokes.Erase(eraser);
+        }
+
+        /// <summary>
+        /// OCR magic
+        /// </summary>
+        private void recognize() {
             using (MemoryStream ms = new MemoryStream()) {
+                // Build an inkCollector containing the strokes
                 canvas.Strokes.Save(ms);
                 var myInkCollector = new InkCollector();
                 var ink = new Ink();
                 ink.Load(ms.ToArray());
-
+                
                 using (RecognizerContext recognizer = new RecognizerContext()) {
                     RecognitionStatus status;
                     recognizer.Strokes = ink.Strokes;
 
+                    // Cannot do if there are no strokes
                     if (ink.Strokes.Count > 0) {
                         var results = recognizer.Recognize(out status);
                         if (status == RecognitionStatus.NoError) {
@@ -128,5 +230,9 @@ namespace gbtis {
 
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
         }
+    }
+
+    public enum CursorModes {
+        Idle, Draw, Erase
     }
 }

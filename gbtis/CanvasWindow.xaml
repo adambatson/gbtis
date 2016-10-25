@@ -34,6 +34,7 @@
         <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
             <Grid>
                 <InkCanvas x:Name="canvas" EditingMode="Select">
+                    <InkPresenter x:Name="canvasPresenter" />
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes Color="Black" FitToCurve="true" Width="10" Height="10"/>
                     </InkCanvas.DefaultDrawingAttributes>

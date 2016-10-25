@@ -13,7 +13,7 @@ namespace gbtis {
     public delegate void WaveGestureHandler();
     public delegate void EasterEggHandler();
     public delegate void SensorStatusHandler(Boolean isAvailable);
-    public delegate void ModeChangedHandler(CanvasCursor.CursorType mode);
+    public delegate void ModeChangedHandler(CursorModes mode);
     public delegate void FingerPositionHandler(Point point);
 
     /// <summary>
@@ -24,6 +24,9 @@ namespace gbtis {
         //Constants
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
+
+        public Point FingerPosition { get; set; }
+        public CursorModes CursorMode { get; set; }
 
         //Events
         public event BitMapReadyHandler BitMapReady;
@@ -105,23 +108,26 @@ namespace gbtis {
                 );
                 if (!point.Equals(prevPoint)) {
                     FingerPositionChanged?.Invoke(point);
+                    FingerPosition = point;
                     prevPoint = point;
                 }
                 if(activeBody.HandRightState != lastRightHandState) {
-                    switch(activeBody.HandRightState) {
+                    ModeEnd?.Invoke(CursorMode);
+
+                    switch (activeBody.HandRightState) {
                         case HandState.NotTracked:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Missing);
-                            break;
                         case HandState.Closed:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Idle);
+                            CursorMode = CursorModes.Idle;
                             break;
                         case HandState.Open:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Erase);
+                            CursorMode = CursorModes.Erase;
                             break;
                         default:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Draw);
+                            CursorMode = CursorModes.Draw;
                             break;
                     }
+
+                    ModeStart?.Invoke(CursorMode);
                 }
             }
         }

@@ -22,8 +22,10 @@ namespace gbtis {
     public partial class HoverButton : UserControl {
         public const float COMPLETION_TIME = 0.75f;
         public const float UNDO_MULTIPLIER = 2.0f;
+        public const float DISABLED_OPACITY = 0.3f;
 
         Timer t;
+        private bool disabled;
         private float completion;
         private bool over;
         private bool done;
@@ -34,9 +36,9 @@ namespace gbtis {
         /// <summary>
         /// Register the Text property of the hoverbutton control
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(String), typeof(HoverButton), new PropertyMetadata(""));
-        public String Text {
-            get { return (String)this.GetValue(TextProperty); }
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(HoverButton), new PropertyMetadata(""));
+        public string Text {
+            get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
 
@@ -45,7 +47,7 @@ namespace gbtis {
         /// </summary>
         public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(HoverButton), new PropertyMetadata(Colors.Black));
         public Color Color {
-            get { return (Color)this.GetValue(ColorProperty); }
+            get { return (Color)GetValue(ColorProperty); }
             set { SetValue(ColorProperty, value); }
         }
 
@@ -55,15 +57,31 @@ namespace gbtis {
         public HoverButton() {
             InitializeComponent();
             (this.Content as FrameworkElement).DataContext = this;
-            over = done = reset = false;
+            over = done = reset = disabled = false;
             completion = 0;
 
             MouseEnter += (s, e) => over = true;
             MouseLeave += (s, e) => over = false;
-
+            
             t = new Timer(50);
             t.Elapsed += T_Elapsed;
             t.Start();
+        }
+
+        /// <summary>
+        /// Disable the button
+        /// </summary>
+        public void Disable() {
+            disabled = true;
+            borderBox.Opacity = DISABLED_OPACITY;
+        }
+
+        /// <summary>
+        /// Enable the button
+        /// </summary>
+        public void Enable() {
+            disabled = false;
+            borderBox.Opacity = 1;
         }
 
         /// <summary>
@@ -124,7 +142,7 @@ namespace gbtis {
             }
 
             // Over the button. Progress towards the event
-            if (over && !done) {
+            if (over && !done && !disabled) {
                 completion += completionRate();
                 if (completion >= 1) {
                     completion = 1;

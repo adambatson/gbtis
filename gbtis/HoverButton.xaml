@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:gbtis"
              mc:Ignorable="d">
     <Grid>
-        <Border x:Name="borderBox" BorderThickness="4" CornerRadius="2">
+        <Border x:Name="borderBox" BorderThickness="4">
             <Border.Background>
                 <SolidColorBrush Color="{Binding Path=Color, ElementName=hoverButton, UpdateSourceTrigger=PropertyChanged}" />
             </Border.Background>
@@ -17,7 +17,7 @@
                     <GradientStop x:Name="progressColor" Color="{Binding Path=Color, ElementName=hoverButton, UpdateSourceTrigger=PropertyChanged}" Offset="1" />
                     <GradientStop x:Name="progressBlack" Color="Black" Offset="1"/>
 
-                    <GradientStop Color="Black" Offset="1"/>
+                    <GradientStop x:Name="endBlack" Color="Black" Offset="1"/>
                 </LinearGradientBrush>
             </Border.BorderBrush>
             <Grid>

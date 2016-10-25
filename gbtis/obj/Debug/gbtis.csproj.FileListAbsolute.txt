@@ -59,8 +59,6 @@ D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.dll
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.VisualGestureBuilder.xml
 D:\repositories\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.xml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe.config
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.exe
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\gbtis.pdb
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Ink.dll
@@ -68,12 +66,9 @@ C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.dll
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.VisualGestureBuilder.dll
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.dll
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\BodyCounter.g.cs
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\Canvas.g.cs
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\CanvasWindow.g.cs
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\CanvasCursor.g.cs
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\HoverButton.g.cs
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\App.g.cs
@@ -82,12 +77,12 @@ C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.ca
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.baml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\BodyCounter.baml
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\Canvas.baml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\CanvasWindow.baml
-C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\CanvasCursor.baml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\HoverButton.baml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.baml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\Themes\Generic.baml
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.g.resources
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
+C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
+C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb

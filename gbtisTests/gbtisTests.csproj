@@ -69,8 +69,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AdminWindowTests.cs" />
-    <Compile Include="CanvasCursorTests.cs" />
-    <Compile Include="CanvasTests.cs" />
     <Compile Include="HoverButtonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StandbyWindowTests.cs" />

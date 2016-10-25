@@ -22,11 +22,16 @@ namespace gbtis {
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
+        public const int FR_CA = 0x0c0c;
         public const int ERASER_SIZE = 100;
+
+        private string _text;
+        public string Text { get { return _text; } }
 
         public event EventHandler Cancel;
         public event EventHandler Continue;
         
+        private Recognizer recognizer;
         private StylusPointCollection stylusPoints;
 
         /// <summary>
@@ -34,6 +39,16 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow(Kinect kinect) {
             InitializeComponent();
+
+            // Recognizers
+
+            // Get language. French first, or default
+            Recognizers systemRecognizers = new Recognizers();
+            try {
+                recognizer = systemRecognizers.GetDefaultRecognizer(FR_CA);
+            } catch {
+                recognizer = systemRecognizers.GetDefaultRecognizer();
+            }
 
             // Init canvas
             canvas.EraserShape = new RectangleStylusShape(ERASER_SIZE, ERASER_SIZE);
@@ -63,9 +78,12 @@ namespace gbtis {
                 cursorUp(Mouse.GetPosition(canvas), mouseMode());
                 e.Handled = true;
             };
-            
+
             // Button events
-            clearButton.Clicked += (s, e) => this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
+            clearButton.Clicked += (s, e) => {
+                recognize();
+                this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
+            };
             cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
             continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
         }
@@ -91,9 +109,11 @@ namespace gbtis {
         private void cursorMove(Point cursor, CursorModes mode) {
             // Stop if input capture isn't ready
             if (stylusPoints == null) return;
-
-            // Erase points if need be
+            
+            // Add current point
             stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
+
+            //Erase if need be
             if (mode == CursorModes.Erase) erase(cursor);
         }
 
@@ -105,11 +125,14 @@ namespace gbtis {
         private void cursorDown(Point cursor, CursorModes mode) {
             // Start input capture
             if (stylusPoints == null)
-                stylusPoints = new StylusPointCollection(); ;
+                stylusPoints = new StylusPointCollection();
+
+            // Add current point
+            stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
 
             // Draw points if need be
-            stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
             if (mode == CursorModes.Draw) draw();
+            if (mode == CursorModes.Erase) erase(cursor);
         }
 
         /// <summary>
@@ -161,24 +184,32 @@ namespace gbtis {
                 var ink = new Ink();
                 ink.Load(ms.ToArray());
                 
-                using (RecognizerContext recognizer = new RecognizerContext()) {
+                using (RecognizerContext context = recognizer.CreateRecognizerContext()) {
                     RecognitionStatus status;
-                    recognizer.Strokes = ink.Strokes;
+                    context.Strokes = ink.Strokes;
 
                     // Cannot do if there are no strokes
                     if (ink.Strokes.Count > 0) {
-                        var results = recognizer.Recognize(out status);
+                        var results = context.Recognize(out status);
                         if (status == RecognitionStatus.NoError) {
                             if (results.TopString.Length > 0) {
-                                previewText.Text = results.TopString;
+                                // Set the text
+                                _text = results.TopString;
+                                previewText.Text = _text;
+
+                                // Styling changes
                                 previewText.Foreground = new SolidColorBrush(Colors.Black);
+                                continueButton.Enable();
+
                                 return;
                             }
                         }
                     }
 
+                    // Default options
                     previewText.Text = gbtis.Properties.Resources.noString;
                     previewText.Foreground = new SolidColorBrush(Colors.Gray);
+                    continueButton.Disable();
                 }
             }
         }
@@ -187,7 +218,7 @@ namespace gbtis {
         /// Update the camera feed from the sensor
         /// </summary>
         /// <param name="img">The latest ImageSource</param>
-        void BitMapArrived(ImageSource img) {
+        private void BitMapArrived(ImageSource img) {
             this.Dispatcher.Invoke(new Action(() =>
                 sensorOverlay.Source = img));
         }

@@ -25,10 +25,14 @@ namespace gbtis {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CanvasWindow() {
+        public CanvasWindow(Kinect kinect) {
             InitializeComponent();
-            Mouse.OverrideCursor = Cursors.None;
+
+            // Set up the cursor
             drawCursor.Type = CanvasCursor.CursorType.Idle;
+            drawCursor.setKinect(kinect);
+
+            kinect.BitMapReady += BitMapArrived;
 
             // Set up cursor update events
             drawCursor.Moved += DrawCursor_Moved;
@@ -61,6 +65,15 @@ namespace gbtis {
         }
 
         /// <summary>
+        /// Update the camera feed from the sensor
+        /// </summary>
+        /// <param name="img">The latest ImageSource</param>
+        void BitMapArrived(ImageSource img) {
+            this.Dispatcher.Invoke(new Action(() =>
+                sensorOverlay.Source = img));
+        }
+
+        /// <summary>
         /// Cursor moved. Update position
         /// </summary>
         /// <param name="sender">Source of the event</param>
@@ -79,9 +92,9 @@ namespace gbtis {
                 }
 
                 // Test button
-                clearButton.CursorOver(Mouse.GetPosition(this));
-                cancelButton.CursorOver(Mouse.GetPosition(this));
-                continueButton.CursorOver(Mouse.GetPosition(this));
+                clearButton.CursorOver(p);
+                cancelButton.CursorOver(p);
+                continueButton.CursorOver(p);
             });
         }
         
@@ -133,15 +146,6 @@ namespace gbtis {
         /// <returns>True if in range</returns>
         private bool isInRange(double n, double min, double max) {
             return (n >= min) && (n <= max);
-        }
-
-        /// <summary>
-        /// Get a cursor position on the canvas
-        /// </summary>
-        /// <returns>The cursor position</returns>
-        private Point CursorPosition() {
-            Point p = Mouse.GetPosition(drawCanvas);
-            return p;
         }
     }
 }

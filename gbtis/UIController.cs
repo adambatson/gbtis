@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -32,7 +33,7 @@ namespace gbtis {
             admin.Show();
 
             //Starting the canvas screen
-            canvas = new CanvasWindow();
+            canvas = new CanvasWindow(kinect);
             canvasHandler();
 
             startTimer();
@@ -46,13 +47,14 @@ namespace gbtis {
         }
 
         private void kinectHandler() {
-            kinect.WaveGestureOccured += (s,e) => { standby.hide(); cavas.Show(); };
-            kinect.EasterEggGestureOccured += (s,e) => { 
+            kinect.WaveGestureOccured += () => { standby.Hide(); canvas.Show(); };
+            kinect.EasterEggGestureOccured += () => { 
                 standby.changeText("Bruh!");
                 SoundPlayer player = new SoundPlayer(
                     @"..\..\Resources\excellent.wav");
                 player.Play();
-                standby.hide(); cavas.Show(); 
+                standby.Hide();
+                canvas.Show(); 
                 standby.changeText(""); //change to whatever it was before
             };
         }

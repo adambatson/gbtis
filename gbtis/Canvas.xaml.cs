@@ -39,7 +39,7 @@ namespace gbtis {
         /// Init pixel array
         /// </summary>
         public void InitializeCanvas() {
-            if ((int)ActualWidth == 0)
+            if ((int)ActualWidth == 0 || !IsVisible)
                 return;
 
             // Initialize canvas to the right size
@@ -247,6 +247,7 @@ namespace gbtis {
                 this.Dispatcher.Invoke(() => {
                     if (pixels == null)
                         InitializeCanvas();
+                    if (pixels == null) return;
 
                     content.Source = BitmapSource.Create((int)ActualWidth, (int)ActualHeight, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
                 });

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,14 @@ using System.Windows.Shapes;
 
 namespace gbtis {
     public partial class CanvasCursor : UserControl {
-        private bool motionOn;
+        public readonly Point COLOR_SIZE = new Point { X=1920, Y=1080 };
 
         public event EventHandler Moved;
         public event EventHandler Draw;
         public event EventHandler Erase;
         public event EventHandler Idle;
+
+        private Kinect kinect;
 
         // Size of the cursor brush
         public int Size { get; set; }
@@ -56,31 +59,39 @@ namespace gbtis {
         /// </summary>
         public CanvasCursor() {
             InitializeComponent();
-            Type = CursorType.Missing;
+            Type = CursorType.Idle;
+        }
 
-            if (motionOn) {
-                throw new NotImplementedException();
-            } else {
-                Loaded += (ls, le) => {
-                    Window parentWindow = Window.GetWindow(this);
-                    parentWindow.MouseMove += (s, e) => {
-                        Position = RelativePosition(parentWindow);
+        /// <summary>
+        /// Set up the kinect events
+        /// </summary>
+        /// <param name="kinect"></param>
+        public void setKinect(Kinect kinect) {
+            this.kinect = kinect;
 
-                        if (Mouse.LeftButton == MouseButtonState.Pressed)
-                            cursorDraw();
-                        else if (Mouse.RightButton == MouseButtonState.Pressed)
-                            cursorErase();
+            kinect.FingerPositionChanged += (p) => {
+                Position = p;
+                cursorAction(Type);
 
-                        Moved?.Invoke(this, new EventArgs());
-                    };
+                Moved?.Invoke(this, new EventArgs());
+            };
 
-                    MouseLeftButtonDown += (s, e) => cursorDraw();
-                    MouseRightButtonDown += (s, e) => cursorErase();
+            kinect.ModeStart += (m) => {
+                cursorAction(m);
+            };
+        }
 
-                    MouseLeftButtonUp += (s, e) => cursorIdle();
-                    MouseRightButtonUp += (s, e) => cursorIdle();
-                };
-            }
+        /// <summary>
+        /// Perform an action based on cursor mode
+        /// </summary>
+        /// <param name="mode">Current mode</param>
+        private void cursorAction(CursorType mode) {
+            if (mode == CursorType.Draw)
+                cursorDraw();
+            else if (mode == CursorType.Erase)
+                cursorErase();
+            else
+                cursorIdle();
         }
 
         /// <summary>
@@ -88,12 +99,11 @@ namespace gbtis {
         /// </summary>
         /// <param name="relativeTo">Relative element</param>
         /// <returns>Coordinates of the cursor</returns>
-        public Point RelativePosition(IInputElement relativeTo) {
-            if (motionOn) {
-                throw new NotImplementedException();
-            } else {
-                return Mouse.GetPosition(relativeTo);
-            }
+        public Point RelativePosition(FrameworkElement relativeTo) {
+            return new Point(
+                relativeTo.ActualWidth * Position.X / COLOR_SIZE.X,
+                relativeTo.ActualHeight * Position.Y / COLOR_SIZE.Y
+            );
         }
 
         /// <summary>
@@ -173,7 +183,7 @@ namespace gbtis {
             public static readonly CursorType Missing = Create(Colors.White, Colors.White, 0, false);
             public static readonly CursorType Idle = Create(Colors.Gray, Colors.DarkSlateGray, 15, true);
             public static readonly CursorType Draw = Create(Colors.Black, Colors.White, 10, true);
-            public static readonly CursorType Erase = Create(Colors.White, Colors.Black, 50, false);
+            public static readonly CursorType Erase = Create(Colors.White, Colors.Black, 100, false);
         }
     }
 }

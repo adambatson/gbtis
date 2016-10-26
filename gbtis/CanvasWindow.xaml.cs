@@ -50,6 +50,9 @@ namespace gbtis {
                 recognizer = systemRecognizers.GetDefaultRecognizer();
             }
 
+            // Overlay
+            kinect.BitMapReady += BitMapArrived;
+
             // Init canvas
             canvas.EraserShape = new RectangleStylusShape(ERASER_SIZE, ERASER_SIZE);
             this.Dispatcher.Invoke(new Action(() => recognize())); 
@@ -59,10 +62,10 @@ namespace gbtis {
                 cursorMove(p, kinect.CursorMode);
             };
             kinect.ModeEnd += (m) => {
-                cursorMove(kinect.FingerPosition, m);
+                cursorUp(kinect.FingerPosition, m);
             };
             kinect.ModeStart += (m) => {
-                cursorMove(kinect.FingerPosition, m);
+                cursorDown(kinect.FingerPosition, m);
             };
 
             // Mouse controls
@@ -109,9 +112,9 @@ namespace gbtis {
         private void cursorMove(Point cursor, CursorModes mode) {
             // Stop if input capture isn't ready
             if (stylusPoints == null) return;
-            
+
             // Add current point
-            stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
+            stylusPoints.Add(new StylusPoint(cursor.X, cursor.Y));
 
             //Erase if need be
             if (mode == CursorModes.Erase) erase(cursor);
@@ -128,7 +131,7 @@ namespace gbtis {
                 stylusPoints = new StylusPointCollection();
 
             // Add current point
-            stylusPoints.Add(new StylusPoint(Mouse.GetPosition(canvas).X, Mouse.GetPosition(canvas).Y));
+            stylusPoints.Add(new StylusPoint(cursor.X, cursor.Y));
 
             // Draw points if need be
             if (mode == CursorModes.Draw) draw();
@@ -146,7 +149,7 @@ namespace gbtis {
                 canvas.EditingMode = InkCanvasEditingMode.Select;
 
             // Recognize input and clear set of points
-            this.Dispatcher.Invoke(new Action(() => recognize()));
+            //this.Dispatcher.Invoke(new Action(() => recognize()));
             stylusPoints = null;
         }
 

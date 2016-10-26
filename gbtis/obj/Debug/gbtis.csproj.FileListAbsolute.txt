@@ -33,9 +33,7 @@ C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.xml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.g.cs
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\BodyCounter.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Canvas.g.cs
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasWindow.g.cs
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasCursor.g.cs
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\HoverButton.g.cs
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.g.cs
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\App.g.cs
@@ -44,9 +42,7 @@ C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.cache
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\gbtis_MarkupCompile.lref
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\AdminWindow.baml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\BodyCounter.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Canvas.baml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasWindow.baml
-C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\CanvasCursor.baml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\HoverButton.baml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\StandbyWindow.baml
 C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Themes\Generic.baml
@@ -86,3 +82,6 @@ C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.Properties.Resou
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.exe
 C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Ink.dll
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.VisualGestureBuilder.dll
+C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.dll

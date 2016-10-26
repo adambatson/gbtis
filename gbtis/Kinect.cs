@@ -100,6 +100,7 @@ namespace gbtis {
             }
             if(activeBody != null && activeBody.IsTracked) {
                 var rightHand = activeBody.Joints[JointType.HandTipRight];
+                HandState handState = activeBody.HandRightState;
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     rightHand.Position);
                 Point point = new Point(
@@ -107,14 +108,16 @@ namespace gbtis {
                     colorPoint.Y
                 );
                 if (!point.Equals(prevPoint)) {
-                    FingerPositionChanged?.Invoke(point);
                     FingerPosition = point;
                     prevPoint = point;
+                    Application.Current.Dispatcher.Invoke(new Action(() => FingerPositionChanged?.Invoke(point)));
+                    
                 }
-                if(activeBody.HandRightState != lastRightHandState) {
-                    ModeEnd?.Invoke(CursorMode);
+                if(handState != lastRightHandState) {
+                    Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
+                    //ModeEnd?.Invoke(CursorMode);
 
-                    switch (activeBody.HandRightState) {
+                    switch (handState) {
                         case HandState.NotTracked:
                         case HandState.Closed:
                             CursorMode = CursorModes.Idle;
@@ -127,7 +130,8 @@ namespace gbtis {
                             break;
                     }
 
-                    ModeStart?.Invoke(CursorMode);
+                    Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(CursorMode)));
+                    //ModeStart?.Invoke(CursorMode);
                 }
             }
         }

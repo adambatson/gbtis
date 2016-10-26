@@ -97,6 +97,9 @@
     <Compile Include="CanvasWindow.xaml.cs">
       <DependentUpon>CanvasWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Cursor.xaml.cs">
+      <DependentUpon>Cursor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HoverButton.xaml.cs">
       <DependentUpon>HoverButton.xaml</DependentUpon>
     </Compile>
@@ -119,6 +122,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CanvasWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Cursor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

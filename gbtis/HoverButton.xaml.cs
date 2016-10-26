@@ -60,13 +60,23 @@ namespace gbtis {
 
             over = done = reset = disabled = false;
             completion = 0;
-
-            MouseEnter += (s, e) => over = true;
-            MouseLeave += (s, e) => over = false;
             
             t = new Timer(50);
             t.Elapsed += T_Elapsed;
             t.Start();
+        }
+        
+        /// <summary>
+        /// Hover over the button
+        /// </summary>
+        /// <param name="over">True to activate</param>
+        public void Over(bool over) {
+            this.over = !disabled && over;
+        }
+
+        public bool Intersects(Visual parent, Point p) {
+            Rect bounds = TransformToVisual(parent).TransformBounds(new Rect(RenderSize));
+            return bounds.Contains(p);
         }
 
         /// <summary>
@@ -143,7 +153,7 @@ namespace gbtis {
             }
 
             // Over the button. Progress towards the event
-            if (over && !done && !disabled) {
+            if (over && !done) {
                 completion += completionRate();
                 if (completion >= 1) {
                     completion = 1;

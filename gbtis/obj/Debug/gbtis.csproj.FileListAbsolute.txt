@@ -85,3 +85,6 @@ C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.pdb
 C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Ink.dll
 C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.VisualGestureBuilder.dll
 C:\Users\rscar\Source\Repos\gbtis\gbtis\bin\Debug\Microsoft.Kinect.Wpf.Controls.dll
+C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\gbtis.csprojResolveAssemblyReference.cache
+C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\Cursor.g.cs
+C:\Users\richardcarson\Source\Repos\gbtis\gbtis\obj\Debug\Cursor.baml

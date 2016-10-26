@@ -23,11 +23,11 @@ namespace gbtis {
     /// </summary>
     public partial class CanvasWindow : Window {
         public const int FR_CA = 0x0c0c;
-        public const int ERASER_SIZE = 100;
 
         private string _text;
         public string Text { get { return _text; } }
 
+        public event EventHandler Help;
         public event EventHandler Cancel;
         public event EventHandler Continue;
         
@@ -39,8 +39,7 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow(Kinect kinect) {
             InitializeComponent();
-
-            // Recognizers
+            cursor.Position = Mouse.GetPosition(canvas);
 
             // Get language. French first, or default
             Recognizers systemRecognizers = new Recognizers();
@@ -54,41 +53,65 @@ namespace gbtis {
             kinect.BitMapReady += BitMapArrived;
 
             // Init canvas
-            canvas.EraserShape = new RectangleStylusShape(ERASER_SIZE, ERASER_SIZE);
             this.Dispatcher.Invoke(new Action(() => recognize())); 
 
             // Kinect controls
             kinect.FingerPositionChanged += (p) => {
-                cursorMove(p, kinect.CursorMode);
+                cursor.Position = p;
+                cursor.Mode = kinect.CursorMode;
+
+                cursorMove();
             };
             kinect.ModeEnd += (m) => {
-                cursorUp(kinect.FingerPosition, m);
+                cursor.Position = kinect.FingerPosition;
+                cursor.Mode = m;
+                cursorUp();
             };
             kinect.ModeStart += (m) => {
-                cursorDown(kinect.FingerPosition, m);
+                cursor.Position = kinect.FingerPosition;
+                cursor.Mode = m;
+                cursorDown();
             };
 
             // Mouse controls
-            canvas.MouseMove += (s, e) => {
-                cursorMove(Mouse.GetPosition(canvas), mouseMode());
+            MouseMove += (s, e) => {
+                cursor.Position = Mouse.GetPosition(canvas);
+                cursor.Mode = mouseMode();
+
+                cursorMove();
                 e.Handled = true;
             };
-            canvas.PreviewMouseDown += (s, e) => {
-                cursorDown(Mouse.GetPosition(canvas), mouseMode());
-                e.Handled = true;
+            PreviewMouseDown += (s, e) => {
+                cursor.Position = Mouse.GetPosition(canvas);
+                cursor.Mode = mouseMode();
+
+                cursorDown();
             };
-            canvas.PreviewMouseUp += (s, e) => {
-                cursorUp(Mouse.GetPosition(canvas), mouseMode());
-                e.Handled = true;
+            PreviewMouseUp += (s, e) => {
+                cursor.Position = Mouse.GetPosition(canvas);
+                cursor.Mode = mouseMode();
+
+                cursorUp();
             };
 
+            canvas.PreviewMouseDown += (s, e) => e.Handled = true;
+            canvas.PreviewMouseUp += (s, e) => e.Handled = true;
+
             // Button events
+            cursor.Moved += (p) => {
+                p = canvas.TranslatePoint(p, this);
+                helpButton.Over((helpButton.Intersects(this, p)));
+                clearButton.Over((clearButton.Intersects(this, p)));
+                cancelButton.Over((cancelButton.Intersects(this, p)));
+                continueButton.Over((continueButton.Intersects(this, p)));
+            };
             clearButton.Clicked += (s, e) => {
                 this.Dispatcher.Invoke(new Action(() => recognize()));
                 this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
             };
             cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
             continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
+            helpButton.Clicked += (s, e) => Help?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -109,15 +132,15 @@ namespace gbtis {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorMove(Point cursor, CursorModes mode) {
+        private void cursorMove() {
             // Stop if input capture isn't ready
             if (stylusPoints == null) return;
 
             // Add current point
-            stylusPoints.Add(new StylusPoint(cursor.X, cursor.Y));
+            stylusPoints.Add(new StylusPoint(cursor.Position.X, cursor.Position.Y));
 
             //Erase if need be
-            if (mode == CursorModes.Erase) erase(cursor);
+            if (cursor.Mode == CursorModes.Erase) erase();
         }
 
         /// <summary>
@@ -125,17 +148,17 @@ namespace gbtis {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorDown(Point cursor, CursorModes mode) {
+        private void cursorDown() {
             // Start input capture
             if (stylusPoints == null)
                 stylusPoints = new StylusPointCollection();
 
             // Add current point
-            stylusPoints.Add(new StylusPoint(cursor.X, cursor.Y));
+            stylusPoints.Add(new StylusPoint(cursor.Position.X, cursor.Position.Y));
 
             // Draw points if need be
-            if (mode == CursorModes.Draw) draw();
-            if (mode == CursorModes.Erase) erase(cursor);
+            if (cursor.Mode == CursorModes.Draw) draw();
+            if (cursor.Mode == CursorModes.Erase) erase();
         }
 
         /// <summary>
@@ -143,13 +166,13 @@ namespace gbtis {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorUp(Point cursor, CursorModes mode) {
+        private void cursorUp() {
             // Revert to standby cursor
-            if (mode == CursorModes.Idle)
+            if (cursor.Mode == CursorModes.Idle)
                 canvas.EditingMode = InkCanvasEditingMode.Select;
 
             // Recognize input and clear set of points
-            //this.Dispatcher.Invoke(new Action(() => recognize()));
+            this.Dispatcher.Invoke(new Action(() => recognize()));
             stylusPoints = null;
         }
 
@@ -167,13 +190,9 @@ namespace gbtis {
         /// Erase at a point
         /// </summary>
         /// <param name="cursor">Cursor location</param>
-        private void erase(Point cursor) {
+        private void erase() {
             canvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
-
-            Rect eraser = new Rect(
-                new Point(cursor.X - ERASER_SIZE / 2, cursor.Y - ERASER_SIZE / 2),
-                new Size(ERASER_SIZE, ERASER_SIZE));
-            canvas.Strokes.Erase(eraser);
+            canvas.Strokes.Erase(cursor.Rect);
         }
 
         /// <summary>

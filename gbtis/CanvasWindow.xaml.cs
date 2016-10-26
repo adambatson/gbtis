@@ -1,20 +1,9 @@
-﻿using Microsoft.Kinect;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.Ink;
-using System.Windows.Ink;
 using System.IO;
 
 namespace gbtis {
@@ -24,13 +13,19 @@ namespace gbtis {
     public partial class CanvasWindow : Window {
         public const int FR_CA = 0x0c0c;
 
+        // OCR property
         private string _text;
         public string Text { get { return _text; } }
 
-        public event EventHandler Help;
-        public event EventHandler Cancel;
-        public event EventHandler Continue;
-        
+        // Button events
+        public event ButtonEventHandler Help;
+        public event ButtonEventHandler Cancel;
+        public event TextEventHandler Continue;
+
+        // Event handler types
+        public delegate void TextEventHandler(string text);
+        public delegate void ButtonEventHandler();
+
         private Recognizer recognizer;
         private StylusPointCollection stylusPoints;
 
@@ -49,7 +44,7 @@ namespace gbtis {
             kinect.BitMapReady += BitMapArrived;
 
             // Init canvas
-            this.Dispatcher.Invoke(new Action(() => recognize())); 
+            this.Dispatcher.Invoke(new Action(() => recognize()));
 
             // Kinect controls
             kinect.FingerPositionChanged += (p) => {
@@ -90,8 +85,13 @@ namespace gbtis {
                 cursorUp();
             };
 
+            // Disable default controls
             canvas.PreviewMouseDown += (s, e) => e.Handled = true;
             canvas.PreviewMouseUp += (s, e) => e.Handled = true;
+            canvas.PreviewStylusDown += (s, e) => e.Handled = true;
+            canvas.PreviewStylusUp += (s, e) => e.Handled = true;
+            canvas.PreviewTouchDown += (s, e) => e.Handled = true;
+            canvas.PreviewTouchUp += (s, e) => e.Handled = true;
 
             // Button events
             cursor.Moved += (p) => {
@@ -105,9 +105,9 @@ namespace gbtis {
                 this.Dispatcher.Invoke(new Action(() => recognize()));
                 this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
             };
-            cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
-            continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
-            helpButton.Clicked += (s, e) => Help?.Invoke(this, new EventArgs());
+            cancelButton.Clicked += (s, e) => Cancel?.Invoke();
+            continueButton.Clicked += (s, e) => Continue?.Invoke(Text);
+            helpButton.Clicked += (s, e) => Help?.Invoke();
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace gbtis {
             System.Windows.Ink.Stroke stroke = new System.Windows.Ink.Stroke(stylusPoints, canvas.DefaultDrawingAttributes);
             canvas.Strokes.Add(stroke);
         }
-        
+
         /// <summary>
         /// Erase at a point
         /// </summary>
@@ -201,7 +201,7 @@ namespace gbtis {
                 var myInkCollector = new InkCollector();
                 var ink = new Ink();
                 ink.Load(ms.ToArray());
-                
+
                 using (RecognizerContext context = recognizer.CreateRecognizerContext()) {
                     RecognitionStatus status;
                     context.Factoid = Factoid.WordList; // Magic smoke for name recognition
@@ -241,47 +241,11 @@ namespace gbtis {
             this.Dispatcher.Invoke(new Action(() =>
                 sensorOverlay.Source = img));
         }
-        
-        /// <summary>
-        /// Update the camera feed from the sensor
-        /// </summary>
-        /// <param name="sender">Object sending the event</param>
-        /// <param name="e">Arguments for the event object</param>
-        private void FrameReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
-            var reference = e.FrameReference.AcquireFrame();
-            using (var frame = reference.ColorFrameReference.AcquireFrame()) {
-                if (frame != null) {
-                    this.Dispatcher.Invoke(new Action(() =>
-                    sensorOverlay.Source = ToBitmap(frame)));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Convert a frame of kinect color video to bitmap for display
-        /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
-        /// Under Apache License 2.0
-        /// </summary>
-        /// <param name="frame">The frame received from the kinect</param>
-        /// <returns>A bitmap format source for a WPF image control</returns>
-        private static ImageSource ToBitmap(ColorFrame frame) {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-
-            byte[] pixels = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
-
-            if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
-                frame.CopyRawFrameDataToArray(pixels);
-            } else {
-                frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
-            }
-
-            int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
-
-            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
-        }
     }
 
+    /// <summary>
+    /// Cursor modes for the canvas' cursor
+    /// </summary>
     public enum CursorModes {
         Idle, Draw, Erase
     }

@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace gbtis {
     /// <summary>
@@ -96,71 +86,41 @@ namespace gbtis {
         }
 
         /// <summary>
-        /// Test the cursor's position against the button
-        /// </summary>
-        /// <param name="cursor">Coordinates of the cursor</param>
-        /// <returns></returns>
-        public bool CursorOver(Point cursor) {
-            Window parentWindow = Window.GetWindow(this);
-            Point self = parentWindow.TransformToDescendant(this).Transform(cursor);
-            over =
-                self.X >= 0 && self.X <= ActualWidth &&
-                self.Y >= 0 && self.Y <= ActualHeight;
-            return over;
-        }
-
-        /// <summary>
-        /// Activates the Clicked event and changes the look of the control
-        /// </summary>
-        private void clicked() {
-            if (done) return;
-            done = true;
-
-            Clicked?.Invoke(this, new EventArgs());
-
-            try {
-                this.Dispatcher.Invoke(() => {
-                    textBox.Foreground = new SolidColorBrush(Colors.Black);
-                    reset = true;
-                });
-            } catch (OperationCanceledException) { }
-        }
-
-        /// <summary>
         /// Timed event to check the button's progress
         /// </summary>
         /// <param name="sender">Source of the event</param>
         /// <param name="e">Event args</param>
         private void T_Elapsed(object sender, ElapsedEventArgs e) {
-            if (!over) {
-                // User is not on the button. Reverse progress
-                completion -= completionRate() * UNDO_MULTIPLIER;
-                if (completion < 0) completion = 0;
+            completion += (over) ? completionRate() : -completionRate() * UNDO_MULTIPLIER;
+            if (completion < 0) completion = 0;
+            if (completion > 1) completion = 1;
 
-                // No longer over the button, and finished the animation. Reset.
-                if (done) {
-                    done = false;
-                    completion = 0;
-                }
+            // Click the button
+            if (over && !done && completion >= 1) {
+                done = true;
+                Clicked?.Invoke(this, new EventArgs());
 
-                if (reset) {
-                    try {
-                        this.Dispatcher.Invoke(() => {
-                            textBox.Foreground = new SolidColorBrush(Colors.White);
-                        });
-                    } catch (OperationCanceledException) { }
-                }
+                try {
+                    this.Dispatcher.Invoke(() => {
+                        textBox.Foreground = new SolidColorBrush(Colors.Black);
+                        reset = true;
+                    });
+                } catch (OperationCanceledException) { }
             }
 
-            // Over the button. Progress towards the event
-            if (over && !done) {
-                completion += completionRate();
-                if (completion >= 1) {
-                    completion = 1;
-                    clicked();
-                }
-            }
+            // All done, reset everything
+            if (!over && reset) {
+                done = reset = false;
+                completion = 0;
 
+                try {
+                    this.Dispatcher.Invoke(() => {
+                        textBox.Foreground = new SolidColorBrush(Colors.White);
+                        reset = true;
+                    });
+                } catch (OperationCanceledException) { }
+            }
+            
             // Update Button look to reflect progress
             try {
                 this.Dispatcher.Invoke(() => {

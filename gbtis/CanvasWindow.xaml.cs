@@ -43,11 +43,7 @@ namespace gbtis {
 
             // Get language. French first, or default
             Recognizers systemRecognizers = new Recognizers();
-            try {
-                recognizer = systemRecognizers.GetDefaultRecognizer(FR_CA);
-            } catch {
-                recognizer = systemRecognizers.GetDefaultRecognizer();
-            }
+            recognizer = systemRecognizers.GetDefaultRecognizer();
 
             // Overlay
             kinect.BitMapReady += BitMapArrived;
@@ -208,6 +204,7 @@ namespace gbtis {
                 
                 using (RecognizerContext context = recognizer.CreateRecognizerContext()) {
                     RecognitionStatus status;
+                    context.Factoid = Factoid.WordList; // Magic smoke for name recognition
                     context.Strokes = ink.Strokes;
 
                     // Cannot do if there are no strokes
@@ -216,7 +213,7 @@ namespace gbtis {
                         if (status == RecognitionStatus.NoError) {
                             if (results.TopString.Length > 0) {
                                 // Set the text
-                                _text = results.TopString;
+                                _text = results.ToString();
                                 previewText.Text = _text;
 
                                 // Styling changes

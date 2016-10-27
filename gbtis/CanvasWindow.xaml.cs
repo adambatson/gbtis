@@ -102,8 +102,10 @@ namespace gbtis {
                 continueButton.Over((continueButton.Intersects(this, p)));
             };
             clearButton.Clicked += (s, e) => {
-                this.Dispatcher.Invoke(new Action(() => recognize()));
-                this.Dispatcher.Invoke(new Action(() => canvas.Strokes.Clear()));
+                this.Dispatcher.Invoke(new Action(() => {
+                    canvas.Strokes.Clear();
+                    recognize();
+                }));
             };
             cancelButton.Clicked += (s, e) => Cancel?.Invoke();
             continueButton.Clicked += (s, e) => Continue?.Invoke(Text);

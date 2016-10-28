@@ -20,11 +20,11 @@ namespace gbtis {
 
         public UIController() {
             //Making the kinect Controller
-            kinect = new Kinect();
+            kinect = Kinect.getInstance();
             kinectHandler();
 
             //Starting the standby window
-            standby = new StandbyWindow(kinect);
+            standby = new StandbyWindow();
             standbyHandler();
 
             //Starting and showing the admin window
@@ -33,7 +33,7 @@ namespace gbtis {
             admin.Show();
 
             //Starting the canvas screen
-            canvas = new CanvasWindow(kinect);
+            canvas = new CanvasWindow();
             canvasHandler();
 
             startTimer();

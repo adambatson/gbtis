@@ -21,9 +21,13 @@ namespace gbtis {
     /// </summary>
     public class Kinect {
 
+        //Singleton Instance
+        private static readonly Kinect instance = new Kinect();
+
         //Constants
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
+        private const int POINT_SAMPLE_SIZE = 15;
 
         //Events
         public event BitMapReadyHandler BitMapReady;
@@ -51,7 +55,11 @@ namespace gbtis {
         private CoordinateMapper coordinateMapper;
         private HandState lastRightHandState;
 
-        public Kinect() {
+        //Rolling average finger positions
+        private LinkedList<float> xPoints, yPoints;
+        private float xAvg, yAvg;
+
+        private Kinect() {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
 
@@ -66,8 +74,19 @@ namespace gbtis {
             //Coordinate Mapping
             coordinateMapper = sensor.CoordinateMapper;
 
-            //sensor.IsAvailableChanged += OnIsAvailableChanged;
+            sensor.IsAvailableChanged += OnIsAvailableChanged;
 
+            xPoints = new LinkedList<float>();
+            yPoints = new LinkedList<float>();
+            xAvg = 0; yAvg = 0;
+        }
+
+        /// <summary>
+        /// Returns the singleton kinect instance
+        /// </summary>
+        /// <returns></returns>
+        public static Kinect getInstance() {
+            return instance;
         }
 
         /// <summary>
@@ -99,10 +118,7 @@ namespace gbtis {
                 var rightHand = activeBody.Joints[JointType.HandTipRight];
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     rightHand.Position);
-                Point point = new Point(
-                    colorPoint.X,
-                    colorPoint.Y
-                );
+                Point point = getAverageFingerTipPosition(colorPoint.X, colorPoint.Y);
                 if (!point.Equals(prevPoint)) {
                     FingerPositionChanged?.Invoke(point);
                     prevPoint = point;
@@ -124,6 +140,39 @@ namespace gbtis {
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the average finger position over the last
+        /// POINT_SAMPLE_SIZE frames
+        /// </summary>
+        /// <param name="x">The latest x coordinate</param>
+        /// <param name="y">The latest y coordinate</param>
+        /// <returns>The average position</returns>
+        private Point getAverageFingerTipPosition(float x, float y) {
+            //Only need to check one because their lengths should never be out of synch
+            if(xPoints.Count == 0) {
+                xAvg = x;
+                yAvg = y;
+            }
+            else {
+                if (xPoints.Count < POINT_SAMPLE_SIZE) {
+                    //We're still calculating a normal average
+                    xAvg -= xAvg / (xPoints.Count + 1);
+                    yAvg -= yAvg / (yPoints.Count + 1);
+                }
+                else { //Now we're calculating a rolling average
+                    //I wanted to use ternary operators for this but
+                    //RemoveFirst() returns void
+                    xAvg -= xPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
+                    yAvg -= yPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
+                    xPoints.RemoveFirst();
+                    yPoints.RemoveFirst();
+                }
+            }
+            xPoints.AddLast(x);
+            yPoints.AddLast(y);
+            return new Point(xAvg, yAvg);
         }
 
         /// <summary>

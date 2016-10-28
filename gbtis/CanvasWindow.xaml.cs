@@ -25,8 +25,9 @@ namespace gbtis {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CanvasWindow(Kinect kinect) {
+        public CanvasWindow() {
             InitializeComponent();
+            Kinect kinect = Kinect.getInstance();
 
             // Set up the cursor
             drawCursor.Type = CanvasCursor.CursorType.Idle;

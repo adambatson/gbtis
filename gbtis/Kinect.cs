@@ -27,6 +27,7 @@ namespace gbtis {
         //Constants
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
+        private const int POINT_SAMPLE_SIZE = 15;
 
         //Events
         public event BitMapReadyHandler BitMapReady;
@@ -54,6 +55,9 @@ namespace gbtis {
         private CoordinateMapper coordinateMapper;
         private HandState lastRightHandState;
 
+        //Rolling average finger positions
+        private LinkedList<float> xPoints, yPoints;
+
         private Kinect() {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
@@ -71,6 +75,8 @@ namespace gbtis {
 
             sensor.IsAvailableChanged += OnIsAvailableChanged;
 
+            xPoints = new LinkedList<float>();
+            yPoints = new LinkedList<float>();
         }
 
         /// <summary>
@@ -110,10 +116,7 @@ namespace gbtis {
                 var rightHand = activeBody.Joints[JointType.HandTipRight];
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     rightHand.Position);
-                Point point = new Point(
-                    colorPoint.X,
-                    colorPoint.Y
-                );
+                Point point = getAverageFingerTipPosition(colorPoint.X, colorPoint.Y);
                 if (!point.Equals(prevPoint)) {
                     FingerPositionChanged?.Invoke(point);
                     prevPoint = point;
@@ -135,6 +138,26 @@ namespace gbtis {
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Calculates the average finger position over the last
+        /// POINT_SAMPLE_SIZE frames
+        /// </summary>
+        /// <param name="x">The latest x coordinate</param>
+        /// <param name="y">The latest y coordinate</param>
+        /// <returns>The average position</returns>
+        private Point getAverageFingerTipPosition(float x, float y) {
+            //Remove oldest points if necessary
+            if (xPoints.Count >= POINT_SAMPLE_SIZE) {
+                xPoints.RemoveFirst();
+            }
+            if (yPoints.Count >= POINT_SAMPLE_SIZE) {
+                yPoints.RemoveFirst();
+            }
+            xPoints.AddLast(x);
+            yPoints.AddLast(y);
+            return new Point(xPoints.Average(), yPoints.Average());
         }
 
         /// <summary>

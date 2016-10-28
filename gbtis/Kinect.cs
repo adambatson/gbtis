@@ -57,6 +57,7 @@ namespace gbtis {
 
         //Rolling average finger positions
         private LinkedList<float> xPoints, yPoints;
+        private float xAvg, yAvg;
 
         private Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -77,6 +78,7 @@ namespace gbtis {
 
             xPoints = new LinkedList<float>();
             yPoints = new LinkedList<float>();
+            xAvg = 0; yAvg = 0;
         }
 
         /// <summary>
@@ -148,16 +150,29 @@ namespace gbtis {
         /// <param name="y">The latest y coordinate</param>
         /// <returns>The average position</returns>
         private Point getAverageFingerTipPosition(float x, float y) {
-            //Remove oldest points if necessary
-            if (xPoints.Count >= POINT_SAMPLE_SIZE) {
-                xPoints.RemoveFirst();
+            //Only need to check one because their lengths should never be out of synch
+            if(xPoints.Count == 0) {
+                xAvg = x;
+                yAvg = y;
             }
-            if (yPoints.Count >= POINT_SAMPLE_SIZE) {
-                yPoints.RemoveFirst();
+            else {
+                if (xPoints.Count < POINT_SAMPLE_SIZE) {
+                    //We're still calculating a normal average
+                    xAvg -= xAvg / (xPoints.Count + 1);
+                    yAvg -= yAvg / (yPoints.Count + 1);
+                }
+                else { //Now we're calculating a rolling average
+                    //I wanted to use ternary operators for this but
+                    //RemoveFirst() returns void
+                    xAvg -= xPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
+                    yAvg -= yPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
+                    xPoints.RemoveFirst();
+                    yPoints.RemoveFirst();
+                }
             }
             xPoints.AddLast(x);
             yPoints.AddLast(y);
-            return new Point(xPoints.Average(), yPoints.Average());
+            return new Point(xAvg, yAvg);
         }
 
         /// <summary>

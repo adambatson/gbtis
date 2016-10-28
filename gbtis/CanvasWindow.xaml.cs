@@ -33,9 +33,10 @@ namespace gbtis {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public CanvasWindow(Kinect kinect) {
+        public CanvasWindow() {
             InitializeComponent();
             cursor.Position = Mouse.GetPosition(canvas);
+            Kinect kinect = Kinect.getInstance();
 
             // Get language. French first, or default
             Recognizers systemRecognizers = new Recognizers();

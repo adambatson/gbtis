@@ -21,6 +21,9 @@ namespace gbtis {
     /// </summary>
     public class Kinect {
 
+        //Singleton Instance
+        private static readonly Kinect instance = new Kinect();
+
         //Constants
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
@@ -51,7 +54,7 @@ namespace gbtis {
         private CoordinateMapper coordinateMapper;
         private HandState lastRightHandState;
 
-        public Kinect() {
+        private Kinect() {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
 
@@ -66,8 +69,16 @@ namespace gbtis {
             //Coordinate Mapping
             coordinateMapper = sensor.CoordinateMapper;
 
-            //sensor.IsAvailableChanged += OnIsAvailableChanged;
+            sensor.IsAvailableChanged += OnIsAvailableChanged;
 
+        }
+
+        /// <summary>
+        /// Returns the singleton kinect instance
+        /// </summary>
+        /// <returns></returns>
+        public static Kinect getInstance() {
+            return instance;
         }
 
         /// <summary>

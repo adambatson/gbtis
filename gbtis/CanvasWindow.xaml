@@ -39,7 +39,6 @@
                         <DrawingAttributes Color="Black" FitToCurve="true" Width="10" Height="10"/>
                     </InkCanvas.DefaultDrawingAttributes>
                 </InkCanvas>
-                <local:Cursor x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top" />
             </Grid>
         </Border>
 
@@ -47,6 +46,9 @@
             <TextBlock Margin="10,0,10,0" x:Name="previewText" />
         </Viewbox>
 
+        <Grid Grid.ColumnSpan="4" Grid.RowSpan="3">
+            <local:Cursor x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        </Grid>
         <Image x:Name="sensorOverlay" Opacity="0.2" 
                Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
                Grid.ColumnSpan="3" Grid.RowSpan="10" />

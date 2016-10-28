@@ -90,3 +90,5 @@ D:\repositories\gbtis\gbtis\obj\Debug\gbtis.Properties.Resources.resources
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.csproj.GenerateResource.Cache
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.exe
 D:\repositories\gbtis\gbtis\obj\Debug\gbtis.pdb
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Cursor.g.cs
+C:\Users\rscar\Source\Repos\gbtis\gbtis\obj\Debug\Cursor.baml

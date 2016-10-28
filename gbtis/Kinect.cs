@@ -98,42 +98,59 @@ namespace gbtis {
                     handler?.Invoke(img);
                 }
             }
+
             if(activeBody != null && activeBody.IsTracked) {
                 var rightHand = activeBody.Joints[JointType.HandTipRight];
                 HandState handState = activeBody.HandRightState;
+                
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     rightHand.Position);
                 Point point = new Point(
                     colorPoint.X,
                     colorPoint.Y
                 );
+
                 if (!point.Equals(prevPoint)) {
                     FingerPosition = point;
                     prevPoint = point;
                     Application.Current.Dispatcher.Invoke(new Action(() => FingerPositionChanged?.Invoke(point)));
-                    
                 }
-                if(handState != lastRightHandState) {
+
+                CursorModes mode;
+                switch (handState) {
+                    case HandState.Lasso:
+                        mode = CursorModes.Draw;
+                        break;
+                    case HandState.Open:
+                        mode = CursorModes.Erase;
+                        break;
+                    case HandState.Closed:
+                    case HandState.NotTracked:
+                        mode = CursorModes.Idle;
+                        break;
+                    default:
+                        return;
+                }
+
+                if (mode != CursorMode) {
                     Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
-                    //ModeEnd?.Invoke(CursorMode);
-
-                    switch (handState) {
-                        case HandState.NotTracked:
-                        case HandState.Closed:
-                            CursorMode = CursorModes.Idle;
-                            break;
-                        case HandState.Open:
-                            CursorMode = CursorModes.Erase;
-                            break;
-                        default:
-                            CursorMode = CursorModes.Draw;
-                            break;
-                    }
-
-                    Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(CursorMode)));
-                    //ModeStart?.Invoke(CursorMode);
+                    Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
+                    CursorMode = mode;
                 }
             }
+        }
+
+        /// <summary>
+        /// Convert color camera coordinates to arbitrary coordinates
+        /// </summary>
+        /// <param name="p">Point to convert</param>
+        /// <param name="size">Size of the new region</param>
+        /// <returns></returns>
+        public static Point ColorToInterface(Point p, Size size) {
+            return new Point(
+                p.X * size.Width / 1920,
+                p.Y * size.Height / 1080
+            );
         }
 
         /// <summary>

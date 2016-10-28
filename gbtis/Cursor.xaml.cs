@@ -28,13 +28,18 @@ namespace gbtis {
         /// Cursor bounds
         /// </summary>
         private int _size;
+        public int Size { get { return _size; } }
+
         private Point _position;
         public Point Position {
             get { return new Point(_position.X + ActualWidth / 2, _position.Y + ActualWidth / 2); }
             set {
                 value = new Point(value.X - ActualWidth / 2, value.Y - ActualHeight / 2);
+
+                try {
+                    Margin = new Thickness(value.X, value.Y, 0, 0);
+                } catch (Exception) { return; }
                 _position = value;
-                Margin = new Thickness(value.X, value.Y, 0, 0);
                 Moved?.Invoke(Position);
             }
         }
@@ -46,17 +51,6 @@ namespace gbtis {
         public CursorModes Mode {
             get { return _mode; }
             set { _mode=value; setMode(value); }
-        }
-
-        /// <summary>
-        /// Boundary of the cursor
-        /// </summary>
-        public Rect Rect {
-            get {
-                return new Rect(
-                    new Point(Position.X - _size / 2, Position.Y - _size / 2), 
-                    new Size(_size, _size));
-            }
         }
 
         public Cursor() {

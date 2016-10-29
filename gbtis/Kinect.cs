@@ -27,7 +27,7 @@ namespace gbtis {
         //Constants
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
-        private const int POINT_SAMPLE_SIZE = 15;
+        private const float SMOOTHING_FACTOR = 0.35f;
 
         public Point FingerPosition { get; set; }
         public CursorModes CursorMode { get; set; }
@@ -56,7 +56,6 @@ namespace gbtis {
         //Just the tip
         private Point? prevPoint;
         private CoordinateMapper coordinateMapper;
-        private HandState lastRightHandState;
 
         //Rolling average finger positions
         private LinkedList<float> xPoints, yPoints;
@@ -162,46 +161,27 @@ namespace gbtis {
         /// <param name="p">Point to convert</param>
         /// <param name="size">Size of the new region</param>
         /// <returns></returns>
-        public static Point ColorToInterface(Point p, Size size) {
+        public Point ColorToInterface(Point p, Size size) {
+            ColorFrameSource c = sensor.ColorFrameSource;
             return new Point(
-                p.X * size.Width / 1920,
-                p.Y * size.Height / 1080
+                p.X * size.Width / c.FrameDescription.Width,
+                p.Y * size.Height / c.FrameDescription.Height
             );
         }
 
         /// <summary>
-        /// Calculates the average finger position over the last
-        /// POINT_SAMPLE_SIZE frames
+        /// Exponential moving average of fingertip position
         /// </summary>
         /// <param name="x">The latest x coordinate</param>
         /// <param name="y">The latest y coordinate</param>
         /// <returns>The average position</returns>
         private Point getAverageFingerTipPosition(float x, float y) {
-            //Only need to check one because their lengths should never be out of synch
-            if(xPoints.Count == 0) {
-                xAvg = x;
-                yAvg = y;
-            }
-            else {
-                if (xPoints.Count < POINT_SAMPLE_SIZE) {
-                    //We're still calculating a normal average
-                    xAvg -= xAvg / (xPoints.Count + 1);
-                    yAvg -= yAvg / (yPoints.Count + 1);
-                }
-                else { //Now we're calculating a rolling average
-                    //I wanted to use ternary operators for this but
-                    //RemoveFirst() returns void
-                    xAvg -= xPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
-                    yAvg -= yPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
-                    xPoints.RemoveFirst();
-                    yPoints.RemoveFirst();
-                }
-            }
-            xPoints.AddLast(x);
-            yPoints.AddLast(y);
+            xAvg = SMOOTHING_FACTOR * x + (1 - SMOOTHING_FACTOR) * xAvg;
+            yAvg = SMOOTHING_FACTOR * y + (1 - SMOOTHING_FACTOR) * yAvg;
+            
             return new Point(xAvg, yAvg);
         }
-
+        
         /// <summary>
         /// Convert a frame of kinect color video to bitmap for display
         /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/

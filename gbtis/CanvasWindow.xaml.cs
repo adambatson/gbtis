@@ -50,18 +50,18 @@ namespace gbtis {
 
             // Kinect controls
             kinect.FingerPositionChanged += (p) => {
-                cursor.Position = Kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
+                cursor.Position = kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
                 cursor.Mode = kinect.CursorMode;
                 c++;
                 cursorMove();
             };
             kinect.ModeEnd += (m) => {
-                cursor.Position = Kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
+                cursor.Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
                 cursor.Mode = m;
                 cursorUp();
             };
             kinect.ModeStart += (m) => {
-                cursor.Position = Kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
+                cursor.Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
                 cursor.Mode = m;
                 cursorDown();
             };
@@ -126,11 +126,21 @@ namespace gbtis {
             return CursorModes.Idle;
         }
 
+        /// <summary>
+        /// Transform a point into a point relative to the canvas
+        /// </summary>
+        /// <param name="p">The point</param>
+        /// <returns>A StylusPoint</returns>
         private StylusPoint RelativeTransformStylus(Point p) {
             p = this.TransformToDescendant(canvas).Transform(p);
             return new StylusPoint(p.X, p.Y);
         }
 
+        /// <summary>
+        /// Transform a point into a point relative to the canvas
+        /// </summary>
+        /// <param name="p">The point</param>
+        /// <returns>A Point</returns>
         private Point RelativeTransform(Point p) {
             p = this.TransformToDescendant(canvas).Transform(p);
             return new Point(p.X, p.Y);

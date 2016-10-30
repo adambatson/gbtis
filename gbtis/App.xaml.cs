@@ -7,10 +7,7 @@ namespace gbtis {
     public partial class App : Application {
 
         public App() {
-            //UIController uicont = new UIController();
-            
-            CanvasWindow canvas = new CanvasWindow();
-            canvas.Show();
+            UIController uicont = new UIController();
         }
     }
 }

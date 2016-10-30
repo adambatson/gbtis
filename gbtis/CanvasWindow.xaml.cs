@@ -26,9 +26,9 @@ namespace gbtis {
         public delegate void TextEventHandler(string text);
         public delegate void ButtonEventHandler();
 
+        //Text and canvas data
         private Recognizer recognizer;
         private StylusPointCollection stylusPoints;
-        private int c;
 
         /// <summary>
         /// Default constructor
@@ -48,46 +48,18 @@ namespace gbtis {
             // Init canvas
             Dispatcher.Invoke(new Action(() => recognize()));
 
-            // Kinect controls
-            kinect.FingerPositionChanged += (p) => {
-                cursor.Position = kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
-                cursor.Mode = kinect.CursorMode;
-                c++;
+            //Cursor Events
+            cursor.Moved += (p) => {
                 cursorMove();
             };
-            kinect.ModeEnd += (m) => {
-                cursor.Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
-                cursor.Mode = m;
-                cursorUp();
-            };
-            kinect.ModeStart += (m) => {
-                cursor.Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
-                cursor.Mode = m;
+            cursor.ModeStart += (m) => {
                 cursorDown();
             };
-
-            // Mouse controls
-            MouseMove += (s, e) => {
-                cursor.Position = Mouse.GetPosition(canvas);
-                cursor.Mode = mouseMode();
-
-                cursorMove();
-                e.Handled = true;
-            };
-            PreviewMouseDown += (s, e) => {
-                cursor.Position = Mouse.GetPosition(canvas);
-                cursor.Mode = mouseMode();
-
-                cursorDown();
-            };
-            PreviewMouseUp += (s, e) => {
-                cursor.Position = Mouse.GetPosition(canvas);
-                cursor.Mode = mouseMode();
-
+            cursor.ModeEnd += (m) => {
                 cursorUp();
             };
 
-            // Disable default controls
+            // Disable default canvas controls
             canvas.PreviewMouseDown += (s, e) => e.Handled = true;
             canvas.PreviewMouseUp += (s, e) => e.Handled = true;
             canvas.PreviewStylusDown += (s, e) => e.Handled = true;
@@ -114,25 +86,11 @@ namespace gbtis {
         }
 
         /// <summary>
-        /// Mouse based cursor mode
+        ///  Convert a Point into a StylusPoint
         /// </summary>
-        /// <returns></returns>
-        private CursorModes mouseMode() {
-            bool leftDown = Mouse.LeftButton == MouseButtonState.Pressed;
-            bool rightDown = Mouse.RightButton == MouseButtonState.Pressed;
-
-            if (leftDown) return CursorModes.Draw;
-            if (rightDown) return CursorModes.Erase;
-            return CursorModes.Idle;
-        }
-
-        /// <summary>
-        /// Transform a point into a point relative to the canvas
-        /// </summary>
-        /// <param name="p">The point</param>
-        /// <returns>A StylusPoint</returns>
-        private StylusPoint RelativeTransformStylus(Point p) {
-            p = this.TransformToDescendant(canvas).Transform(p);
+        /// <param name="p">A Point</param>
+        /// <returns>StylusPoint</returns>
+        private StylusPoint toStylusPoint(Point p) {
             return new StylusPoint(p.X, p.Y);
         }
 
@@ -141,7 +99,7 @@ namespace gbtis {
         /// </summary>
         /// <param name="p">The point</param>
         /// <returns>A Point</returns>
-        private Point RelativeTransform(Point p) {
+        private Point relativeTransform(Point p) {
             p = this.TransformToDescendant(canvas).Transform(p);
             return new Point(p.X, p.Y);
         }
@@ -156,7 +114,7 @@ namespace gbtis {
             if (stylusPoints == null) return;
 
             // Add current point
-            stylusPoints.Add(RelativeTransformStylus(cursor.Position));
+            stylusPoints.Add(toStylusPoint(relativeTransform(cursor.Position)));
 
             //Erase if need be
             if (cursor.Mode == CursorModes.Erase) erase();
@@ -173,7 +131,7 @@ namespace gbtis {
                 stylusPoints = new StylusPointCollection();
 
             // Add current point
-            stylusPoints.Add(RelativeTransformStylus(cursor.Position));
+            stylusPoints.Add(toStylusPoint(relativeTransform(cursor.Position)));
 
             // Draw points if need be
             if (cursor.Mode == CursorModes.Draw) draw();
@@ -212,7 +170,7 @@ namespace gbtis {
         private void erase() {
             canvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
 
-            Point p = RelativeTransform(new Point(
+            Point p = relativeTransform(new Point(
                 cursor.Position.X - cursor.Size / 2, cursor.Position.Y - cursor.Size / 2));
             canvas.Strokes.Erase(new Rect(p, new Size(cursor.Size, cursor.Size)));
         }

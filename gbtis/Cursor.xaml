@@ -9,11 +9,21 @@
     <Grid Width="100" Height="100">
         <Border x:Name="erase" Background="White" BorderBrush="Black" BorderThickness="1">
             <Grid x:Name="idle" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Line X1="0" Y1="10" X2="20" Y2="10" Stroke="Black" StrokeThickness="1" />
-                <Line X1="10" Y1="0" X2="10" Y2="20" Stroke="Black" StrokeThickness="1" />
+                <!-- Over canvas -->
+                <Line 
+                    X1="0" Y1="25" 
+                    X2="50" Y2="25" Stroke="Black" StrokeThickness="1" />
+                <Line 
+                    X1="25" Y1="0" 
+                    X2="25" Y2="50" Stroke="Black" StrokeThickness="1" />
                 
-                <Line X1="0" Y1="10" X2="20" Y2="10" Stroke="White" StrokeThickness="1" />
-                <Line X1="10" Y1="0" X2="10" Y2="20" Stroke="White" StrokeThickness="1" />
+                <!-- Over strokes -->
+                <Line 
+                    X1="0" Y1="25" 
+                    X2="50" Y2="25" Stroke="White" StrokeThickness="1" />
+                <Line 
+                    X1="25" Y1="0" 
+                    X2="25" Y2="50" Stroke="White" StrokeThickness="1" />
             </Grid>
         </Border>
     </Grid>

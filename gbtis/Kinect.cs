@@ -58,7 +58,6 @@ namespace gbtis {
         private CoordinateMapper coordinateMapper;
 
         //Rolling average finger positions
-        private LinkedList<float> xPoints, yPoints;
         private float xAvg, yAvg;
 
         private Kinect() {
@@ -77,9 +76,6 @@ namespace gbtis {
             coordinateMapper = sensor.CoordinateMapper;
 
             sensor.IsAvailableChanged += OnIsAvailableChanged;
-
-            xPoints = new LinkedList<float>();
-            yPoints = new LinkedList<float>();
             xAvg = 0; yAvg = 0;
         }
 
@@ -217,10 +213,12 @@ namespace gbtis {
         /// Opens the GestureReader and loads the Gestures
         /// </summary>
         private void OpenGestureReader() {
-
-            // we assume that this file exists and will load
-            db = new VisualGestureBuilderDatabase(
-              @"..\..\Resources\gbtisg.gbd");
+            try {
+                db = new VisualGestureBuilderDatabase(
+                  @"..\..\Resources\gbtisg.gbd");
+            } catch (Exception) {
+                return;
+            }
 
             // we assume that this gesture is in that database (it should be, it's the only
             // gesture in there).

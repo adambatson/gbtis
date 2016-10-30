@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,8 +22,17 @@ namespace gbtis {
         public const int ERASER_SIZE = 100;
         public const int DEFAULT_SIZE = 10;
 
+        // For mouse position data
+        private Window parentWindow;
+
+        // Movement event
         public delegate void PositionEventHandler(Point p);
         public event PositionEventHandler Moved;
+
+        //Mode events
+        public delegate void ModeEventHandler(CursorModes m);
+        public event ModeEventHandler ModeStart;
+        public event ModeEventHandler ModeEnd;
 
         /// <summary>
         /// Cursor bounds
@@ -30,6 +40,9 @@ namespace gbtis {
         private int _size;
         public int Size { get { return _size; } }
 
+        /// <summary>
+        /// Cursor position
+        /// </summary>
         private Point _position;
         public Point Position {
             get { return new Point(_position.X + ActualWidth / 2, _position.Y + ActualWidth / 2); }
@@ -56,6 +69,63 @@ namespace gbtis {
         public Cursor() {
             InitializeComponent();
             toggleIdle(true);
+            Kinect kinect = Kinect.getInstance();
+            Loaded += (source, args) => {
+                parentWindow = Window.GetWindow(this);
+
+                // Kinect controls
+                kinect.FingerPositionChanged += (p) => {
+                    Position = kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
+                    Mode = kinect.CursorMode;
+
+                    Moved?.Invoke(p);
+                };
+                kinect.ModeStart += (m) => {
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
+                    Mode = m;
+
+                    ModeStart?.Invoke(m);
+                };
+                kinect.ModeEnd += (m) => {
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
+                    Mode = m;
+
+                    ModeEnd?.Invoke(m);
+                };
+
+                // Mouse controls
+                parentWindow.MouseMove += (s, e) => {
+                    Position = Mouse.GetPosition(parentWindow);
+                    Mode = mouseMode();
+
+                    Moved?.Invoke(Position);
+                };
+                parentWindow.PreviewMouseDown += (s, e) => {
+                    Position = Mouse.GetPosition(parentWindow);
+                    Mode = mouseMode();
+
+                    ModeStart?.Invoke(Mode);
+                };
+                parentWindow.PreviewMouseUp += (s, e) => {
+                    Position = Mouse.GetPosition(parentWindow);
+                    Mode = mouseMode();
+
+                    ModeEnd?.Invoke(Mode);
+                };
+            };
+        }
+
+        /// <summary>
+        /// Mouse based cursor mode
+        /// </summary>
+        /// <returns></returns>
+        private CursorModes mouseMode() {
+            bool leftDown = Mouse.LeftButton == MouseButtonState.Pressed;
+            bool rightDown = Mouse.RightButton == MouseButtonState.Pressed;
+
+            if (leftDown) return CursorModes.Draw;
+            if (rightDown) return CursorModes.Erase;
+            return CursorModes.Idle;
         }
 
         /// <summary>

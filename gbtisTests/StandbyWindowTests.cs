@@ -18,7 +18,7 @@ namespace gbtis.Tests {
         public void Initialize() {
             eventFlag = false;
 
-            window = new StandbyWindow(new Kinect());
+            window = new StandbyWindow();
             window.Show();
         }
 

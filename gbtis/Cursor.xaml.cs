@@ -45,7 +45,7 @@ namespace gbtis {
         /// </summary>
         private Point _position;
         public Point Position {
-            get { return new Point(_position.X + ActualWidth / 2, _position.Y + ActualWidth / 2); }
+            get { return new Point(_position.X + ActualWidth / 2, _position.Y + ActualHeight / 2); }
             set {
                 value = new Point(value.X - ActualWidth / 2, value.Y - ActualHeight / 2);
 
@@ -75,19 +75,19 @@ namespace gbtis {
 
                 // Kinect controls
                 kinect.FingerPositionChanged += (p) => {
-                    Position = kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
+                    Position = kinect.ColorToInterface(p, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
                     Mode = kinect.CursorMode;
 
                     Moved?.Invoke(p);
                 };
                 kinect.ModeStart += (m) => {
-                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
                     Mode = m;
 
                     ModeStart?.Invoke(m);
                 };
                 kinect.ModeEnd += (m) => {
-                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(ActualWidth, ActualHeight));
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
                     Mode = m;
 
                     ModeEnd?.Invoke(m);

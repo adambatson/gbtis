@@ -23,9 +23,9 @@ namespace gbtis {
         /// Constructor for the standby window
         /// </summary>
         /// <param name="_sensor">An open kinect sensor, or null</param>
-        public StandbyWindow(Kinect kinect) {
+        public StandbyWindow() {
             InitializeComponent();
-            this.kinect = kinect;
+            this.kinect = Kinect.getInstance();
 
             // Initialize load text
             standbyMsg.Text = (kinect.isAvailable()) ? 

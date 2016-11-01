@@ -6,6 +6,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 
 namespace gbtis { 
     class UIController {
@@ -20,23 +21,21 @@ namespace gbtis {
 
         public UIController() {
             //Making the kinect Controller
-            kinect = new Kinect();
+            kinect = Kinect.getInstance();
             kinectHandler();
 
-            /*Starting the standby window
-            standby = new StandbyWindow(kinect);
+            //Starting the standby window
+            standby = new StandbyWindow();
             standbyHandler();
-            */
 
             //Starting and showing the admin window
             admin = new AdminWindow();
             adminHandler();
             admin.Show();
 
-            /*Starting the canvas screen
-            canvas = new CanvasWindow(kinect);
+            //Starting the canvas screen
+            canvas = new CanvasWindow();
             canvasHandler();
-            */
 
             startTimer();
         }
@@ -49,61 +48,43 @@ namespace gbtis {
         }
 
         private void kinectHandler() {
-            kinect.WaveGestureOccured += () => { startNewCanvas(); closeStandby(); };
-            kinect.EasterEggGestureOccured += () => {
-                standby.EasterEggArrived();
-                standby.changeText(""); //change to whatever it was before
-                closeStandby();
-                startNewCanvas();
-            };
+            kinect.WaveGestureOccured += () => { waveOccured(); };
+            kinect.EasterEggGestureOccured += () => { handleEasterEggOccured(); };
         }
 
-        private void unSubscribekinectHandler() {
-            kinect.WaveGestureOccured -= () => { };
-            //kinect.EasterEggGestureOccured -= () => { };
-        }
-
-        private void startNewCanvas() {
-            canvas = new CanvasWindow(kinect);
+        //Application.Current.Dispatcher.Invoke(new Action(() =>));
+        private void waveOccured() {
+            standby.Hide();
             canvas.Show();
-            canvas.Cancel += (s, e) => { startNewStandby(); closeCanvas(); };
-            canvas.Continue += (s, e) => { startNewStandby(); closeCanvas(); };
         }
 
-        private void closeCanvas() {
-            if (canvas != null) {
-                canvas.Close();
-                canvas.Cancel -= (s, e) => { };
-                canvas.Continue -= (s, e) => { };
-            }
+        private void handleEasterEggOccured() {
+            standby.EasterEggArrived();
+            standby.Hide();
+            standby.changeText(gbtis.Properties.Resources.msgStart);
+            canvas.Show();
+        }
+
+        private void canvasHandler() {
+            canvas.Cancel += (s, e) => { canvas.Hide(); standby.Show(); };
+            canvas.Continue += (s, e) => { canvas.Hide(); standby.Show(); };
         }
 
         private void adminHandler() {
             admin.Exit += (s, e) => { exitAll(); };
-            admin.Standby += (s, e) => { startNewStandby(); };
-            admin.Input += (s, e) => { startNewStandby(); };
+            admin.Standby += (s, e) => { standby.Show(); };
+            admin.Input += (s, e) => { standby.Show(); };
         }
 
-        private void startNewStandby() {
-            standby = new StandbyWindow(kinect);
-            standby.Show();
+        private void standbyHandler() {
             standby.Exit += (s, e) => { exitAll(); };
-            kinectHandler();
-        }
-
-        private void closeStandby() {
-            if (standby != null) {
-                standby.Close();
-                standby.Exit -= (s, e) => { exitAll(); };
-                unSubscribekinectHandler();
-            }
         }
 
         private void exitAll() {
             try {
-                closeStandby();
+                standby.Close();
                 admin.Close();
-                closeCanvas();
+                canvas.Close();
             }
             catch (InvalidOperationException e){}  
         }

@@ -48,13 +48,14 @@ namespace gbtis {
         }
 
         private void kinectHandler() {
-            kinect.WaveGestureOccured += () => { waveOccured(); };
-            kinect.EasterEggGestureOccured += () => { handleEasterEggOccured(); };
+            kinect.WaveGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => waveOccured() )); };
+            kinect.EasterEggGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => handleEasterEggOccured() )); };
         }
 
         //Application.Current.Dispatcher.Invoke(new Action(() =>));
         private void waveOccured() {
             standby.Hide();
+            canvas.clearScreen();
             canvas.Show();
         }
 
@@ -62,16 +63,27 @@ namespace gbtis {
             standby.EasterEggArrived();
             standby.Hide();
             standby.changeText(gbtis.Properties.Resources.msgStart);
+            canvas.clearScreen();
             canvas.Show();
         }
 
         private void canvasHandler() {
-            canvas.Cancel += (s, e) => { canvas.Hide(); standby.Show(); };
-            canvas.Continue += (s, e) => { canvas.Hide(); standby.Show(); };
+            canvas.Cancel += () => { Application.Current.Dispatcher.Invoke(new Action(() => cancelOccured() )); };
+            canvas.Continue += (s) => { Application.Current.Dispatcher.Invoke(new Action(() => continueOccured() )); };
+        }
+
+        private void cancelOccured() {
+            canvas.Hide();
+            standby.Show();
+        }
+
+        private void continueOccured() {
+            canvas.Hide();
+            standby.Show();
         }
 
         private void adminHandler() {
-            admin.Exit += (s, e) => { exitAll(); };
+            admin.Exit += (s, e) => { Application.Current.Dispatcher.Invoke(new Action(() => exitAll() )); };
             admin.Standby += (s, e) => { standby.Show(); };
             admin.Input += (s, e) => { standby.Show(); };
         }
@@ -85,8 +97,7 @@ namespace gbtis {
                 standby.Close();
                 admin.Close();
                 canvas.Close();
-            }
-            catch (InvalidOperationException e){}  
+            } catch (InvalidOperationException e) { }  
         }
     }
 }

@@ -13,7 +13,7 @@ namespace gbtis {
     public delegate void WaveGestureHandler();
     public delegate void EasterEggHandler();
     public delegate void SensorStatusHandler(Boolean isAvailable);
-    public delegate void ModeChangedHandler(CanvasCursor.CursorType mode);
+    public delegate void ModeChangedHandler(CursorModes mode);
     public delegate void FingerPositionHandler(Point point);
 
     /// <summary>
@@ -27,7 +27,10 @@ namespace gbtis {
         //Constants
         private const double WAVE_CONFIDENCE = 0.5;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
-        private const int POINT_SAMPLE_SIZE = 15;
+        private const float SMOOTHING_FACTOR = 0.35f;
+
+        public Point FingerPosition { get; set; }
+        public CursorModes CursorMode { get; set; }
 
         //Events
         public event BitMapReadyHandler BitMapReady;
@@ -53,10 +56,8 @@ namespace gbtis {
         //Just the tip
         private Point? prevPoint;
         private CoordinateMapper coordinateMapper;
-        private HandState lastRightHandState;
 
         //Rolling average finger positions
-        private LinkedList<float> xPoints, yPoints;
         private float xAvg, yAvg;
 
         private Kinect() {
@@ -75,9 +76,6 @@ namespace gbtis {
             coordinateMapper = sensor.CoordinateMapper;
 
             sensor.IsAvailableChanged += OnIsAvailableChanged;
-
-            xPoints = new LinkedList<float>();
-            yPoints = new LinkedList<float>();
             xAvg = 0; yAvg = 0;
         }
 
@@ -114,67 +112,72 @@ namespace gbtis {
                     handler?.Invoke(img);
                 }
             }
+
             if(activeBody != null && activeBody.IsTracked) {
                 var rightHand = activeBody.Joints[JointType.HandTipRight];
+                HandState handState = activeBody.HandRightState;
+                
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     rightHand.Position);
+
                 Point point = getAverageFingerTipPosition(colorPoint.X, colorPoint.Y);
                 if (!point.Equals(prevPoint)) {
-                    FingerPositionChanged?.Invoke(point);
+                    FingerPosition = point;
                     prevPoint = point;
+                    Application.Current.Dispatcher.Invoke(new Action(() => FingerPositionChanged?.Invoke(point)));
                 }
-                if(activeBody.HandRightState != lastRightHandState) {
-                    switch(activeBody.HandRightState) {
-                        case HandState.NotTracked:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Missing);
-                            break;
-                        case HandState.Closed:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Idle);
-                            break;
-                        case HandState.Open:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Erase);
-                            break;
-                        default:
-                            ModeStart?.Invoke(CanvasCursor.CursorType.Draw);
-                            break;
-                    }
+
+                CursorModes mode;
+                switch (handState) {
+                    case HandState.Lasso:
+                        mode = CursorModes.Draw;
+                        break;
+                    case HandState.Open:
+                        mode = CursorModes.Erase;
+                        break;
+                    case HandState.Closed:
+                    case HandState.NotTracked:
+                        mode = CursorModes.Idle;
+                        break;
+                    default:
+                        return;
+                }
+
+                if (mode != CursorMode) {
+                    Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
+                    Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
+                    CursorMode = mode;
                 }
             }
         }
 
         /// <summary>
-        /// Calculates the average finger position over the last
-        /// POINT_SAMPLE_SIZE frames
+        /// Convert color camera coordinates to arbitrary coordinates
+        /// </summary>
+        /// <param name="p">Point to convert</param>
+        /// <param name="size">Size of the new region</param>
+        /// <returns></returns>
+        public Point ColorToInterface(Point p, Size size) {
+            ColorFrameSource c = sensor.ColorFrameSource;
+            return new Point(
+                p.X * size.Width / c.FrameDescription.Width,
+                p.Y * size.Height / c.FrameDescription.Height
+            );
+        }
+
+        /// <summary>
+        /// Exponential moving average of fingertip position
         /// </summary>
         /// <param name="x">The latest x coordinate</param>
         /// <param name="y">The latest y coordinate</param>
         /// <returns>The average position</returns>
         private Point getAverageFingerTipPosition(float x, float y) {
-            //Only need to check one because their lengths should never be out of synch
-            if(xPoints.Count == 0) {
-                xAvg = x;
-                yAvg = y;
-            }
-            else {
-                if (xPoints.Count < POINT_SAMPLE_SIZE) {
-                    //We're still calculating a normal average
-                    xAvg -= xAvg / (xPoints.Count + 1);
-                    yAvg -= yAvg / (yPoints.Count + 1);
-                }
-                else { //Now we're calculating a rolling average
-                    //I wanted to use ternary operators for this but
-                    //RemoveFirst() returns void
-                    xAvg -= xPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
-                    yAvg -= yPoints.ElementAt(0) / POINT_SAMPLE_SIZE;
-                    xPoints.RemoveFirst();
-                    yPoints.RemoveFirst();
-                }
-            }
-            xPoints.AddLast(x);
-            yPoints.AddLast(y);
+            xAvg = SMOOTHING_FACTOR * x + (1 - SMOOTHING_FACTOR) * xAvg;
+            yAvg = SMOOTHING_FACTOR * y + (1 - SMOOTHING_FACTOR) * yAvg;
+            
             return new Point(xAvg, yAvg);
         }
-
+        
         /// <summary>
         /// Convert a frame of kinect color video to bitmap for display
         /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
@@ -210,10 +213,12 @@ namespace gbtis {
         /// Opens the GestureReader and loads the Gestures
         /// </summary>
         private void OpenGestureReader() {
-
-            // we assume that this file exists and will load
-            db = new VisualGestureBuilderDatabase(
-              @"..\..\Resources\gbtisg.gbd");
+            try {
+                db = new VisualGestureBuilderDatabase(
+                  @"..\..\Resources\gbtisg.gbd");
+            } catch (Exception) {
+                return;
+            }
 
             // we assume that this gesture is in that database (it should be, it's the only
             // gesture in there).

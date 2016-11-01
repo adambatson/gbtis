@@ -50,6 +50,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Ink, Version=6.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Windows\WinSxS\amd64_microsoft.ink_31bf3856ad364e35_10.0.14393.321_none_c0e1c32f3e35d7a4\Microsoft.Ink.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft SDKs\Kinect\v2.0_1409\Assemblies\Microsoft.Kinect.dll</HintPath>
@@ -90,14 +94,11 @@
     <Compile Include="BodyCounter.xaml.cs">
       <DependentUpon>BodyCounter.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Canvas.xaml.cs">
-      <DependentUpon>Canvas.xaml</DependentUpon>
-    </Compile>
     <Compile Include="CanvasWindow.xaml.cs">
       <DependentUpon>CanvasWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CanvasCursor.xaml.cs">
-      <DependentUpon>CanvasCursor.xaml</DependentUpon>
+    <Compile Include="Cursor.xaml.cs">
+      <DependentUpon>Cursor.xaml</DependentUpon>
     </Compile>
     <Compile Include="HoverButton.xaml.cs">
       <DependentUpon>HoverButton.xaml</DependentUpon>
@@ -120,15 +121,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Canvas.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="CanvasWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CanvasCursor.xaml">
+    <Page Include="Cursor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -163,6 +160,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

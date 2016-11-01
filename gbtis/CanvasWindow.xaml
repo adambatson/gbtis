@@ -6,38 +6,49 @@
         xmlns:local="clr-namespace:gbtis"
         mc:Ignorable="d"
         
-        WindowStyle="None" ResizeMode="NoResize"
+        WindowStyle="None" ResizeMode="NoResize" Cursor="None"
         WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="8*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <local:HoverButton x:Name="clearButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="0" Text="Clear" Color="Teal" />
-        <local:HoverButton x:Name="cancelButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="1" Text="Cancel" Color="Crimson" />
-        <local:HoverButton x:Name="continueButton" x:FieldModifier="public" Margin="10" Grid.Row="0" Grid.Column="2" Text="Continue" Color="ForestGreen" />
+        <Grid Grid.Row="0" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="8">
+           
+            <local:HoverButton x:Name="helpButton" x:FieldModifier="public" Grid.Column="0" Text="Help" Color="SlateGray" Margin="0,0,10,0" />
+            <local:HoverButton x:Name="clearButton" x:FieldModifier="public" Grid.Column="1" Text="Clear" Color="RoyalBlue" />
+            <local:HoverButton x:Name="cancelButton" x:FieldModifier="public" Grid.Column="2" Text="Cancel" Color="Crimson" />
+            <local:HoverButton x:Name="continueButton" x:FieldModifier="public" Grid.Column="3" Text="Continue" Color="ForestGreen" />
+           
+        </Grid>
+
+        <Border BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1">
             <Grid>
-                <local:Canvas x:Name="drawCanvas" />
-                <local:CanvasCursor x:Name="drawCursor" />
+                <InkCanvas x:Name="canvas" EditingMode="Select" UseCustomCursor="True" Cursor="None">
+                    <InkPresenter x:Name="canvasPresenter" />
+                    <InkCanvas.DefaultDrawingAttributes>
+                        <DrawingAttributes Color="Black" FitToCurve="true" Width="10" Height="10"/>
+                    </InkCanvas.DefaultDrawingAttributes>
+                </InkCanvas>
             </Grid>
         </Border>
 
+        <Viewbox HorizontalAlignment="Stretch" Grid.Row="2">
+            <TextBlock Margin="10,0,10,0" x:Name="previewText" />
+        </Viewbox>
+
+        <Grid Grid.ColumnSpan="4" Grid.RowSpan="3">
+            <local:Cursor x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        </Grid>
         <Image x:Name="sensorOverlay" Opacity="0.2" 
                Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
                Grid.ColumnSpan="3" Grid.RowSpan="10" />

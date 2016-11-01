@@ -60,8 +60,8 @@ namespace gbtis {
         }
 
         private void canvasHandler() {
-            canvas.Cancel += (s, e) => { canvas.Hide(); standby.Show(); };
-            canvas.Continue += (s, e) => { canvas.Hide(); standby.Show(); };
+            canvas.Cancel += () => { canvas.Hide(); standby.Show(); };
+            canvas.Continue += (s) => { canvas.Hide(); standby.Show(); };
         }
 
         private void adminHandler() {

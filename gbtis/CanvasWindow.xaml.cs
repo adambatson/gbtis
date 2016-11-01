@@ -1,152 +1,236 @@
-﻿using Microsoft.Kinect;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using Microsoft.Ink;
+using System.IO;
 
 namespace gbtis {
     /// <summary>
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
-        public event EventHandler Cancel;
-        public event EventHandler Continue;
+        public const int FR_CA = 0x0c0c;
+
+        // OCR property
+        private string _text;
+        public string Text { get { return _text; } }
+
+        // Button events
+        public event ButtonEventHandler Help;
+        public event ButtonEventHandler Cancel;
+        public event TextEventHandler Continue;
+
+        // Event handler types
+        public delegate void TextEventHandler(string text);
+        public delegate void ButtonEventHandler();
+
+        //Text and canvas data
+        private Recognizer recognizer;
+        private StylusPointCollection stylusPoints;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public CanvasWindow() {
             InitializeComponent();
+            cursor.Position = Mouse.GetPosition(canvas);
             Kinect kinect = Kinect.getInstance();
 
-            // Set up the cursor
-            drawCursor.Type = CanvasCursor.CursorType.Idle;
-            drawCursor.setKinect(kinect);
+            // Get language. French first, or default
+            Recognizers systemRecognizers = new Recognizers();
+            recognizer = systemRecognizers.GetDefaultRecognizer();
 
+            // Overlay
             kinect.BitMapReady += BitMapArrived;
 
-            // Set up cursor update events
-            drawCursor.Moved += DrawCursor_Moved;
-            drawCursor.Draw += (s, e) => drawCanvas.Mark(
-                drawCursor.RelativePosition(drawCanvas), drawCursor.Size, drawCursor.Type.round);
-            drawCursor.Erase += (s, e) => drawCanvas.Erase(
-                drawCursor.RelativePosition(drawCanvas), drawCursor.Size, drawCursor.Type.round);
-            drawCursor.Idle += (s, e) => drawCanvas.ClearPrevious();
+            // Init canvas
+            Dispatcher.Invoke(new Action(() => recognize()));
+
+            //Cursor Events
+            cursor.Moved += (p) => {
+                cursorMove();
+            };
+            cursor.ModeStart += (m) => {
+                cursorDown();
+            };
+            cursor.ModeEnd += (m) => {
+                cursorUp();
+            };
+
+            // Disable default canvas controls
+            canvas.PreviewMouseDown += (s, e) => e.Handled = true;
+            canvas.PreviewMouseUp += (s, e) => e.Handled = true;
+            canvas.PreviewStylusDown += (s, e) => e.Handled = true;
+            canvas.PreviewStylusUp += (s, e) => e.Handled = true;
+            canvas.PreviewTouchDown += (s, e) => e.Handled = true;
+            canvas.PreviewTouchUp += (s, e) => e.Handled = true;
 
             // Button events
-            clearButton.Clicked += (s, e) => drawCanvas.ClearCanvas();
-            cancelButton.Clicked += (s, e) => Cancel?.Invoke(this, new EventArgs());
-            continueButton.Clicked += (s, e) => Continue?.Invoke(this, new EventArgs());
+            cursor.Moved += (p) => {
+                helpButton.Over((helpButton.Intersects(this, p)));
+                clearButton.Over((clearButton.Intersects(this, p)));
+                cancelButton.Over((cancelButton.Intersects(this, p)));
+                continueButton.Over((continueButton.Intersects(this, p)));
+            };
+            clearButton.Clicked += (s, e) => {
+                this.Dispatcher.Invoke(new Action(() => {
+                    canvas.Strokes.Clear();
+                    recognize();
+                }));
+            };
+            cancelButton.Clicked += (s, e) => Cancel?.Invoke();
+            continueButton.Clicked += (s, e) => Continue?.Invoke(Text);
+            helpButton.Clicked += (s, e) => Help?.Invoke();
         }
 
         /// <summary>
-        /// Get the canvas' current image
+        ///  Convert a Point into a StylusPoint
         /// </summary>
-        /// <returns>The canvas ImageSource</returns>
-        public ImageSource Image() {
-            return drawCanvas.Image();
+        /// <param name="p">A Point</param>
+        /// <returns>StylusPoint</returns>
+        private StylusPoint toStylusPoint(Point p) {
+            return new StylusPoint(p.X, p.Y);
         }
 
         /// <summary>
-        /// Get the raw pixel data from the canvas
+        /// Transform a point into a point relative to the canvas
         /// </summary>
-        /// <returns>RGBA pixel data</returns>
-        public byte[] Pixels() {
-            return drawCanvas.Pixels();
+        /// <param name="p">The point</param>
+        /// <returns>A Point</returns>
+        private Point relativeTransform(Point p) {
+            p = this.TransformToDescendant(canvas).Transform(p);
+            return new Point(p.X, p.Y);
+        }
+
+        /// <summary>
+        /// Cursor has been moved
+        /// </summary>
+        /// <param name="cursor">Position</param>
+        /// <param name="mode">State</param>
+        private void cursorMove() {
+            // Stop if input capture isn't ready
+            if (stylusPoints == null) return;
+
+            // Add current point
+            stylusPoints.Add(toStylusPoint(relativeTransform(cursor.Position)));
+
+            //Erase if need be
+            if (cursor.Mode == CursorModes.Erase) erase();
+        }
+
+        /// <summary>
+        /// Cursor pressed
+        /// </summary>
+        /// <param name="cursor">Position</param>
+        /// <param name="mode">State</param>
+        private void cursorDown() {
+            // Start input capture
+            if (stylusPoints == null)
+                stylusPoints = new StylusPointCollection();
+
+            // Add current point
+            stylusPoints.Add(toStylusPoint(relativeTransform(cursor.Position)));
+
+            // Draw points if need be
+            if (cursor.Mode == CursorModes.Draw) draw();
+            if (cursor.Mode == CursorModes.Erase) erase();
+        }
+
+        /// <summary>
+        /// Cursor released
+        /// </summary>
+        /// <param name="cursor">Position</param>
+        /// <param name="mode">State</param>
+        private void cursorUp() {
+            // Revert to standby cursor
+            if (cursor.Mode == CursorModes.Idle)
+                canvas.EditingMode = InkCanvasEditingMode.Select;
+
+            // Recognize input and clear set of points
+            Dispatcher.Invoke(new Action(() => recognize()));
+            stylusPoints = null;
+        }
+
+        /// <summary>
+        /// Draw the strokes saved up
+        /// </summary>
+        private void draw() {
+            canvas.EditingMode = InkCanvasEditingMode.Ink;
+
+            System.Windows.Ink.Stroke stroke = new System.Windows.Ink.Stroke(stylusPoints, canvas.DefaultDrawingAttributes);
+            canvas.Strokes.Add(stroke);
+        }
+
+        /// <summary>
+        /// Erase at a point
+        /// </summary>
+        /// <param name="cursor">Cursor location</param>
+        private void erase() {
+            canvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+
+            Point p = relativeTransform(new Point(
+                cursor.Position.X - cursor.Size / 2, cursor.Position.Y - cursor.Size / 2));
+            canvas.Strokes.Erase(new Rect(p, new Size(cursor.Size, cursor.Size)));
+        }
+
+        /// <summary>
+        /// OCR magic
+        /// </summary>
+        private void recognize() {
+            using (MemoryStream ms = new MemoryStream()) {
+                // Build an inkCollector containing the strokes
+                canvas.Strokes.Save(ms);
+                var myInkCollector = new InkCollector();
+                var ink = new Ink();
+                ink.Load(ms.ToArray());
+
+                using (RecognizerContext context = recognizer.CreateRecognizerContext()) {
+                    RecognitionStatus status;
+                    context.Factoid = Factoid.WordList; // Magic smoke for name recognition
+                    context.Strokes = ink.Strokes;
+
+                    // Cannot do if there are no strokes
+                    if (ink.Strokes.Count > 0) {
+                        var results = context.Recognize(out status);
+                        if (status == RecognitionStatus.NoError) {
+                            if (results.TopString.Length > 0) {
+                                // Set the text
+                                _text = results.ToString();
+                                previewText.Text = _text;
+
+                                // Styling changes
+                                previewText.Foreground = new SolidColorBrush(Colors.Black);
+                                continueButton.Enable();
+
+                                return;
+                            }
+                        }
+                    }
+
+                    // Default options
+                    previewText.Text = gbtis.Properties.Resources.noString;
+                    previewText.Foreground = new SolidColorBrush(Colors.Gray);
+                    continueButton.Disable();
+                }
+            }
         }
 
         /// <summary>
         /// Update the camera feed from the sensor
         /// </summary>
         /// <param name="img">The latest ImageSource</param>
-        void BitMapArrived(ImageSource img) {
+        private void BitMapArrived(ImageSource img) {
             this.Dispatcher.Invoke(new Action(() =>
                 sensorOverlay.Source = img));
         }
+    }
 
-        /// <summary>
-        /// Cursor moved. Update position
-        /// </summary>
-        /// <param name="sender">Source of the event</param>
-        /// <param name="e">Event parameters</param>
-        private void DrawCursor_Moved(object sender, EventArgs e) {
-            this.Dispatcher.Invoke(() => {
-                // Update cursor position
-                Point p = drawCursor.RelativePosition(drawCanvas);
-                drawCursor.Position = p;
-
-                // Test canvas borders
-                if (!isInRange(p.X, 0, drawCanvas.ActualWidth - 1) || !isInRange(p.Y, 0, drawCanvas.ActualHeight - 1)) {
-                    drawCursor.Type = CanvasCursor.CursorType.Missing;
-                } else if (drawCursor.Type == CanvasCursor.CursorType.Missing) {
-                    drawCursor.Type = CanvasCursor.CursorType.Idle;
-                }
-
-                // Test button
-                clearButton.CursorOver(p);
-                cancelButton.CursorOver(p);
-                continueButton.CursorOver(p);
-            });
-        }
-        
-        /// <summary>
-        /// Update the camera feed from the sensor
-        /// </summary>
-        /// <param name="sender">Object sending the event</param>
-        /// <param name="e">Arguments for the event object</param>
-        private void FrameReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
-            var reference = e.FrameReference.AcquireFrame();
-            using (var frame = reference.ColorFrameReference.AcquireFrame()) {
-                if (frame != null) {
-                    this.Dispatcher.Invoke(new Action(() =>
-                    sensorOverlay.Source = ToBitmap(frame)));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Convert a frame of kinect color video to bitmap for display
-        /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
-        /// Under Apache License 2.0
-        /// </summary>
-        /// <param name="frame">The frame received from the kinect</param>
-        /// <returns>A bitmap format source for a WPF image control</returns>
-        private static ImageSource ToBitmap(ColorFrame frame) {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-
-            byte[] pixels = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
-
-            if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
-                frame.CopyRawFrameDataToArray(pixels);
-            } else {
-                frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
-            }
-
-            int stride = width * PixelFormats.Bgr32.BitsPerPixel / 8;
-
-            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, pixels, stride);
-        }
-
-        /// <summary>
-        /// Test a value for a range
-        /// </summary>
-        /// <param name="n">The value</param>
-        /// <param name="min">Minimum value</param>
-        /// <param name="max">Maximum value</param>
-        /// <returns>True if in range</returns>
-        private bool isInRange(double n, double min, double max) {
-            return (n >= min) && (n <= max);
-        }
+    /// <summary>
+    /// Cursor modes for the canvas' cursor
+    /// </summary>
+    public enum CursorModes {
+        Idle, Draw, Erase
     }
 }

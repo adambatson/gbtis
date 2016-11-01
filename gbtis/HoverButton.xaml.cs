@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace gbtis {
     /// <summary>
@@ -22,8 +12,10 @@ namespace gbtis {
     public partial class HoverButton : UserControl {
         public const float COMPLETION_TIME = 0.75f;
         public const float UNDO_MULTIPLIER = 2.0f;
+        public const float DISABLED_OPACITY = 0.3f;
 
         Timer t;
+        private bool disabled;
         private float completion;
         private bool over;
         private bool done;
@@ -34,18 +26,18 @@ namespace gbtis {
         /// <summary>
         /// Register the Text property of the hoverbutton control
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(String), typeof(HoverButton), new PropertyMetadata(""));
-        public String Text {
-            get { return (String)this.GetValue(TextProperty); }
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(HoverButton), new PropertyMetadata(""));
+        public string Text {
+            get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
 
         /// <summary>
         /// Register the Color property of the hoverbutton control
         /// </summary>
-        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(HoverButton), new PropertyMetadata(Colors.Black));
+        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(HoverButton), new PropertyMetadata(Colors.Gray));
         public Color Color {
-            get { return (Color)this.GetValue(ColorProperty); }
+            get { return (Color)GetValue(ColorProperty); }
             set { SetValue(ColorProperty, value); }
         }
 
@@ -54,44 +46,43 @@ namespace gbtis {
         /// </summary>
         public HoverButton() {
             InitializeComponent();
-            (this.Content as FrameworkElement).DataContext = this;
-            over = done = reset = false;
+            this.DataContext = this;
+
+            over = done = reset = disabled = false;
             completion = 0;
             
             t = new Timer(50);
             t.Elapsed += T_Elapsed;
             t.Start();
         }
-
+        
         /// <summary>
-        /// Test the cursor's position against the button
+        /// Hover over the button
         /// </summary>
-        /// <param name="cursor">Coordinates of the cursor</param>
-        /// <returns></returns>
-        public bool CursorOver(Point cursor) {
-            Window parentWindow = Window.GetWindow(this);
-            Point self = parentWindow.TransformToDescendant(this).Transform(cursor);
-            over =
-                self.X >= 0 && self.X <= ActualWidth &&
-                self.Y >= 0 && self.Y <= ActualHeight;
-            return over;
+        /// <param name="over">True to activate</param>
+        public void Over(bool over) {
+            this.over = !disabled && over;
+        }
+
+        public bool Intersects(Visual parent, Point p) {
+            Rect bounds = TransformToVisual(parent).TransformBounds(new Rect(RenderSize));
+            return bounds.Contains(p);
         }
 
         /// <summary>
-        /// Activates the Clicked event and changes the look of the control
+        /// Disable the button
         /// </summary>
-        private void clicked() {
-            if (done) return;
-            done = true;
+        public void Disable() {
+            disabled = true;
+            borderBox.Opacity = DISABLED_OPACITY;
+        }
 
-            Clicked?.Invoke(this, new EventArgs());
-
-            try {
-                this.Dispatcher.Invoke(() => {
-                    textBox.Foreground = new SolidColorBrush(Colors.Black);
-                    reset = true;
-                });
-            } catch (OperationCanceledException) { }
+        /// <summary>
+        /// Enable the button
+        /// </summary>
+        public void Enable() {
+            disabled = false;
+            borderBox.Opacity = 1;
         }
 
         /// <summary>
@@ -100,35 +91,36 @@ namespace gbtis {
         /// <param name="sender">Source of the event</param>
         /// <param name="e">Event args</param>
         private void T_Elapsed(object sender, ElapsedEventArgs e) {
-            if (!over) {
-                // User is not on the button. Reverse progress
-                completion -= completionRate() * UNDO_MULTIPLIER;
-                if (completion < 0) completion = 0;
+            completion += (over) ? completionRate() : -completionRate() * UNDO_MULTIPLIER;
+            if (completion < 0) completion = 0;
+            if (completion > 1) completion = 1;
 
-                // No longer over the button, and finished the animation. Reset.
-                if (done) {
-                    done = false;
-                    completion = 0;
-                }
+            // Click the button
+            if (over && !done && completion >= 1) {
+                done = true;
+                Clicked?.Invoke(this, new EventArgs());
 
-                if (reset) {
-                    try {
-                        this.Dispatcher.Invoke(() => {
-                            textBox.Foreground = new SolidColorBrush(Colors.White);
-                        });
-                    } catch (OperationCanceledException) { }
-                }
+                try {
+                    this.Dispatcher.Invoke(() => {
+                        textBox.Foreground = new SolidColorBrush(Colors.Black);
+                        reset = true;
+                    });
+                } catch (OperationCanceledException) { }
             }
 
-            // Over the button. Progress towards the event
-            if (over && !done) {
-                completion += completionRate();
-                if (completion >= 1) {
-                    completion = 1;
-                    clicked();
-                }
-            }
+            // All done, reset everything
+            if (!over && reset) {
+                done = reset = false;
+                completion = 0;
 
+                try {
+                    this.Dispatcher.Invoke(() => {
+                        textBox.Foreground = new SolidColorBrush(Colors.White);
+                        reset = true;
+                    });
+                } catch (OperationCanceledException) { }
+            }
+            
             // Update Button look to reflect progress
             try {
                 this.Dispatcher.Invoke(() => {

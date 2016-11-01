@@ -16,16 +16,13 @@ namespace gbtis {
         // Events
         public event EventHandler Exit;
 
-        // For the kinect display
-        Kinect kinect;
-
         /// <summary>
         /// Constructor for the standby window
         /// </summary>
         /// <param name="_sensor">An open kinect sensor, or null</param>
         public StandbyWindow() {
             InitializeComponent();
-            this.kinect = Kinect.getInstance();
+            Kinect kinect = Kinect.getInstance();
 
             // Initialize load text
             standbyMsg.Text = (kinect.isAvailable()) ? 

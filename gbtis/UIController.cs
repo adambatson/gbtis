@@ -18,6 +18,7 @@ namespace gbtis {
         StandbyWindow standby;
         CanvasWindow canvas;
         Kinect kinect;
+        Boolean canvasOpen;
 
         public UIController() {
             //Making the kinect Controller
@@ -35,6 +36,7 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = new CanvasWindow();
+            canvasOpen = false;
             canvasHandler();
 
             startTimer();
@@ -49,14 +51,17 @@ namespace gbtis {
 
         private void kinectHandler() {
             kinect.WaveGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => waveOccured() )); };
-            kinect.EasterEggGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => handleEasterEggOccured() )); };
+            //kinect.EasterEggGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => handleEasterEggOccured() )); };
         }
 
         //Application.Current.Dispatcher.Invoke(new Action(() =>));
         private void waveOccured() {
-            standby.Hide();
-            canvas.clearScreen();
-            canvas.Show();
+            if (!canvasOpen) {
+                standby.Hide();
+                canvas.clearScreen();
+                canvasOpen = true;
+                canvas.Show();
+            }
         }
 
         private void handleEasterEggOccured() {
@@ -64,6 +69,7 @@ namespace gbtis {
             standby.Hide();
             standby.changeText(gbtis.Properties.Resources.msgStart);
             canvas.clearScreen();
+            canvasOpen = true;
             canvas.Show();
         }
 
@@ -74,18 +80,20 @@ namespace gbtis {
 
         private void cancelOccured() {
             canvas.Hide();
+            canvasOpen = false;
             standby.Show();
         }
 
         private void continueOccured() {
             canvas.Hide();
+            canvasOpen = false;
             standby.Show();
         }
 
         private void adminHandler() {
             admin.Exit += (s, e) => { Application.Current.Dispatcher.Invoke(new Action(() => exitAll() )); };
-            admin.Standby += (s, e) => { standby.Show(); };
-            admin.Input += (s, e) => { standby.Show(); };
+            admin.Standby += (s, e) => { continueOccured(); };
+            admin.Input += (s, e) => { continueOccured(); };
         }
 
         private void standbyHandler() {
@@ -97,7 +105,8 @@ namespace gbtis {
                 standby.Close();
                 admin.Close();
                 canvas.Close();
-            } catch (InvalidOperationException e) { }  
+                Environment.Exit(0);
+            } catch (InvalidOperationException e) { Environment.Exit(0); }  
         }
     }
 }

@@ -88,6 +88,7 @@ namespace gbtis {
         //im so sorry
         public void clearScreen() {
             canvas.Strokes.Clear();
+            recognize();
         }
 
         /// <summary>

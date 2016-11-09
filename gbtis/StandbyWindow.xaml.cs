@@ -30,8 +30,6 @@ namespace gbtis {
                 gbtis.Properties.Resources.msgNoSensor;
 
             kinect.BitMapReady += BitMapArrived;
-            kinect.WaveGestureOccured += WaveGestureArrived;
-            kinect.EasterEggGestureOccured += EasterEggArrived;
             kinect.SensorStatusChanged += OnSensorStatusChanged;
 
             // Initialize the names
@@ -67,7 +65,7 @@ namespace gbtis {
         /// <summary>
         /// Handles the occurence of a easter egg gesture
         /// </summary>
-        private void EasterEggArrived() {
+        public void EasterEggArrived() {
             this.Dispatcher.Invoke(() => {
                 standbyMsg.Text = "Bruh.";
                 SoundPlayer player = new SoundPlayer(

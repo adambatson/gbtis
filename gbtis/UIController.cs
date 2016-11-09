@@ -6,6 +6,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 
 namespace gbtis { 
     class UIController {
@@ -17,6 +18,7 @@ namespace gbtis {
         StandbyWindow standby;
         CanvasWindow canvas;
         Kinect kinect;
+        Boolean canvasOpen;
 
         public UIController() {
             //Making the kinect Controller
@@ -34,6 +36,7 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = new CanvasWindow();
+            canvasOpen = false;
             canvasHandler();
 
             startTimer();
@@ -47,26 +50,50 @@ namespace gbtis {
         }
 
         private void kinectHandler() {
-            kinect.WaveGestureOccured += () => { standby.Hide(); canvas.Show(); };
-            kinect.EasterEggGestureOccured += () => { 
-                standby.changeText("Bruh!");
-                SoundPlayer player = new SoundPlayer(
-                    @"..\..\Resources\excellent.wav");
-                player.Play();
+            kinect.WaveGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => waveOccured() )); };
+            //kinect.EasterEggGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => handleEasterEggOccured() )); };
+        }
+
+        //Application.Current.Dispatcher.Invoke(new Action(() =>));
+        private void waveOccured() {
+            if (!canvasOpen) {
                 standby.Hide();
-                canvas.Show(); 
-                standby.changeText(""); //change to whatever it was before
-            };
+                canvas.clearScreen();
+                canvasOpen = true;
+                canvas.Show();
+            }
+        }
+
+        private void handleEasterEggOccured() {
+            standby.EasterEggArrived();
+            standby.Hide();
+            standby.changeText(gbtis.Properties.Resources.msgStart);
+            canvas.clearScreen();
+            canvasOpen = true;
+            canvas.Show();
         }
 
         private void canvasHandler() {
-            canvas.Cancel += () => { canvas.Hide(); standby.Show(); };
-            canvas.Continue += (s) => { canvas.Hide(); standby.Show(); };
+            canvas.Cancel += () => { Application.Current.Dispatcher.Invoke(new Action(() => cancelOccured() )); };
+            canvas.Continue += (s) => { Application.Current.Dispatcher.Invoke(new Action(() => continueOccured() )); };
+        }
+
+        private void cancelOccured() {
+            canvas.Hide();
+            canvasOpen = false;
+            standby.Show();
+        }
+
+        private void continueOccured() {
+            canvas.Hide();
+            canvasOpen = false;
+            standby.Show();
         }
 
         private void adminHandler() {
-            admin.Exit += (s, e) => { exitAll(); };
-            admin.Standby += (s, e) => { standby.Show(); };
+            admin.Exit += (s, e) => { Application.Current.Dispatcher.Invoke(new Action(() => exitAll() )); };
+            admin.Standby += (s, e) => { continueOccured(); };
+            admin.Input += (s, e) => { continueOccured(); };
         }
 
         private void standbyHandler() {
@@ -77,8 +104,9 @@ namespace gbtis {
             try {
                 standby.Close();
                 admin.Close();
-            }
-            catch (InvalidOperationException e){}  
+                canvas.Close();
+                Environment.Exit(0);
+            } catch (InvalidOperationException e) { Environment.Exit(0); }  
         }
     }
 }

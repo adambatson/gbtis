@@ -85,6 +85,12 @@ namespace gbtis {
             helpButton.Clicked += (s, e) => Help?.Invoke();
         }
 
+        //im so sorry
+        public void clearScreen() {
+            canvas.Strokes.Clear();
+            recognize();
+        }
+
         /// <summary>
         ///  Convert a Point into a StylusPoint
         /// </summary>

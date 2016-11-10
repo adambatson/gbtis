@@ -93,7 +93,7 @@ namespace gbtis {
         private void adminHandler() {
             admin.Exit += (s, e) => { Application.Current.Dispatcher.Invoke(new Action(() => exitAll() )); };
             admin.Standby += (s, e) => { continueOccured(); };
-            admin.Input += (s, e) => { continueOccured(); };
+            admin.Input += (s, e) => { waveOccured(); };
         }
 
         private void standbyHandler() {

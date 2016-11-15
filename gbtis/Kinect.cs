@@ -59,13 +59,15 @@ namespace gbtis {
 
         //Rolling average finger positions
         private float xAvg, yAvg;
+        private ushort[] depthData;
+        private int frameSkipCount;
 
         private Kinect() {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
 
             // Prepare sensor feed
-            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
+            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth);
             frameReader.MultiSourceFrameArrived += frameReader_frameArrived;
 
             OpenBodyReader();
@@ -103,20 +105,21 @@ namespace gbtis {
         /// <param name="e">The MultiSourceFrameEventArgs</param>
         private void frameReader_frameArrived(Object sender, MultiSourceFrameArrivedEventArgs e) {
             var reference = e.FrameReference.AcquireFrame();
+
             using (var frame = reference.ColorFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     BitMapReadyHandler handler = BitMapReady;
                     ImageSource img = ToBitmap(frame);
                     //Allow the image to be accessible outside this thread
                     img.Freeze();
-                    handler?.Invoke(img);
+                    Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(img)));
                 }
             }
 
-            if(activeBody != null && activeBody.IsTracked) {
+            if (activeBody != null && activeBody.IsTracked) {
                 var rightHand = activeBody.Joints[JointType.HandTipRight];
                 HandState handState = activeBody.HandRightState;
-                
+
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     rightHand.Position);
 
@@ -144,6 +147,16 @@ namespace gbtis {
                 }
 
                 if (mode != CursorMode) {
+
+                    if (mode == CursorModes.Idle) {
+                        //Compare the tip of the hand to the hand blob
+                        //Attempt to see if a finger is extended
+                        if (Math.Abs(rightHand.Position.Z - activeBody.Joints[JointType.HandRight].Position.Z) > 0.05) {
+                            mode = CursorModes.Draw;
+                            return;
+                        }
+                    }
+
                     Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
                     Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
                     CursorMode = mode;
@@ -174,10 +187,10 @@ namespace gbtis {
         private Point getAverageFingerTipPosition(float x, float y) {
             xAvg = SMOOTHING_FACTOR * x + (1 - SMOOTHING_FACTOR) * xAvg;
             yAvg = SMOOTHING_FACTOR * y + (1 - SMOOTHING_FACTOR) * yAvg;
-            
+
             return new Point(xAvg, yAvg);
         }
-        
+
         /// <summary>
         /// Convert a frame of kinect color video to bitmap for display
         /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
@@ -254,9 +267,9 @@ namespace gbtis {
                     }
 
                     if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
-                        activeBody = trackedBodies.FirstOrDefault();                       
+                        activeBody = trackedBodies.FirstOrDefault();
                     }
-                    
+
                     if (gestureReader.IsPaused) {
                         gestureSource.TrackingId = activeBody.TrackingId;
                         gestureReader.IsPaused = false;
@@ -314,7 +327,7 @@ namespace gbtis {
         /// <param name="e"></param>
         private void OnIsAvailableChanged(Object sender, EventArgs e) {
             SensorStatusHandler handler = SensorStatusChanged;
-            handler?.Invoke(isAvailable());
+            Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(isAvailable())));
         }
     }
 }

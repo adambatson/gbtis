@@ -59,8 +59,9 @@ namespace gbtis {
 
         //Rolling average finger positions
         private float xAvg, yAvg;
-        private ushort[] depthData;
-        private int frameSkipCount;
+
+        //Handedness
+        private JointType hand, handTip;
 
         private Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -79,6 +80,8 @@ namespace gbtis {
 
             sensor.IsAvailableChanged += OnIsAvailableChanged;
             xAvg = 0; yAvg = 0;
+
+            setHand(true);
         }
 
         /// <summary>
@@ -117,11 +120,12 @@ namespace gbtis {
             }
 
             if (activeBody != null && activeBody.IsTracked) {
-                var rightHand = activeBody.Joints[JointType.HandTipRight];
-                HandState handState = activeBody.HandRightState;
-
+                HandState handState = (hand == JointType.HandRight) ?
+                    activeBody.HandRightState :
+                    activeBody.HandLeftState;
+                
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
-                    rightHand.Position);
+                    activeBody.Joints[handTip].Position);
 
                 Point point = getAverageFingerTipPosition(colorPoint.X, colorPoint.Y);
                 if (!point.Equals(prevPoint)) {
@@ -151,7 +155,7 @@ namespace gbtis {
                     if (mode == CursorModes.Idle) {
                         //Compare the tip of the hand to the hand blob
                         //Attempt to see if a finger is extended
-                        if (Math.Abs(rightHand.Position.Z - activeBody.Joints[JointType.HandRight].Position.Z) > 0.05) {
+                        if (Math.Abs(activeBody.Joints[hand].Position.Z - activeBody.Joints[JointType.HandRight].Position.Z) > 0.05) {
                             mode = CursorModes.Draw;
                             return;
                         }
@@ -304,15 +308,14 @@ namespace gbtis {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
                             if (gesture.Confidence > WAVE_CONFIDENCE) {
-                                WaveGestureHandler handler = WaveGestureOccured;
-                                handler?.Invoke();
-                            }
-                        }
-                        if (result.ContainsKey(easterEgg)) {
-                            var gesture = result[easterEgg];
-                            if (gesture.Confidence > EASTER_EGG_CONFIDENCE) {
-                                EasterEggHandler handler = EasterEggGestureOccured;
-                                handler?.Invoke();
+                                Application.Current.Dispatcher.Invoke(new Action(() => {
+                                    setHand(
+                                    activeBody.Joints[JointType.HandRight].Position.Y >=
+                                    activeBody.Joints[JointType.HandLeft].Position.Y
+                                    );
+                                    WaveGestureHandler handler = WaveGestureOccured;
+                                    handler?.Invoke();
+                                }));
                             }
                         }
                     }
@@ -328,6 +331,11 @@ namespace gbtis {
         private void OnIsAvailableChanged(Object sender, EventArgs e) {
             SensorStatusHandler handler = SensorStatusChanged;
             Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(isAvailable())));
+        }
+
+        private void setHand(bool right) {
+            hand = (right) ? JointType.HandRight : JointType.HandLeft;
+            handTip = (right) ? JointType.HandTipRight : JointType.HandTipLeft;            
         }
     }
 }

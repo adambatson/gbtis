@@ -60,12 +60,15 @@ namespace gbtis {
         //Rolling average finger positions
         private float xAvg, yAvg;
 
+        //Handedness
+        private JointType hand, handTip;
+
         private Kinect() {
             sensor = KinectSensor.GetDefault();
             sensor.Open();
 
             // Prepare sensor feed
-            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color);
+            frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth);
             frameReader.MultiSourceFrameArrived += frameReader_frameArrived;
 
             OpenBodyReader();
@@ -77,6 +80,8 @@ namespace gbtis {
 
             sensor.IsAvailableChanged += OnIsAvailableChanged;
             xAvg = 0; yAvg = 0;
+
+            setHand(true);
         }
 
         /// <summary>
@@ -103,22 +108,24 @@ namespace gbtis {
         /// <param name="e">The MultiSourceFrameEventArgs</param>
         private void frameReader_frameArrived(Object sender, MultiSourceFrameArrivedEventArgs e) {
             var reference = e.FrameReference.AcquireFrame();
+
             using (var frame = reference.ColorFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     BitMapReadyHandler handler = BitMapReady;
                     ImageSource img = ToBitmap(frame);
                     //Allow the image to be accessible outside this thread
                     img.Freeze();
-                    handler?.Invoke(img);
+                    Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(img)));
                 }
             }
 
-            if(activeBody != null && activeBody.IsTracked) {
-                var rightHand = activeBody.Joints[JointType.HandTipRight];
-                HandState handState = activeBody.HandRightState;
+            if (activeBody != null && activeBody.IsTracked) {
+                HandState handState = (hand == JointType.HandRight) ?
+                    activeBody.HandRightState :
+                    activeBody.HandLeftState;
                 
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
-                    rightHand.Position);
+                    activeBody.Joints[handTip].Position);
 
                 Point point = getAverageFingerTipPosition(colorPoint.X, colorPoint.Y);
                 if (!point.Equals(prevPoint)) {
@@ -144,6 +151,16 @@ namespace gbtis {
                 }
 
                 if (mode != CursorMode) {
+
+                    if (mode == CursorModes.Idle) {
+                        //Compare the tip of the hand to the hand blob
+                        //Attempt to see if a finger is extended
+                        if (Math.Abs(activeBody.Joints[hand].Position.Z - activeBody.Joints[JointType.HandRight].Position.Z) > 0.05) {
+                            mode = CursorModes.Draw;
+                            return;
+                        }
+                    }
+
                     Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
                     Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
                     CursorMode = mode;
@@ -174,10 +191,10 @@ namespace gbtis {
         private Point getAverageFingerTipPosition(float x, float y) {
             xAvg = SMOOTHING_FACTOR * x + (1 - SMOOTHING_FACTOR) * xAvg;
             yAvg = SMOOTHING_FACTOR * y + (1 - SMOOTHING_FACTOR) * yAvg;
-            
+
             return new Point(xAvg, yAvg);
         }
-        
+
         /// <summary>
         /// Convert a frame of kinect color video to bitmap for display
         /// Conversion code from http://pterneas.com/2014/02/20/kinect-for-windows-version-2-color-depth-and-infrared-streams/
@@ -254,9 +271,9 @@ namespace gbtis {
                     }
 
                     if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
-                        activeBody = trackedBodies.FirstOrDefault();                       
+                        activeBody = trackedBodies.FirstOrDefault();
                     }
-                    
+
                     if (gestureReader.IsPaused) {
                         gestureSource.TrackingId = activeBody.TrackingId;
                         gestureReader.IsPaused = false;
@@ -291,15 +308,14 @@ namespace gbtis {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
                             if (gesture.Confidence > WAVE_CONFIDENCE) {
-                                WaveGestureHandler handler = WaveGestureOccured;
-                                handler?.Invoke();
-                            }
-                        }
-                        if (result.ContainsKey(easterEgg)) {
-                            var gesture = result[easterEgg];
-                            if (gesture.Confidence > EASTER_EGG_CONFIDENCE) {
-                                EasterEggHandler handler = EasterEggGestureOccured;
-                                handler?.Invoke();
+                                Application.Current.Dispatcher.Invoke(new Action(() => {
+                                    setHand(
+                                    activeBody.Joints[JointType.HandRight].Position.Y >=
+                                    activeBody.Joints[JointType.HandLeft].Position.Y
+                                    );
+                                    WaveGestureHandler handler = WaveGestureOccured;
+                                    handler?.Invoke();
+                                }));
                             }
                         }
                     }
@@ -314,7 +330,12 @@ namespace gbtis {
         /// <param name="e"></param>
         private void OnIsAvailableChanged(Object sender, EventArgs e) {
             SensorStatusHandler handler = SensorStatusChanged;
-            handler?.Invoke(isAvailable());
+            Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(isAvailable())));
+        }
+
+        private void setHand(bool right) {
+            hand = (right) ? JointType.HandRight : JointType.HandLeft;
+            handTip = (right) ? JointType.HandTipRight : JointType.HandTipLeft;            
         }
     }
 }

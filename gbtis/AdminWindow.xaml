@@ -40,7 +40,6 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <local:BodyCounter x:Name="bodies" Grid.Column="1" Grid.Row="0" />
                 <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
                     <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>

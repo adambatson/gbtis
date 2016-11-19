@@ -53,27 +53,6 @@ namespace gbtis {
                 sensorFeed.Source = img));
         }
 
-        /// <summary>
-        /// Handles the occurence of a wave gesture
-        /// </summary>
-        private void WaveGestureArrived() {
-            this.Dispatcher.Invoke(() => {
-                standbyMsg.Text = "You just waved!";
-            });
-        }
-
-        /// <summary>
-        /// Handles the occurence of a easter egg gesture
-        /// </summary>
-        public void EasterEggArrived() {
-            this.Dispatcher.Invoke(() => {
-                standbyMsg.Text = "Bruh.";
-                SoundPlayer player = new SoundPlayer(
-                    @"..\..\Resources\excellent.wav");
-                player.Play();
-            });
-        }
-
         public void changeText(String newText) {
             this.Dispatcher.Invoke(new Action(() => {
                 standbyMsg.Text = newText;

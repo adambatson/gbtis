@@ -18,20 +18,24 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Shows a random selection of entries -->
-        <Viewbox VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock x:Name="topName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" />
-        </Viewbox>
-        <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock x:Name="centerName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" TextAlignment="Right" />
-        </Viewbox>
-        <Viewbox VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="2">
-            <TextBlock x:Name="bottomName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" TextAlignment="Right" />
-        </Viewbox>
-
         <!-- Shows the current feed from the camera -->
-        <Border Background="DarkBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2" Grid.ColumnSpan="3">
+        <Border Background="DarkBlue" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" Grid.ColumnSpan="5">
             <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+
+        <!-- Shows a random selection of entries -->
+        <Border Background="White" Opacity="0.6" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid>
+                <Viewbox VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="topName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" />
+                </Viewbox>
+                <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="centerName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" TextAlignment="Right" />
+                </Viewbox>
+                <Viewbox VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="bottomName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" TextAlignment="Right" />
+                </Viewbox>
+            </Grid>
         </Border>
 
         <!-- Intro text... Hidden until someone is in frame -->

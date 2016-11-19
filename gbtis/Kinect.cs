@@ -62,6 +62,7 @@ namespace gbtis {
 
         //Handedness
         private JointType hand, handTip;
+        private bool rightHand;
 
         private Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -120,8 +121,7 @@ namespace gbtis {
             }
 
             if (activeBody != null && activeBody.IsTracked) {
-                HandState handState = (hand == JointType.HandRight) ?
-                    activeBody.HandRightState :
+                HandState handState = (rightHand) ? activeBody.HandRightState :
                     activeBody.HandLeftState;
                 
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
@@ -334,8 +334,9 @@ namespace gbtis {
         }
 
         private void setHand(bool right) {
-            hand = (right) ? JointType.HandRight : JointType.HandLeft;
-            handTip = (right) ? JointType.HandTipRight : JointType.HandTipLeft;            
+            rightHand = right;
+            hand = (rightHand) ? JointType.HandRight : JointType.HandLeft;
+            handTip = (rightHand) ? JointType.HandTipRight : JointType.HandTipLeft;            
         }
     }
 }

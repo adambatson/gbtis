@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace gbtis {
@@ -28,9 +27,15 @@ namespace gbtis {
         private const double WAVE_CONFIDENCE = 0.9;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
+        private const int FRAME_SKIP_HAND_STATUS = 3;
 
+        //TODO Should these be private?
         public Point FingerPosition { get; set; }
         public CursorModes CursorMode { get; set; }
+
+        //Mode switch frame skip
+        private CursorModes NextMode;
+        private int ModeFrameSkip;
 
         //Events
         public event BitMapReadyHandler BitMapReady;
@@ -83,6 +88,8 @@ namespace gbtis {
             xAvg = 0; yAvg = 0;
 
             setHand(true);
+            NextMode = CursorModes.Idle;
+            ModeFrameSkip = 0;
         }
 
         /// <summary>
@@ -160,10 +167,15 @@ namespace gbtis {
                             return;
                         }
                     }
-
-                    Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
-                    Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
-                    CursorMode = mode;
+                    
+                    if (mode == NextMode) {
+                        if (++ModeFrameSkip == FRAME_SKIP_HAND_STATUS) {
+                            Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
+                            Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
+                            CursorMode = mode;
+                            ModeFrameSkip = 0;
+                        }
+                    } else NextMode = mode;
                 }
             }
         }

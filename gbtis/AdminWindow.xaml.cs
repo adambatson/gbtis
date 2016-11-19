@@ -19,6 +19,18 @@ namespace gbtis {
         public AdminWindow() {
             DataContext = this;
             InitializeComponent();
+
+            Kinect kinect = Kinect.getInstance();
+            kinect.BitMapReady += BitMapArrived;
+        }
+
+        /// <summary>
+        /// Update the camera feed from the sensor
+        /// </summary>
+        /// <param name="img">The latest ImageSource</param>
+        void BitMapArrived(ImageSource img) {
+            this.Dispatcher.Invoke(new Action(() =>
+                sensorFeed.Source = img));
         }
 
         /// <summary>

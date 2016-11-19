@@ -101,6 +101,18 @@ namespace gbtis {
         }
 
         /// <summary>
+        /// Gets the Head Position of the Active Body
+        /// </summary>
+        /// <returns>The head position of the active body, or null if 
+        /// no body is currently being tracked
+        /// </returns>
+        public CameraSpacePoint? ActiveBodyHeadPosition() {
+            if (activeBody != null)
+                return activeBody.Joints[JointType.Head].Position;
+            return null;
+        }
+
+        /// <summary>
         /// Determines if the Kinect Sensor if available for use
         /// </summary>
         /// <returns>true if the sensor is available else false</returns>
@@ -282,9 +294,9 @@ namespace gbtis {
                         return;
                     }
 
-                    if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
+                    /*if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
                         activeBody = trackedBodies.FirstOrDefault();
-                    }
+                    }*/
 
                     if (gestureReader.IsPaused) {
                         gestureSource.TrackingId = activeBody.TrackingId;
@@ -303,6 +315,7 @@ namespace gbtis {
         /// <param name="e"></param>
         private void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
             gestureReader.IsPaused = true;
+            activeBody = null;
         }
 
         /// <summary>
@@ -315,7 +328,7 @@ namespace gbtis {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
                     var result = frame.DiscreteGestureResults;
-
+                    SetActiveBody(frame.TrackingId);
                     if (result != null) {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
@@ -331,6 +344,15 @@ namespace gbtis {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        private void SetActiveBody(ulong trackingId) {
+            foreach(Body b in bodies) {
+                if (b.TrackingId == trackingId) {
+                    activeBody = b;
+                    return;
                 }
             }
         }

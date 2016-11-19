@@ -91,9 +91,6 @@
     <Compile Include="AdminWindow.xaml.cs">
       <DependentUpon>AdminWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BodyCounter.xaml.cs">
-      <DependentUpon>BodyCounter.xaml</DependentUpon>
-    </Compile>
     <Compile Include="CanvasWindow.xaml.cs">
       <DependentUpon>CanvasWindow.xaml</DependentUpon>
     </Compile>
@@ -114,10 +111,6 @@
     <Compile Include="TextBlockFadeAnimation.cs" />
     <Compile Include="UIController.cs" />
     <Page Include="AdminWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="BodyCounter.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

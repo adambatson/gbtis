@@ -65,7 +65,6 @@ namespace gbtis {
         }
 
         private void handleEasterEggOccured() {
-            standby.EasterEggArrived();
             standby.Hide();
             standby.changeText(gbtis.Properties.Resources.msgStart);
             canvas.clearScreen();

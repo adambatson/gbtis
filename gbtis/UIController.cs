@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Data;
+using System.Data.SQLite;
 
 namespace gbtis { 
     class UIController {
@@ -14,12 +16,17 @@ namespace gbtis {
         public static int TICK = 50;
         public static event EventHandler Tock;
 
+        private SQLiteConnection sqlite;
+
         AdminWindow admin;
         StandbyWindow standby;
         CanvasWindow canvas;
         Kinect kinect;
 
         public UIController() {
+            //Starting SQlite Connection
+            sqlite = new SQLiteConnection("location of datebase");  //Not fully implemented
+
             //Making the kinect Controller
             kinect = Kinect.getInstance();
             kinectHandler();

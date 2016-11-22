@@ -9,7 +9,7 @@ using System.Windows;
 namespace gbtis {
     //Deleagtes for custom event handlers
     public delegate void BitMapReadyHandler(ImageSource img);
-    public delegate void WaveGestureHandler();
+    public delegate void WaveGestureHandler(ulong bodyID, bool rightHand);
     public delegate void EasterEggHandler();
     public delegate void SensorStatusHandler(Boolean isAvailable);
     public delegate void ModeChangedHandler(CursorModes mode);
@@ -328,18 +328,15 @@ namespace gbtis {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
                     var result = frame.DiscreteGestureResults;
-                    SetActiveBody(frame.TrackingId);
                     if (result != null) {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
                             if (gesture.Confidence > WAVE_CONFIDENCE) {
                                 Application.Current.Dispatcher.Invoke(new Action(() => {
-                                    setHand(
-                                    activeBody.Joints[JointType.HandRight].Position.Y >=
-                                    activeBody.Joints[JointType.HandLeft].Position.Y
-                                    );
                                     WaveGestureHandler handler = WaveGestureOccured;
-                                    handler?.Invoke();
+                                    handler?.Invoke(frame.TrackingId, 
+                                        (activeBody.Joints[JointType.HandRight].Position.Y >=
+                                        activeBody.Joints[JointType.HandLeft].Position.Y));
                                 }));
                             }
                         }
@@ -348,7 +345,7 @@ namespace gbtis {
             }
         }
 
-        private void SetActiveBody(ulong trackingId) {
+        public void SetActiveBody(ulong trackingId) {
             foreach(Body b in bodies) {
                 if (b.TrackingId == trackingId) {
                     activeBody = b;
@@ -367,7 +364,7 @@ namespace gbtis {
             Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(isAvailable())));
         }
 
-        private void setHand(bool right) {
+        public void setHand(bool right) {
             rightHand = right;
             hand = (rightHand) ? JointType.HandRight : JointType.HandLeft;
             handTip = (rightHand) ? JointType.HandTipRight : JointType.HandTipLeft;            

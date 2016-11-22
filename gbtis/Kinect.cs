@@ -24,7 +24,7 @@ namespace gbtis {
         private static readonly Kinect instance = new Kinect();
 
         //Constants
-        private const double WAVE_CONFIDENCE = 0.9;
+        private const double WAVE_CONFIDENCE = 0.7;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
         private const int FRAME_SKIP_HAND_STATUS = 5;
@@ -98,18 +98,6 @@ namespace gbtis {
         /// <returns></returns>
         public static Kinect getInstance() {
             return instance;
-        }
-
-        /// <summary>
-        /// Gets the Head Position of the Active Body
-        /// </summary>
-        /// <returns>The head position of the active body, or null if 
-        /// no body is currently being tracked
-        /// </returns>
-        public CameraSpacePoint? ActiveBodyHeadPosition() {
-            if (activeBody != null)
-                return activeBody.Joints[JointType.Head].Position;
-            return null;
         }
 
         /// <summary>

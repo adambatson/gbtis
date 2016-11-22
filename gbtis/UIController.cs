@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Data;
-using System.Data.SQLite;
+//using System.Data.SQLite;
 
 namespace gbtis { 
     class UIController {
@@ -16,7 +16,7 @@ namespace gbtis {
         public static int TICK = 50;
         public static event EventHandler Tock;
 
-        private SQLiteConnection sqlite;
+        //private SQLiteConnection sqlite;
 
         AdminWindow admin;
         StandbyWindow standby;
@@ -25,7 +25,7 @@ namespace gbtis {
 
         public UIController() {
             //Starting SQlite Connection
-            sqlite = new SQLiteConnection("location of datebase");  //Not fully implemented
+            //sqlite = new SQLiteConnection("location of datebase");  //Not fully implemented
 
             //Making the kinect Controller
             kinect = Kinect.getInstance();
@@ -42,7 +42,6 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = null;
-            canvasHandler();
 
             startTimer();
         }
@@ -60,43 +59,62 @@ namespace gbtis {
         /// Handles all the UI related Kinect events
         /// </summary>
         private void kinectHandler() {
-            kinect.WaveGestureOccured += () => { Application.Current.Dispatcher.Invoke(new Action(() => waveOccured() )); };
+            kinect.WaveGestureOccured += (id, rightHand) => { Application.Current.Dispatcher.Invoke(new Action(() => waveOccured(id, rightHand) )); };
         }
 
         /// <summary>
         /// When the wave gestured is recognized by the kinect
         /// Switch from Standby to Canvas
         /// </summary>
-        private void waveOccured() {
+        private void waveOccured(ulong bodyId, bool rightHand) {
             if (canvas == null) {
                 standby.Hide();
                 canvas = new CanvasWindow();
+                subscribeToCanvasHandler();
                 canvas.Show();
+                if (kinect.getActiveBodyId() != bodyId) {
+                    kinect.SetActiveBody(bodyId);
+                } else kinect.setHand(rightHand);
             }
             else {
-                Standby.Hide();
+                /*standby.Hide();
                 canvas.clearScreen();
-                canvas.Show();
+                canvas.Show();*/
+                if (kinect.getActiveBodyId() == bodyId)
+                    kinect.setHand(rightHand);
             }
         }
 
         /// <summary>
         /// Handles all the UI related Canvas events
         /// </summary>
-        private void canvasHandler() {
-            canvas.Cancel += () => { Application.Current.Dispatcher.Invoke(new Action(() => cancelOccured() )); };
-            canvas.Continue += (s) => { Application.Current.Dispatcher.Invoke(new Action(() => continueOccured() )); };
+        private void subscribeToCanvasHandler() {
+            canvas.Cancel += goToStandby; 
+            canvas.Continue += saveName;
+        }
+
+        /// <summary>
+        /// Handles all the UI related Canvas events
+        /// </summary>
+        private void unsubscribeToCanvasHandler() {
+            canvas.Cancel -= goToStandby;
+            canvas.Continue -= saveName;
         }
 
         /// <summary>
         /// When the cancel button is pressed in the canvas Screen
         /// Switch back to standby from canvas
         /// </summary>
-        private void cancelOccured() {
-            canvas.Hide();
-            standby.Show();
-            canvas.Close();
-            canvas = null;
+        private void goToStandby() {
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                if (canvas != null) {
+                    canvas.Hide();
+                    unsubscribeToCanvasHandler();
+                    canvas.Close();
+                    canvas = null;
+                }
+                standby.Show();
+            }));
         }
 
         /// <summary>
@@ -104,20 +122,18 @@ namespace gbtis {
         /// Switch back to standby from canvas 
         /// As well as save the name from what was inputted
         /// </summary>
-        private void continueOccured() {
-            canvas.Hide();
-            standby.Show();
-            canvas.Close();
-            canvas = null;
+        private void saveName(String s) {
+            goToStandby();
         }
 
         /// <summary>
         /// Handles all the UI related Admin events
         /// </summary>
         private void adminHandler() {
-            admin.Exit += (s, e) => { Application.Current.Dispatcher.Invoke(new Action(() => exitAll() )); };
-            admin.Standby += (s, e) => { continueOccured(); };
-            admin.Input += (s, e) => { waveOccured(); };
+            admin.Exit += (s, e) => {  exitAll(); };
+            admin.Standby += (s, e) => { goToStandby(); };
+            //Broken with new body setting features
+            //admin.Input += (s, e) => { waveOccured(); };
         }
 
         /// <summary>

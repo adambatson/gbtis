@@ -174,7 +174,7 @@ namespace gbtis {
                     if (mode == CursorModes.Idle) {
                         //Compare the tip of the hand to the hand blob
                         //Attempt to see if a finger is extended
-                        if (Math.Abs(activeBody.Joints[hand].Position.Z - activeBody.Joints[JointType.HandRight].Position.Z) > 0.05) {
+                        if (Math.Abs(activeBody.Joints[hand].Position.Z - activeBody.Joints[handTip].Position.Z) > 0.05) {
                             mode = CursorModes.Draw;
                             return;
                         }

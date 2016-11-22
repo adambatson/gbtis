@@ -354,6 +354,12 @@ namespace gbtis {
             }
         }
 
+        public ulong? getActiveBodyId() {
+            if (activeBody != null)
+                return activeBody.TrackingId;
+            return null;
+        }
+
         /// <summary>
         /// Triggered when the KinectSensors availability changes
         /// </summary>

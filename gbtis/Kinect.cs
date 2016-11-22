@@ -27,7 +27,7 @@ namespace gbtis {
         private const double WAVE_CONFIDENCE = 0.9;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
-        private const int FRAME_SKIP_HAND_STATUS = 3;
+        private const int FRAME_SKIP_HAND_STATUS = 5;
 
         //TODO Should these be private?
         public Point FingerPosition { get; set; }
@@ -289,14 +289,21 @@ namespace gbtis {
                     frame.GetAndRefreshBodyData(bodies);
 
                     var trackedBodies = bodies.Where(b => b.IsTracked);
+
+                    if (!trackedBodies.Contains(activeBody))
+                        activeBody = null;
+
                     if (trackedBodies.Count() == 0) {
                         OnTrackingIdLost(null, null);
+                        activeBody = null;
                         return;
                     }
 
-                    /*if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
-                        activeBody = trackedBodies.FirstOrDefault();
-                    }*/
+                    if (activeBody == null) {
+                        if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
+                            activeBody = trackedBodies.FirstOrDefault();
+                        }
+                    }
 
                     if (gestureReader.IsPaused) {
                         gestureSource.TrackingId = activeBody.TrackingId;

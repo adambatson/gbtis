@@ -55,8 +55,9 @@ namespace gbtis {
         private Body[] bodies;
         private Body activeBody;
         private BodyFrameReader bodyReader;
-        private VisualGestureBuilderFrameSource gestureSource;
-        private VisualGestureBuilderFrameReader gestureReader;
+        private VisualGestureBuilderFrameSource[] gestureSources;
+        private VisualGestureBuilderFrameReader[] gestureReaders;
+        private int numBodies;
 
         //Just the tip
         private Point? prevPoint;
@@ -77,9 +78,12 @@ namespace gbtis {
             frameReader = sensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Depth);
             frameReader.MultiSourceFrameArrived += frameReader_frameArrived;
 
+            numBodies = this.sensor.BodyFrameSource.BodyCount;
+            gestureSources = new VisualGestureBuilderFrameSource[numBodies];
+            gestureReaders = new VisualGestureBuilderFrameReader[numBodies];
             OpenBodyReader();
             OpenGestureReader();
-            bodies = new Body[this.sensor.BodyFrameSource.BodyCount];
+            bodies = new Body[numBodies];
 
             //Coordinate Mapping
             coordinateMapper = sensor.CoordinateMapper;
@@ -254,14 +258,15 @@ namespace gbtis {
             waveGesture = db.AvailableGestures.Where(g => g.Name == "wave").Single();
 
             easterEgg = db.AvailableGestures.Where(g => g.Name == "dab").Single();
-            gestureSource = new VisualGestureBuilderFrameSource(sensor, 0);
-            gestureReader = gestureSource.OpenReader();
+            for (int i = 0; i < numBodies; i++) {
+                gestureSources[i] = new VisualGestureBuilderFrameSource(sensor, 0);
+                gestureReaders[i] = gestureSources[i].OpenReader();
 
-            gestureSource.AddGestures(db.AvailableGestures);
-            gestureSource.TrackingIdLost += OnTrackingIdLost;
+                gestureSources[i].AddGestures(db.AvailableGestures);
 
-            gestureReader.IsPaused = true;
-            gestureReader.FrameArrived += OnGestureFrameArrived;
+                gestureReaders[i].IsPaused = true;
+                gestureReaders[i].FrameArrived += OnGestureFrameArrived;
+            }
         }
 
         /// <summary>
@@ -276,41 +281,17 @@ namespace gbtis {
                 if (frame != null) {
                     frame.GetAndRefreshBodyData(bodies);
 
+                    for(int i = 0; i < numBodies; i++) {
+                        gestureSources[i].TrackingId = bodies[i].TrackingId;
+                        gestureReaders[i].IsPaused = !bodies[i].IsTracked;
+                    }
+
                     var trackedBodies = bodies.Where(b => b.IsTracked);
 
                     if (!trackedBodies.Contains(activeBody))
                         activeBody = null;
-
-                    if (trackedBodies.Count() == 0) {
-                        OnTrackingIdLost(null, null);
-                        activeBody = null;
-                        return;
-                    }
-
-                    if (activeBody == null) {
-                        if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
-                            activeBody = trackedBodies.FirstOrDefault();
-                        }
-                    }
-
-                    if (gestureReader.IsPaused) {
-                        gestureSource.TrackingId = activeBody.TrackingId;
-                        gestureReader.IsPaused = false;
-                    }
                 }
             }
-        }
-
-        /// <summary>
-        /// All bodies have left the frame, therefore stop reading gestures for now
-        /// TODO: Again this will need to be modified to support the body tracking
-        ///     in Admin Window
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
-            gestureReader.IsPaused = true;
-            activeBody = null;
         }
 
         /// <summary>

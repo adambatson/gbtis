@@ -62,7 +62,7 @@ namespace gbtis {
         private Point? prevPoint;
         private CoordinateMapper coordinateMapper;
 
-        //Rolling average finger positionsz
+        //Rolling average finger positions
         private float xAvg, yAvg;
 
         //Handedness

@@ -4,13 +4,12 @@ using System;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace gbtis {
     //Deleagtes for custom event handlers
     public delegate void BitMapReadyHandler(ImageSource img);
-    public delegate void WaveGestureHandler();
+    public delegate void WaveGestureHandler(ulong bodyID, bool rightHand);
     public delegate void EasterEggHandler();
     public delegate void SensorStatusHandler(Boolean isAvailable);
     public delegate void ModeChangedHandler(CursorModes mode);
@@ -25,13 +24,18 @@ namespace gbtis {
         private static readonly Kinect instance = new Kinect();
 
         //Constants
-        private const double WAVE_CONFIDENCE = 0.9;
+        private const double WAVE_CONFIDENCE = 0.7;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
-        private const float BORDER_SIZE = 0.1f;
+        private const int FRAME_SKIP_HAND_STATUS = 5;
 
+        //TODO Should these be private?
         public Point FingerPosition { get; set; }
         public CursorModes CursorMode { get; set; }
+
+        //Mode switch frame skip
+        private CursorModes NextMode;
+        private int ModeFrameSkip;
 
         //Events
         public event BitMapReadyHandler BitMapReady;
@@ -63,6 +67,7 @@ namespace gbtis {
 
         //Handedness
         private JointType hand, handTip;
+        private bool rightHand;
 
         private Kinect() {
             sensor = KinectSensor.GetDefault();
@@ -83,6 +88,8 @@ namespace gbtis {
             xAvg = 0; yAvg = 0;
 
             setHand(true);
+            NextMode = CursorModes.Idle;
+            ModeFrameSkip = 0;
         }
 
         /// <summary>
@@ -121,8 +128,7 @@ namespace gbtis {
             }
 
             if (activeBody != null && activeBody.IsTracked) {
-                HandState handState = (hand == JointType.HandRight) ?
-                    activeBody.HandRightState :
+                HandState handState = (rightHand) ? activeBody.HandRightState :
                     activeBody.HandLeftState;
                 
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
@@ -156,15 +162,20 @@ namespace gbtis {
                     if (mode == CursorModes.Idle) {
                         //Compare the tip of the hand to the hand blob
                         //Attempt to see if a finger is extended
-                        if (Math.Abs(activeBody.Joints[hand].Position.Z - activeBody.Joints[JointType.HandRight].Position.Z) > 0.05) {
+                        if (Math.Abs(activeBody.Joints[hand].Position.Z - activeBody.Joints[handTip].Position.Z) > 0.05) {
                             mode = CursorModes.Draw;
                             return;
                         }
                     }
-
-                    Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
-                    Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
-                    CursorMode = mode;
+                    
+                    if (mode == NextMode) {
+                        if (++ModeFrameSkip == FRAME_SKIP_HAND_STATUS) {
+                            Application.Current.Dispatcher.Invoke(new Action(() => ModeEnd?.Invoke(CursorMode)));
+                            Application.Current.Dispatcher.Invoke(new Action(() => ModeStart?.Invoke(mode)));
+                            CursorMode = mode;
+                            ModeFrameSkip = 0;
+                        }
+                    } else NextMode = mode;
                 }
             }
         }
@@ -266,13 +277,20 @@ namespace gbtis {
                     frame.GetAndRefreshBodyData(bodies);
 
                     var trackedBodies = bodies.Where(b => b.IsTracked);
+
+                    if (!trackedBodies.Contains(activeBody))
+                        activeBody = null;
+
                     if (trackedBodies.Count() == 0) {
                         OnTrackingIdLost(null, null);
+                        activeBody = null;
                         return;
                     }
 
-                    if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
-                        activeBody = trackedBodies.FirstOrDefault();
+                    if (activeBody == null) {
+                        if (trackedBodies.Where(b => b.Equals(activeBody)).Count() == 0) {
+                            activeBody = trackedBodies.FirstOrDefault();
+                        }
                     }
 
                     if (gestureReader.IsPaused) {
@@ -292,6 +310,7 @@ namespace gbtis {
         /// <param name="e"></param>
         private void OnTrackingIdLost(object sender, TrackingIdLostEventArgs e) {
             gestureReader.IsPaused = true;
+            activeBody = null;
         }
 
         /// <summary>
@@ -304,24 +323,36 @@ namespace gbtis {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
                     var result = frame.DiscreteGestureResults;
-
                     if (result != null) {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
                             if (gesture.Confidence > WAVE_CONFIDENCE) {
                                 Application.Current.Dispatcher.Invoke(new Action(() => {
-                                    setHand(
-                                    activeBody.Joints[JointType.HandRight].Position.Y >=
-                                    activeBody.Joints[JointType.HandLeft].Position.Y
-                                    );
                                     WaveGestureHandler handler = WaveGestureOccured;
-                                    handler?.Invoke();
+                                    handler?.Invoke(frame.TrackingId, 
+                                        (activeBody.Joints[JointType.HandRight].Position.Y >=
+                                        activeBody.Joints[JointType.HandLeft].Position.Y));
                                 }));
                             }
                         }
                     }
                 }
             }
+        }
+
+        public void SetActiveBody(ulong trackingId) {
+            foreach(Body b in bodies) {
+                if (b.TrackingId == trackingId) {
+                    activeBody = b;
+                    return;
+                }
+            }
+        }
+
+        public ulong? getActiveBodyId() {
+            if (activeBody != null)
+                return activeBody.TrackingId;
+            return null;
         }
 
         /// <summary>
@@ -334,9 +365,10 @@ namespace gbtis {
             Application.Current.Dispatcher.Invoke(new Action(() => handler?.Invoke(isAvailable())));
         }
 
-        private void setHand(bool right) {
-            hand = (right) ? JointType.HandRight : JointType.HandLeft;
-            handTip = (right) ? JointType.HandTipRight : JointType.HandTipLeft;            
+        public void setHand(bool right) {
+            rightHand = right;
+            hand = (rightHand) ? JointType.HandRight : JointType.HandLeft;
+            handTip = (rightHand) ? JointType.HandTipRight : JointType.HandTipLeft;            
         }
     }
 }

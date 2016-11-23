@@ -59,6 +59,7 @@ namespace gbtis {
                 cursorUp();
             };
 
+            // Set the margin, so that we can scale to match the visuals
             sensorOverlay.Loaded += (s, e) => {
                 Size bounds = (sensorOverlay.ActualWidth > 0) ?
                     new Size(sensorOverlay.ActualWidth, sensorOverlay.ActualHeight) :

@@ -59,6 +59,14 @@ namespace gbtis {
                 cursorUp();
             };
 
+            sensorOverlay.Loaded += (s, e) => {
+                Size bounds = (sensorOverlay.ActualWidth > 0) ?
+                    new Size(sensorOverlay.ActualWidth, sensorOverlay.ActualHeight) :
+                    new Size(ActualWidth, ActualHeight);
+
+                cursor.SetBounds(bounds);
+            };
+
             // Disable default canvas controls
             canvas.PreviewMouseDown += (s, e) => e.Handled = true;
             canvas.PreviewMouseUp += (s, e) => e.Handled = true;

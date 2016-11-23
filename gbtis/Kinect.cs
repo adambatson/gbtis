@@ -177,33 +177,10 @@ namespace gbtis {
         /// <returns></returns>
         public Point ColorToInterface(Point p, Size size) {
             ColorFrameSource c = sensor.ColorFrameSource;
-
-            // Border of 10% the sensor area
-            Size border = new Size(c.FrameDescription.Width * BORDER_SIZE, c.FrameDescription.Height * BORDER_SIZE);
-
-            // The effective size of a frame is then the actual size minus twice the border size
-            p = new Point(
-                p.X * size.Width / (c.FrameDescription.Width - 2*border.Width),
-                p.Y + border.Height * size.Height / (c.FrameDescription.Height - 2 * border.Height)
-            );
-
-            // X could now be out of range
-            if (p.X < 0) p.X = 0;
-            if (p.X > size.Width) p.X = size.Width;
-
-            // So could y
-            if (p.Y < 0) p.Y = 0;
-            if (p.Y > size.Height) p.Y = size.Height;
-
-            return p;
-
-            /* OLD CODE IN CASE I FUCKED IT ALL UP
-            ColorFrameSource c = sensor.ColorFrameSource;
             return new Point(
                 p.X * size.Width / c.FrameDescription.Width,
                 p.Y * size.Height / c.FrameDescription.Height
             );
-            */
         }
 
         /// <summary>

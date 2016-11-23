@@ -21,15 +21,12 @@ namespace gbtis {
     public partial class Cursor : UserControl {
         public const int ERASER_SIZE = 100;
         public const int DEFAULT_SIZE = 10;
-
-        // For mouse position data
-        private Window parentWindow;
-
+        
         // Movement event
         public delegate void PositionEventHandler(Point p);
         public event PositionEventHandler Moved;
 
-        //Mode events
+        // Mode events
         public delegate void ModeEventHandler(CursorModes m);
         public event ModeEventHandler ModeStart;
         public event ModeEventHandler ModeEnd;
@@ -39,6 +36,10 @@ namespace gbtis {
         /// </summary>
         private int _size;
         public int Size { get { return _size; } }
+
+        // Parent bounds
+        private Window parentWindow;
+        private Size parentBounds;
 
         /// <summary>
         /// Cursor position
@@ -66,28 +67,34 @@ namespace gbtis {
             set { _mode=value; setMode(value); }
         }
 
+        public void SetBounds(Size bounds) {
+            parentBounds = bounds;
+        }
+
         public Cursor() {
             InitializeComponent();
             toggleIdle(true);
             Kinect kinect = Kinect.getInstance();
+            parentBounds = new Size(0, 0);
+
             Loaded += (source, args) => {
                 parentWindow = Window.GetWindow(this);
 
                 // Kinect controls
                 kinect.FingerPositionChanged += (p) => {
-                    Position = kinect.ColorToInterface(p, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
+                    Position = kinect.ColorToInterface(p, parentBounds);
                     Mode = kinect.CursorMode;
 
                     Moved?.Invoke(p);
                 };
                 kinect.ModeStart += (m) => {
-                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, parentBounds);
                     Mode = m;
 
                     ModeStart?.Invoke(m);
                 };
                 kinect.ModeEnd += (m) => {
-                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, parentBounds);
                     Mode = m;
 
                     ModeEnd?.Invoke(m);

@@ -103,12 +103,11 @@ namespace gbtis {
         // Temporary source of names to display.
         private static Random selector = new Random();
         private static String[] names = {
-                "Ringo Starr",
-                "Floobo Bopity",
-                "Maximum Overdoot",
-                "Fred Johnson",
-                "Grabby Mcgee",
-                "Hugh Mungus",
+                "Adam Batson",
+                "Max DeMelo",
+                "Richard Carson",
+                "Eranga Ukwatta",
+                "Sreeraman Rajan"
             };
     }
 }

@@ -21,15 +21,12 @@ namespace gbtis {
     public partial class Cursor : UserControl {
         public const int ERASER_SIZE = 100;
         public const int DEFAULT_SIZE = 10;
-
-        // For mouse position data
-        private Window parentWindow;
-
+        
         // Movement event
         public delegate void PositionEventHandler(Point p);
         public event PositionEventHandler Moved;
 
-        //Mode events
+        // Mode events
         public delegate void ModeEventHandler(CursorModes m);
         public event ModeEventHandler ModeStart;
         public event ModeEventHandler ModeEnd;
@@ -40,17 +37,26 @@ namespace gbtis {
         private int _size;
         public int Size { get { return _size; } }
 
+        // Parent bounds
+        double offset;
+        private Window parentWindow;
+        private Size parentBounds;
+
         /// <summary>
         /// Cursor position
         /// </summary>
         private Point _position;
         public Point Position {
-            get { return new Point(_position.X + ActualWidth / 2, _position.Y + ActualHeight / 2); }
+            get { return new Point(
+                (_position.X + ActualWidth / 2) + offset, 
+                (_position.Y + ActualHeight / 2) + offset); }
             set {
-                value = new Point(value.X - ActualWidth / 2, value.Y - ActualHeight / 2);
+                value = new Point(
+                    value.X - ActualWidth / 2, 
+                    value.Y - ActualHeight / 2);
 
                 try {
-                    Margin = new Thickness(value.X, value.Y, 0, 0);
+                    Margin = new Thickness(value.X + offset, value.Y + offset, 0, 0);
                 } catch (Exception) { return; }
                 _position = value;
                 Moved?.Invoke(Position);
@@ -66,33 +72,38 @@ namespace gbtis {
             set { _mode=value; setMode(value); }
         }
 
+        public void SetBounds(Size bounds, double offset) {
+            parentBounds = bounds;
+            this.offset = offset;
+        }
+
         public Cursor() {
             InitializeComponent();
             toggleIdle(true);
             Kinect kinect = Kinect.getInstance();
+            parentBounds = new Size(0, 0);
+
             Loaded += (source, args) => {
                 parentWindow = Window.GetWindow(this);
 
                 // Kinect controls
                 kinect.FingerPositionChanged += (p) => {
-                    Position = kinect.ColorToInterface(p, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
+                    Position = kinect.ColorToInterface(p, parentBounds);
                     Mode = kinect.CursorMode;
-
-                    Moved?.Invoke(p);
                 };
                 kinect.ModeStart += (m) => {
-                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, parentBounds);
                     Mode = m;
 
                     ModeStart?.Invoke(m);
                 };
                 kinect.ModeEnd += (m) => {
-                    Position = kinect.ColorToInterface(kinect.FingerPosition, new Size(parentWindow.ActualWidth, parentWindow.ActualHeight));
+                    Position = kinect.ColorToInterface(kinect.FingerPosition, parentBounds);
                     Mode = m;
 
                     ModeEnd?.Invoke(m);
                 };
-
+                /*
                 // Mouse controls
                 parentWindow.MouseMove += (s, e) => {
                     Position = Mouse.GetPosition(parentWindow);
@@ -111,7 +122,7 @@ namespace gbtis {
                     Mode = mouseMode();
 
                     ModeEnd?.Invoke(Mode);
-                };
+                };*/
             };
         }
 

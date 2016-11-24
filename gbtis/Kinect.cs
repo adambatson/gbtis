@@ -308,17 +308,26 @@ namespace gbtis {
                         if (result.ContainsKey(waveGesture)) {
                             var gesture = result[waveGesture];
                             if (gesture.Confidence > WAVE_CONFIDENCE) {
+                                Body b = getBodyByTrackingID(frame.TrackingId);
                                 Application.Current.Dispatcher.Invoke(new Action(() => {
                                     WaveGestureHandler handler = WaveGestureOccured;
                                     handler?.Invoke(frame.TrackingId, 
-                                        (activeBody.Joints[JointType.HandRight].Position.Y >=
-                                        activeBody.Joints[JointType.HandLeft].Position.Y));
+                                        (b.Joints[JointType.HandRight].Position.Y >=
+                                        b.Joints[JointType.HandLeft].Position.Y));
                                 }));
                             }
                         }
                     }
                 }
             }
+        }
+
+        private Body getBodyByTrackingID(ulong id) {
+            foreach(Body b in bodies){
+                if (b.TrackingId == id)
+                    return b;
+            }
+            return bodies[0];
         }
 
         public void SetActiveBody(ulong trackingId) {

@@ -35,7 +35,6 @@ namespace gbtis {
         /// </summary>
         public CanvasWindow() {
             InitializeComponent();
-            cursor.Position = Mouse.GetPosition(canvas);
             Kinect kinect = Kinect.getInstance();
 
             // Get language. French first, or default
@@ -60,12 +59,12 @@ namespace gbtis {
             };
 
             // Set the margin, so that we can scale to match the visuals
-            sensorOverlay.Loaded += (s, e) => {
+            sensorOverlay.SizeChanged += (s, e) => {
                 Size bounds = (sensorOverlay.ActualWidth > 0) ?
                     new Size(sensorOverlay.ActualWidth, sensorOverlay.ActualHeight) :
                     new Size(ActualWidth, ActualHeight);
 
-                cursor.SetBounds(bounds);
+                cursor.SetBounds(bounds, sensorOverlay.Margin.Left);
             };
 
             // Disable default canvas controls
@@ -78,6 +77,7 @@ namespace gbtis {
 
             // Button events
             cursor.Moved += (p) => {
+                //p = kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
                 helpButton.Over((helpButton.Intersects(this, p)));
                 clearButton.Over((clearButton.Intersects(this, p)));
                 cancelButton.Over((cancelButton.Intersects(this, p)));

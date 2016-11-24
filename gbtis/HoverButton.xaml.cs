@@ -66,6 +66,11 @@ namespace gbtis {
 
         public bool Intersects(Visual parent, Point p) {
             Rect bounds = TransformToVisual(parent).TransformBounds(new Rect(RenderSize));
+
+            if (bounds.Contains(p)) {
+
+                over = over;
+            }
             return bounds.Contains(p);
         }
 

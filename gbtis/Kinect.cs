@@ -185,12 +185,25 @@ namespace gbtis {
         /// </summary>
         /// <param name="p">Point to convert</param>
         /// <param name="size">Size of the new region</param>
-        /// <returns></returns>
+        /// <returns>Scaled point</returns>
         public Point ColorToInterface(Point p, Size size) {
             ColorFrameSource c = sensor.ColorFrameSource;
+            return ScaleToSize(p,
+                new Size(c.FrameDescription.Width, c.FrameDescription.Height),
+                size);
+        }
+
+        /// <summary>
+        /// Convert between 2 coordinate systems
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        /// <returns>Scaled point</returns>
+        public Point ScaleToSize(Point p, Size source, Size dest) {
             return new Point(
-                p.X * size.Width / c.FrameDescription.Width,
-                p.Y * size.Height / c.FrameDescription.Height
+                p.X * dest.Width / source.Width,
+                p.Y * dest.Height / source.Height
             );
         }
 

@@ -38,6 +38,7 @@ namespace gbtis {
         public int Size { get { return _size; } }
 
         // Parent bounds
+        double offset;
         private Window parentWindow;
         private Size parentBounds;
 
@@ -46,12 +47,16 @@ namespace gbtis {
         /// </summary>
         private Point _position;
         public Point Position {
-            get { return new Point(_position.X + ActualWidth / 2, _position.Y + ActualHeight / 2); }
+            get { return new Point(
+                (_position.X + ActualWidth / 2) + offset, 
+                (_position.Y + ActualHeight / 2) + offset); }
             set {
-                value = new Point(value.X - ActualWidth / 2, value.Y - ActualHeight / 2);
+                value = new Point(
+                    value.X - ActualWidth / 2, 
+                    value.Y - ActualHeight / 2);
 
                 try {
-                    Margin = new Thickness(value.X, value.Y, 0, 0);
+                    Margin = new Thickness(value.X + offset, value.Y + offset, 0, 0);
                 } catch (Exception) { return; }
                 _position = value;
                 Moved?.Invoke(Position);
@@ -67,8 +72,9 @@ namespace gbtis {
             set { _mode=value; setMode(value); }
         }
 
-        public void SetBounds(Size bounds) {
+        public void SetBounds(Size bounds, double offset) {
             parentBounds = bounds;
+            this.offset = offset;
         }
 
         public Cursor() {
@@ -84,8 +90,6 @@ namespace gbtis {
                 kinect.FingerPositionChanged += (p) => {
                     Position = kinect.ColorToInterface(p, parentBounds);
                     Mode = kinect.CursorMode;
-
-                    Moved?.Invoke(p);
                 };
                 kinect.ModeStart += (m) => {
                     Position = kinect.ColorToInterface(kinect.FingerPosition, parentBounds);
@@ -99,7 +103,7 @@ namespace gbtis {
 
                     ModeEnd?.Invoke(m);
                 };
-
+                /*
                 // Mouse controls
                 parentWindow.MouseMove += (s, e) => {
                     Position = Mouse.GetPosition(parentWindow);
@@ -118,7 +122,7 @@ namespace gbtis {
                     Mode = mouseMode();
 
                     ModeEnd?.Invoke(Mode);
-                };
+                };*/
             };
         }
 

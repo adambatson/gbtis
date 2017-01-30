@@ -77,14 +77,9 @@ namespace gbtis {
                 X.RemoveAt(0); Y.RemoveAt(0);
             }
 
-            // Calculate the median filter
-            PointF p = new PointF(
-                Median(X), Median(Y));
-
-            // Apply the moving average filter
-            previous = (previous.IsEmpty) ? p : new PointF(
-                (1 - Alpha) * previous.X + Alpha * p.X,
-                (1 - Alpha) * previous.Y + Alpha * p.Y);
+            // Apply the filters
+            previous.X = (previous.IsEmpty) ? Median(X) : (1 - Alpha) * previous.X + Alpha * Median(X);
+            previous.Y = (previous.IsEmpty) ? Median(X) : (1 - Alpha) * previous.Y + Alpha * Median(X);
             return new System.Windows.Point((int)previous.X, (int)previous.Y);
         }
 

@@ -67,7 +67,7 @@ namespace gbtis {
         /// Switch from Standby to Canvas
         /// </summary>
         private void waveOccured(ulong bodyId, bool rightHand) {
-            if (canvas == null) {
+            if ((canvas == null)&&(standby.IsVisible)) {
                 standby.Hide();
                 canvas = new CanvasWindow();
                 subscribeToCanvasHandler();

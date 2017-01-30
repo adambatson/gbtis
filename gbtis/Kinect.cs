@@ -27,7 +27,7 @@ namespace gbtis {
         private const double WAVE_CONFIDENCE = 0.7;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
-        private const int FRAME_SKIP_HAND_STATUS = 5;
+        private const int FRAME_SKIP_HAND_STATUS = 3;
 
         //TODO Should these be private?
         public Point FingerPosition { get; set; }

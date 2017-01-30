@@ -10,7 +10,7 @@ namespace gbtis {
     /// Coordinate smoothing
     /// </summary>
     class Smoother {
-        public static float DEFAULT_ALPHA = 0.35f;
+        public static float DEFAULT_ALPHA = 0.5f;
         public static int DEFAULT_COUNT = 3;
 
         public float Alpha { get; set; }

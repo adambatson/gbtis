@@ -78,8 +78,9 @@ namespace gbtis {
             }
 
             // Apply the filters
-            previous.X = (previous.IsEmpty) ? Median(X) : (1 - Alpha) * previous.X + Alpha * Median(X);
-            previous.Y = (previous.IsEmpty) ? Median(Y) : (1 - Alpha) * previous.Y + Alpha * Median(Y);
+            bool empty = previous.IsEmpty;
+            previous.X = (empty) ? Median(X) : (1 - Alpha) * previous.X + Alpha * Median(X);
+            previous.Y = (empty) ? Median(Y) : (1 - Alpha) * previous.Y + Alpha * Median(Y);
             return new System.Windows.Point((int)previous.X, (int)previous.Y);
         }
 

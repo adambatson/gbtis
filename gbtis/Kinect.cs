@@ -302,7 +302,7 @@ namespace gbtis {
                     var trackedBodies = bodies.Where(b => b.IsTracked);
 
                     if (!trackedBodies.Contains(activeBody))
-                        activeBody = null;
+                        activeBody = trackedBodies.FirstOrDefault();
                 }
             }
         }

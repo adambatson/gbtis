@@ -101,6 +101,7 @@
       <DependentUpon>HoverButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Kinect.cs" />
+    <Compile Include="Smoother.cs" />
     <Compile Include="StandbyWindow.xaml.cs">
       <DependentUpon>StandbyWindow.xaml</DependentUpon>
     </Compile>

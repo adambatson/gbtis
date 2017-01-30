@@ -27,7 +27,7 @@ namespace gbtis {
         private const double WAVE_CONFIDENCE = 0.7;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
-        private const int FRAME_SKIP_HAND_STATUS = 5;
+        private const int FRAME_SKIP_HAND_STATUS = 3;
 
         //TODO Should these be private?
         public Point FingerPosition { get; set; }
@@ -63,8 +63,8 @@ namespace gbtis {
         private Point? prevPoint;
         private CoordinateMapper coordinateMapper;
 
-        //Rolling average finger positions
-        private float xAvg, yAvg;
+        // Point smoothing
+        Smoother smoother;
 
         //Handedness
         private JointType hand, handTip;
@@ -89,7 +89,7 @@ namespace gbtis {
             coordinateMapper = sensor.CoordinateMapper;
 
             sensor.IsAvailableChanged += OnIsAvailableChanged;
-            xAvg = 0; yAvg = 0;
+            smoother = new Smoother();
 
             setHand(true);
             NextMode = CursorModes.Idle;
@@ -138,7 +138,7 @@ namespace gbtis {
                 var colorPoint = coordinateMapper.MapCameraPointToColorSpace(
                     activeBody.Joints[handTip].Position);
 
-                Point point = getAverageFingerTipPosition(colorPoint.X, colorPoint.Y);
+                Point point = smoother.Next(new System.Drawing.PointF(colorPoint.X, colorPoint.Y));
                 if (!point.Equals(prevPoint)) {
                     FingerPosition = point;
                     prevPoint = point;
@@ -209,19 +209,6 @@ namespace gbtis {
                 p.X * dest.Width / source.Width,
                 p.Y * dest.Height / source.Height
             );
-        }
-
-        /// <summary>
-        /// Exponential moving average of fingertip position
-        /// </summary>
-        /// <param name="x">The latest x coordinate</param>
-        /// <param name="y">The latest y coordinate</param>
-        /// <returns>The average position</returns>
-        private Point getAverageFingerTipPosition(float x, float y) {
-            xAvg = SMOOTHING_FACTOR * x + (1 - SMOOTHING_FACTOR) * xAvg;
-            yAvg = SMOOTHING_FACTOR * y + (1 - SMOOTHING_FACTOR) * yAvg;
-
-            return new Point(xAvg, yAvg);
         }
 
         /// <summary>
@@ -302,7 +289,7 @@ namespace gbtis {
                     var trackedBodies = bodies.Where(b => b.IsTracked);
 
                     if (!trackedBodies.Contains(activeBody))
-                        activeBody = null;
+                        activeBody = trackedBodies.FirstOrDefault();
                 }
             }
         }

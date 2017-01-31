@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using gbtis.Helpers;
+using gbtis.Windows;
 
 namespace gbtis {
     //Deleagtes for custom event handlers

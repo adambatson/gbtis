@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Data;
+using gbtis.Windows;
 //using System.Data.SQLite;
 
 namespace gbtis { 

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
-namespace gbtis {
+namespace gbtis.Helpers {
     /// <summary>
     /// Coordinate smoothing
     /// </summary>

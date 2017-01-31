@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="gbtis.Controls.HoverButton" x:Name="hoverButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:gbtis"
+             mc:Ignorable="d">
+    <Grid>
+        <Border x:Name="borderBox" BorderThickness="4">
+            <Border.Background>
+                <SolidColorBrush Color="{Binding Path=Color, ElementName=hoverButton, UpdateSourceTrigger=PropertyChanged}" />
+            </Border.Background>
+            <Border.BorderBrush>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop x:Name="endColor" Color="{Binding Path=Color, ElementName=hoverButton, UpdateSourceTrigger=PropertyChanged}" Offset="0"/>
+
+                    <GradientStop x:Name="progressColor" Color="{Binding Path=Color, ElementName=hoverButton, UpdateSourceTrigger=PropertyChanged}" Offset="1" />
+                    <GradientStop x:Name="progressBlack" Color="Black" Offset="1"/>
+
+                    <GradientStop x:Name="endBlack" Color="Black" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+            <Grid>
+                <Viewbox>
+                    <TextBlock x:Name="textBox"  Margin="2,0,2,0" Text="{Binding Text, ElementName=hoverButton, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBlock.Foreground>
+                            <SolidColorBrush Color="White" />
+                        </TextBlock.Foreground>
+                    </TextBlock>
+                </Viewbox>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

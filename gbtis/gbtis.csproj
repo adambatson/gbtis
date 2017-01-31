@@ -88,46 +88,47 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AdminWindow.xaml.cs">
+    <Compile Include="Helpers\CharacterRecognizer.cs" />
+    <Compile Include="Windows\AdminWindow.xaml.cs">
       <DependentUpon>AdminWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CanvasWindow.xaml.cs">
+    <Compile Include="Windows\CanvasWindow.xaml.cs">
       <DependentUpon>CanvasWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Cursor.xaml.cs">
+    <Compile Include="Controls\Cursor.xaml.cs">
       <DependentUpon>Cursor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HoverButton.xaml.cs">
+    <Compile Include="Controls\HoverButton.xaml.cs">
       <DependentUpon>HoverButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Kinect.cs" />
-    <Compile Include="Smoother.cs" />
-    <Compile Include="StandbyWindow.xaml.cs">
+    <Compile Include="Helpers\Smoother.cs" />
+    <Compile Include="Windows\StandbyWindow.xaml.cs">
       <DependentUpon>StandbyWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="TextBlockFadeAnimation.cs" />
+    <Compile Include="Controls\TextBlockFadeAnimation.cs" />
     <Compile Include="UIController.cs" />
-    <Page Include="AdminWindow.xaml">
+    <Page Include="Windows\AdminWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="CanvasWindow.xaml">
+    <Page Include="Windows\CanvasWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Cursor.xaml">
+    <Page Include="Controls\Cursor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HoverButton.xaml">
+    <Page Include="Controls\HoverButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="StandbyWindow.xaml">
+    <Page Include="Windows\StandbyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

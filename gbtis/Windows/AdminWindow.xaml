@@ -13,34 +13,12 @@
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem x:Name="fileStandbyButton" x:FieldModifier="public"  Header="_Return To Standby" Click="FileStandby_Click" />
-                    <MenuItem x:Name="fileInputButton" x:FieldModifier="public"  Header="_Start Input" Click="FileInput_Click" />
-                    <Separator />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
-                </MenuItem>
-
-                <MenuItem Header="_Help">
-                    <MenuItem x:Name="helpAboutButton" x:FieldModifier="public" Header="_About" Click="HelpAbout_Click" />
                 </MenuItem>
             </Menu>
 
-            <StatusBar x:Name="statusBar" DockPanel.Dock="Bottom">
-                <StatusBarItem>
-                    <TextBlock x:Name="statusText" Text="Loading..."/>
-                </StatusBarItem>
-            </StatusBar>
-
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black" Grid.Column="1" Grid.Row="1">
+                <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black">
                     <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
             </Grid>

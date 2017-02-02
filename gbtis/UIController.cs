@@ -9,24 +9,18 @@ using System.Timers;
 using System.Windows;
 using System.Data;
 using gbtis.Windows;
-//using System.Data.SQLite;
 
 namespace gbtis { 
     class UIController {
-        // Timer set to tick every 50 ms
-        public static int TICK = 50;
-        public static event EventHandler Tock;
+        private Boolean demoMode;
+        private AdminWindow admin;
+        private StandbyWindow standby;
+        private CanvasWindow canvas;
+        private Kinect kinect;
 
-        //private SQLiteConnection sqlite;
-
-        AdminWindow admin;
-        StandbyWindow standby;
-        CanvasWindow canvas;
-        Kinect kinect;
-
-        public UIController() {
-            //Starting SQlite Connection
-            //sqlite = new SQLiteConnection("location of datebase");  //Not fully implemented
+        public UIController(Boolean demoMode) {
+            //How GBTIS operates
+            this.demoMode = demoMode;
 
             //Making the kinect Controller
             kinect = Kinect.getInstance();
@@ -36,26 +30,20 @@ namespace gbtis {
             standby = new StandbyWindow();
             standbyHandler();
 
-            //Starting and showing the admin window
-            admin = new AdminWindow();
-            adminHandler();
-            admin.Show();
+            //Starting and showing the admin window only if its normal mode
+            if (!demoMode) {
+                admin = new AdminWindow();
+                adminHandler();
+                admin.Show();
+            }
+            else {
+                standby.Show();
+            }
 
             //Starting the canvas screen
             canvas = null;
-
-            startTimer();
         }
-
-        /// <summary>
-        /// A timer that shoots out an event "TOCK" every 50 ms
-        /// </summary>
-        public static void startTimer() {
-            Timer timer = new Timer(TICK);
-            timer.Elapsed += (s, e) => Tock?.Invoke(timer, new EventArgs()); ;
-            timer.Start();
-        }
-
+        
         /// <summary>
         /// Handles all the UI related Kinect events
         /// </summary>
@@ -68,21 +56,19 @@ namespace gbtis {
         /// Switch from Standby to Canvas
         /// </summary>
         private void waveOccured(ulong bodyId, bool rightHand) {
-            if ((canvas == null)&&(standby.IsVisible)) {
+            if ( (canvas == null) && (standby.IsVisible) ) {
                 standby.Hide();
                 canvas = new CanvasWindow();
                 subscribeToCanvasHandler();
                 canvas.Show();
+                //only sets new user if the canvas is starting with a new user
                 if (kinect.getActiveBodyId() != bodyId) {
                     kinect.SetActiveBody(bodyId);
-                } else kinect.setHand(rightHand);
+                }
             }
-            else {
-                /*standby.Hide();
-                canvas.clearScreen();
-                canvas.Show();*/
-                if (kinect.getActiveBodyId() == bodyId)
-                    kinect.setHand(rightHand);
+            //happens when changing hands with either screen
+            if (kinect.getActiveBodyId() == bodyId) {
+                kinect.setHand(rightHand);
             }
         }
 
@@ -108,13 +94,17 @@ namespace gbtis {
         /// </summary>
         private void goToStandby() {
             Application.Current.Dispatcher.Invoke(new Action(() => {
-                if (canvas != null) {
-                    canvas.Hide();
-                    unsubscribeToCanvasHandler();
-                    canvas.Close();
-                    canvas = null;
+                if (demoMode) {
+                    exitAll();
+                } else {
+                    if (canvas != null) {
+                        canvas.Hide();
+                        unsubscribeToCanvasHandler();
+                        canvas.Close();
+                        canvas = null;
+                    }
+                    standby.Show();
                 }
-                standby.Show();
             }));
         }
 
@@ -133,8 +123,6 @@ namespace gbtis {
         private void adminHandler() {
             admin.Exit += (s, e) => {  exitAll(); };
             admin.Standby += (s, e) => { goToStandby(); };
-            //Broken with new body setting features
-            //admin.Input += (s, e) => { waveOccured(); };
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ namespace gbtis {
     public partial class App : Application {
 
         public App() {
-            UIController uicont = new UIController();
+            UIController uicont = new UIController(false);
         }
     }
 }

@@ -41,10 +41,18 @@ namespace gbtis {
             adminHandler();
             admin.Show();
 
-            //Starting the canvas screen
+            //Starting the screens
             canvas = null;
 
             startTimer();
+            admin.ScreenChanged += () => alignScreens();
+        }
+
+        private void alignScreens() {
+            admin.AlignWindow(standby);
+
+            if (canvas != null)
+                admin.AlignWindow(canvas);
         }
 
         /// <summary>
@@ -71,6 +79,7 @@ namespace gbtis {
             if ((canvas == null)&&(standby.IsVisible)) {
                 standby.Hide();
                 canvas = new CanvasWindow();
+                admin.AlignWindow(canvas);
                 subscribeToCanvasHandler();
                 canvas.Show();
                 if (kinect.getActiveBodyId() != bodyId) {

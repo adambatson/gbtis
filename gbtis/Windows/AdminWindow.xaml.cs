@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace gbtis.Windows {
@@ -7,10 +9,14 @@ namespace gbtis.Windows {
     /// Interaction logic for AdminWindow.xaml
     /// </summary>
     public partial class AdminWindow : Window {
+        public System.Windows.Forms.Screen PrimaryMonitor { get; private set; }
 
         // Window events
         public event EventHandler Exit;
         public event EventHandler Standby;
+
+        public delegate void ScreenEvent();
+        public event ScreenEvent ScreenChanged;
 
         /// <summary>
         /// Initialize the window
@@ -21,6 +27,33 @@ namespace gbtis.Windows {
 
             Kinect kinect = Kinect.getInstance();
             kinect.BitMapReady += BitMapArrived;
+
+            // Monitor selection
+            PrimaryMonitor = System.Windows.Forms.Screen.PrimaryScreen;
+            ScreenChanged?.Invoke();
+            var i = 0;
+            foreach (var screen in System.Windows.Forms.Screen.AllScreens) {
+                MenuItem item = new MenuItem();
+                item.Header = String.Format("Display {0} ({1}x{2})", ++i, screen.WorkingArea.Width, screen.WorkingArea.Height);
+                item.Tag = screen;
+                item.Click += (s, e) => SetScreen((System.Windows.Forms.Screen)((MenuItem)s).Tag);
+
+                windowMenu.Items.Add(item);
+            }
+        }
+
+        private void SetScreen(System.Windows.Forms.Screen s) {
+            PrimaryMonitor = s;
+            ScreenChanged?.Invoke();
+        }
+
+        public void AlignWindow(Window w) {
+            var area = PrimaryMonitor.WorkingArea;
+            w.Left = area.Left;
+            w.Top = area.Top;
+            w.Width = area.Width;
+            w.Height = area.Height;
+            w.WindowState = WindowState.Maximized;
         }
 
         /// <summary>

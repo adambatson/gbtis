@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace gbtis {
     /// <summary>
@@ -7,7 +9,13 @@ namespace gbtis {
     public partial class App : Application {
 
         public App() {
-            UIController uicont = new UIController(false);
+            UIController uicont;
+
+            if (ConfigurationManager.AppSettings.Get("DemoMode").Equals("1")) {
+                uicont = new UIController(true);
+            } else {
+                uicont = new UIController(false);
+            }
         }
     }
 }

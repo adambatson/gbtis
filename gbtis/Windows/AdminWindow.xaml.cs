@@ -42,11 +42,19 @@ namespace gbtis.Windows {
             }
         }
 
+        /// <summary>
+        /// Change the active screen
+        /// </summary>
+        /// <param name="s"></param>
         private void SetScreen(System.Windows.Forms.Screen s) {
             PrimaryMonitor = s;
             ScreenChanged?.Invoke();
         }
 
+        /// <summary>
+        /// Align a window to the active monitor
+        /// </summary>
+        /// <param name="w">Window to align</param>
         public void AlignWindow(Window w) {
             var area = PrimaryMonitor.WorkingArea;
             w.Left = area.Left;

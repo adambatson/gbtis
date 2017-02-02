@@ -6,12 +6,14 @@ using System.Windows.Media;
 using Microsoft.Ink;
 using System.IO;
 using gbtis.Helpers;
+using System.Timers;
 
 namespace gbtis.Windows {
     /// <summary>
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
+        public const int THANKS_DURATION = 3000;
         public const int FR_CA = 0x0c0c;
 
         // OCR property
@@ -88,8 +90,20 @@ namespace gbtis.Windows {
                 }));
             };
             cancelButton.Clicked += (s, e) => Cancel?.Invoke();
-            continueButton.Clicked += (s, e) => Continue?.Invoke(Text);
             helpButton.Clicked += (s, e) => Help?.Invoke();
+            continueButton.Clicked += (s, e) => {
+                Dispatcher.Invoke(new Action(() => {
+                    sensorOverlay.Opacity = 1;
+                    thanksMsg.Opacity = 1;
+                    cursor.Opacity = 0;
+                    canvasBorder.Opacity = 0;
+                    buttonBar.Opacity = 0;
+                }));
+
+                Timer t = new Timer(THANKS_DURATION);
+                t.Elapsed += (ss, ee) => Continue?.Invoke(Text);
+                t.Start();
+            };
         }
 
         //im so sorry

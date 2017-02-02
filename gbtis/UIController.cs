@@ -9,6 +9,7 @@ using System.Timers;
 using System.Windows;
 using System.Data;
 using gbtis.Windows;
+using System.Collections;
 
 namespace gbtis { 
     class UIController {
@@ -17,6 +18,9 @@ namespace gbtis {
         private StandbyWindow standby;
         private CanvasWindow canvas;
         private Kinect kinect;
+
+        //TESTING PURPOSES
+        private List<String> names;
 
         public UIController(Boolean demoMode) {
             //How GBTIS operates
@@ -42,6 +46,9 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = null;
+
+            //TESTING PURPOSES
+            names = new List<String>();
         }
         
         /// <summary>
@@ -114,6 +121,9 @@ namespace gbtis {
         /// As well as save the name from what was inputted
         /// </summary>
         private void saveName(String s) {
+            names.Add(s);
+            String[] party = names.ToArray();
+            standby.setNames(party);
             goToStandby();
         }
 
@@ -140,5 +150,14 @@ namespace gbtis {
         private void exitAll() {
             Environment.Exit(0);
         }
+
+        // Default names for testing purposes
+        private static String[] DEFAULT_NAMES = {
+                "Adam Batson",
+                "Max DeMelo",
+                "Richard Carson",
+                "Eranga Ukwatta",
+                "Sreeraman Rajan"
+            };
     }
 }

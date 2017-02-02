@@ -17,6 +17,9 @@ namespace gbtis.Windows {
         // Events
         public event EventHandler Exit;
 
+        //names displayed
+        private String[] names;
+
         /// <summary>
         /// Constructor for the standby window
         /// </summary>
@@ -26,7 +29,7 @@ namespace gbtis.Windows {
             Kinect kinect = Kinect.getInstance();
 
             // Initialize load text
-            standbyMsg.Text = (kinect.isAvailable()) ? 
+            standbyMsg.Text = (kinect.isAvailable()) ?
                 gbtis.Properties.Resources.msgStart :
                 gbtis.Properties.Resources.msgNoSensor;
 
@@ -37,6 +40,7 @@ namespace gbtis.Windows {
             topName.Text = "";
             centerName.Text = "";
             bottomName.Text = "";
+            names = new String[] {" "};
 
             // Start the timer for the name animation
             Timer timer = new Timer(nameFadeInterval);
@@ -93,6 +97,14 @@ namespace gbtis.Windows {
         }
 
         /// <summary>
+        /// update the list of names with newly updated names
+        /// </summary>
+        /// <param name="names">new list of names to be displayed</param>
+        public void setNames(String[] names) {
+            this.names = names;
+        }
+
+        /// <summary>
         /// Called when the window is closed
         /// </summary>
         /// <param name="sender">The source of the event</param>
@@ -103,12 +115,5 @@ namespace gbtis.Windows {
 
         // Temporary source of names to display.
         private static Random selector = new Random();
-        private static String[] names = {
-                "Adam Batson",
-                "Max DeMelo",
-                "Richard Carson",
-                "Eranga Ukwatta",
-                "Sreeraman Rajan"
-            };
     }
 }

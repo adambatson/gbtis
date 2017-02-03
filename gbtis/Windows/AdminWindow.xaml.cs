@@ -39,7 +39,7 @@ namespace gbtis.Windows {
         void Kinect_BitMapArrived(ImageSource img) {
             this.Dispatcher.Invoke(new Action(() => {
                 sensorFeed.Source = img;
-                noKinect.Visibility = Visibility.Visible;
+                noKinect.Visibility = Visibility.Hidden;
 
                 // Update pips
                 pipContainer.Children.Clear();

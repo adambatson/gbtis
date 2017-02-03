@@ -49,7 +49,8 @@ namespace gbtis {
         }
 
         private void alignScreens() {
-            admin.AlignWindow(standby);
+            if (standby != null)
+                admin.AlignWindow(standby);
 
             if (canvas != null)
                 admin.AlignWindow(canvas);
@@ -123,6 +124,7 @@ namespace gbtis {
                     canvas.Close();
                     canvas = null;
                 }
+                alignScreens();
                 standby.Show();
             }));
         }

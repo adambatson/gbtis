@@ -56,7 +56,9 @@ namespace gbtis.Windows {
         /// </summary>
         /// <param name="w">Window to align</param>
         public void AlignWindow(Window w) {
+            w.WindowState = WindowState.Normal;
             var area = PrimaryMonitor.WorkingArea;
+
             w.Left = area.Left;
             w.Top = area.Top;
             w.Width = area.Width;

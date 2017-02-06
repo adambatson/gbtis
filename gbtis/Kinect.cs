@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using gbtis.Helpers;
 using gbtis.Windows;
+using System.Collections.Generic;
 
 namespace gbtis {
     //Deleagtes for custom event handlers
@@ -16,6 +17,7 @@ namespace gbtis {
     public delegate void SensorStatusHandler(Boolean isAvailable);
     public delegate void ModeChangedHandler(CursorModes mode);
     public delegate void FingerPositionHandler(Point point);
+    public delegate void BodyPositionsHandler(Dictionary<ulong, CameraSpacePoint> bodyPositions, ulong? activeBodyID);
 
     /// <summary>
     /// Kinect Wrapper Class
@@ -47,6 +49,7 @@ namespace gbtis {
         public event ModeChangedHandler ModeStart;
         public event ModeChangedHandler ModeEnd;
         public event FingerPositionHandler FingerPositionChanged;
+        public event BodyPositionsHandler BodyPositionsChanged;
 
         private KinectSensor sensor;
         private MultiSourceFrameReader frameReader;
@@ -282,16 +285,23 @@ namespace gbtis {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
                     frame.GetAndRefreshBodyData(bodies);
+                    Dictionary<ulong, CameraSpacePoint> bodyPositions = new Dictionary<ulong, CameraSpacePoint>();
 
                     for(int i = 0; i < numBodies; i++) {
                         gestureSources[i].TrackingId = bodies[i].TrackingId;
                         gestureReaders[i].IsPaused = !bodies[i].IsTracked;
+                        if (bodies[i].IsTracked)
+                            bodyPositions.Add(bodies[i].TrackingId, bodies[i].Joints[JointType.Head].Position);
                     }
 
                     var trackedBodies = bodies.Where(b => b.IsTracked);
 
-                    if (!trackedBodies.Contains(activeBody))
+                    if (!trackedBodies.Contains(activeBody)) {
                         activeBody = trackedBodies.FirstOrDefault();
+                    }
+
+                    BodyPositionsHandler handler = BodyPositionsChanged;
+                    handler?.Invoke(bodyPositions, getActiveBodyId());
                 }
             }
         }
@@ -332,13 +342,14 @@ namespace gbtis {
             return bodies[0];
         }
 
-        public void SetActiveBody(ulong trackingId) {
+        public bool SetActiveBody(ulong trackingId) {
             foreach(Body b in bodies) {
                 if (b.TrackingId == trackingId) {
                     activeBody = b;
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
 
         public ulong? getActiveBodyId() {

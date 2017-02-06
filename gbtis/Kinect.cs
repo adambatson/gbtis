@@ -17,7 +17,7 @@ namespace gbtis {
     public delegate void SensorStatusHandler(Boolean isAvailable);
     public delegate void ModeChangedHandler(CursorModes mode);
     public delegate void FingerPositionHandler(Point point);
-    public delegate void BodyPositionsHandler(Dictionary<ulong, CameraSpacePoint> bodyPositions, ulong? activeBodyID);
+    public delegate void BodyPositionsHandler(Dictionary<ulong, ColorSpacePoint> bodyPositions, ulong? activeBodyID);
 
     /// <summary>
     /// Kinect Wrapper Class
@@ -285,13 +285,13 @@ namespace gbtis {
             using (var frame = e.FrameReference.AcquireFrame()) {
                 if (frame != null) {
                     frame.GetAndRefreshBodyData(bodies);
-                    Dictionary<ulong, CameraSpacePoint> bodyPositions = new Dictionary<ulong, CameraSpacePoint>();
+                    Dictionary<ulong, ColorSpacePoint> bodyPositions = new Dictionary<ulong, ColorSpacePoint>();
 
                     for(int i = 0; i < numBodies; i++) {
                         gestureSources[i].TrackingId = bodies[i].TrackingId;
                         gestureReaders[i].IsPaused = !bodies[i].IsTracked;
                         if (bodies[i].IsTracked)
-                            bodyPositions.Add(bodies[i].TrackingId, bodies[i].Joints[JointType.Head].Position);
+                            bodyPositions.Add(bodies[i].TrackingId, coordinateMapper.MapCameraPointToColorSpace(bodies[i].Joints[JointType.Head].Position));
                     }
 
                     var trackedBodies = bodies.Where(b => b.IsTracked);

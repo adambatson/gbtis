@@ -7,11 +7,11 @@
              mc:Ignorable="d" HorizontalAlignment="Left" VerticalAlignment="Top"
              Height="30" Width="30">
     <UserControl.Background>
-        <SolidColorBrush Color="{Binding Path=Color, ElementName=pip}" />
+        <SolidColorBrush x:Name="background" Color="Blue" />
     </UserControl.Background>
     <Viewbox>
         <Border>
-            <TextBlock Padding="5" FontWeight="Bold" Foreground="White" Text="{Binding Path=Text, ElementName=pip}">
+            <TextBlock Padding="5" FontWeight="Bold" Foreground="White" x:Name="label" Text="#">
                 <TextBlock.Effect>
                     <DropShadowEffect BlurRadius="2" Direction="0" ShadowDepth="0"/>
                 </TextBlock.Effect>

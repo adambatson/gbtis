@@ -23,35 +23,26 @@ namespace gbtis.Controls {
         /// </summary>
         public bool Active {
             set {
-                Background = new SolidColorBrush(value ? Colors.Red : Colors.Blue);
-        } }
+                background.Color = value ? Colors.Red : Colors.Blue;
+        }
+        }
 
         /// <summary>
         /// Set the location of the pip
         /// </summary>
         public Point Position {
             set {
-                Margin = new Thickness(value.X - Width/2, value.Y - Height/2, 0, 0);
-        } }
-
-        /// <summary>
-        /// Register the Text property of the control
-        /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            "Text", typeof(string), typeof(Pip), new PropertyMetadata("#"));
-        public string Text {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+                Margin = new Thickness(value.X - Width / 2, value.Y - Height / 2, 0, 0);
+            }
         }
 
         /// <summary>
-        /// Register the Color property of the control
+        /// Set the location of the pip
         /// </summary>
-        public static readonly DependencyProperty ColorProperty = DependencyProperty.Register(
-            "Color", typeof(Color), typeof(Pip), new PropertyMetadata(Colors.Blue));
-        public Color Color {
-            get { return (Color)GetValue(ColorProperty); }
-            set { SetValue(ColorProperty, value); }
+        public string Text {
+            set {
+                label.Text = value;
+            }
         }
 
         public Pip() {

@@ -15,6 +15,9 @@
                     <MenuItem x:Name="fileStandbyButton" x:FieldModifier="public"  Header="_Return To Standby" Click="FileStandby_Click" />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
+
+                <MenuItem x:Name="windowMenu" Header="_Window">
+                </MenuItem>
             </Menu>
 
             <Grid>

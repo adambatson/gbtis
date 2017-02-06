@@ -290,8 +290,12 @@ namespace gbtis {
                     for(int i = 0; i < numBodies; i++) {
                         gestureSources[i].TrackingId = bodies[i].TrackingId;
                         gestureReaders[i].IsPaused = !bodies[i].IsTracked;
-                        if (bodies[i].IsTracked)
-                            bodyPositions.Add(bodies[i].TrackingId, coordinateMapper.MapCameraPointToColorSpace(bodies[i].Joints[JointType.Head].Position));
+                        if (bodies[i].IsTracked) {
+                            ColorSpacePoint p = coordinateMapper.MapCameraPointToColorSpace(
+                                bodies[i].Joints[JointType.Head].Position);
+                            //p.Y -= 100;
+                            bodyPositions.Add(bodies[i].TrackingId, p);
+                        }
                     }
 
                     var trackedBodies = bodies.Where(b => b.IsTracked);

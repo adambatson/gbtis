@@ -32,8 +32,11 @@ namespace gbtis.Controls {
         /// </summary>
         public Point Position {
             set {
-                Margin = new Thickness(value.X - Width / 2, value.Y - Height / 2, 0, 0);
+                try {
+                    Margin = new Thickness(value.X - Width / 2, value.Y - Height / 2, 0, 0);
+                } catch (Exception) { return; }
             }
+            get { return new Point(Margin.Left, Margin.Top); }
         }
 
         /// <summary>

@@ -105,22 +105,16 @@ namespace gbtis.Windows {
             this.Dispatcher.Invoke(new Action(() => {
                 // Update pips
                 pipContainer.Children.Clear();
-                usersMenu.Items.Clear();
-
+                int i = 1;
                 foreach (ulong bodyID in bodyPositions.Keys) {
-                    Pip pip = new Controls.Pip(bodyID.ToString());
+                    Pip pip = new Controls.Pip(i.ToString());
                     pip.Position = kinect.ScaleToSize(new Point(bodyPositions[bodyID].X, bodyPositions[bodyID].Y), new Size(frameSize.Width, frameSize.Height), new Size(this.ActualWidth, this.ActualHeight));
                     pip.Active = bodyID == activeBodyID;
                     pipContainer.Children.Add(pip);
-
-                    MenuItem item = new MenuItem();
-                    item.Header = bodyID.ToString();
-                    item.Tag = bodyID;
-                    item.Click += (s, e) => kinect.SetActiveBody((ulong)((MenuItem)s).Tag);
-                    usersMenu.Items.Add(item);
+                    pip.Tag = bodyID;
+                    pip.MouseDoubleClick += (s, e) => kinect.SetActiveBody((ulong)((Pip)s).Tag);
+                    i++;
                 }
-
-                usersMenu.IsEnabled = usersMenu.Items.Count > 0;
             }));
         }
 
@@ -133,7 +127,7 @@ namespace gbtis.Windows {
                 sensorFeed.Source = img;
                 noKinect.Visibility = Visibility.Hidden;
                 
-                if (frameSize.IsEmpty) {
+                if (frameSize.Width == 0) {
                     frameSize = new Size(img.Width, img.Height);
                 }
             }));

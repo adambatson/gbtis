@@ -18,7 +18,6 @@
                 </MenuItem>
 
                 <MenuItem x:Name="windowMenu" Header="_Windows"></MenuItem>
-                <MenuItem x:Name="usersMenu" Header="_Users" IsEnabled="false"></MenuItem>
             </Menu>
 
             <Grid>

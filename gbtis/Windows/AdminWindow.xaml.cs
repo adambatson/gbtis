@@ -14,9 +14,15 @@ namespace gbtis.Windows {
         private Kinect kinect;
         private Size frameSize;
 
+        public bool DefaultToPrimaryScreen { get; set; } = false;
+        public System.Windows.Forms.Screen PrimaryMonitor { get; private set; }
+
         // Window events
         public event EventHandler Exit;
         public event EventHandler Standby;
+
+        public delegate void ScreenEvent();
+        public event ScreenEvent ScreenChanged;
 
         /// <summary>
         /// Initialize the window
@@ -29,6 +35,56 @@ namespace gbtis.Windows {
             kinect.BitMapReady += Kinect_BitMapArrived;
             kinect.SensorStatusChanged += Kinect_SensorStatusChanged;
             kinect.BodyPositionsChanged += Kinect_BodyPositionsChanged;
+
+            // Monitor selection
+            var i = 0;
+            foreach (var screen in System.Windows.Forms.Screen.AllScreens) {
+                MenuItem item = new MenuItem();
+                item.Header = String.Format("Display {0} ({1}x{2})", ++i, screen.WorkingArea.Width, screen.WorkingArea.Height);
+                item.Tag = screen;
+                item.Click += (s, e) => {
+                    foreach (MenuItem mi in windowMenu.Items) mi.IsChecked = false;
+                    ((MenuItem)s).IsChecked = true;
+                    SetScreen((System.Windows.Forms.Screen)((MenuItem)s).Tag);
+                };
+
+                // Set the default to the first non-primary display
+                if (PrimaryMonitor == null) {
+                    if (!DefaultToPrimaryScreen && !screen.Primary || DefaultToPrimaryScreen && screen.Primary) {
+                        PrimaryMonitor = screen;
+                    }
+                }
+
+                item.IsChecked = (screen == PrimaryMonitor);
+                windowMenu.Items.Add(item);
+            }
+
+            // Realign
+            ScreenChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Change the active screen
+        /// </summary>
+        /// <param name="s"></param>
+        private void SetScreen(System.Windows.Forms.Screen s) {
+            PrimaryMonitor = s;
+            ScreenChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Align a window to the active monitor
+        /// </summary>
+        /// <param name="w">Window to align</param>
+        public void AlignWindow(Window w) {
+            w.WindowState = WindowState.Normal;
+            var area = PrimaryMonitor.WorkingArea;
+
+            w.Left = area.Left;
+            w.Top = area.Top;
+            w.Width = area.Width;
+            w.Height = area.Height;
+            w.WindowState = WindowState.Maximized;
         }
 
         /// <summary>

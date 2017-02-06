@@ -45,6 +45,15 @@ namespace gbtis {
             canvas = null;
 
             startTimer();
+            admin.ScreenChanged += () => alignScreens();
+        }
+
+        private void alignScreens() {
+            if (standby != null)
+                admin.AlignWindow(standby);
+
+            if (canvas != null)
+                admin.AlignWindow(canvas);
         }
 
         /// <summary>
@@ -73,6 +82,7 @@ namespace gbtis {
                 canvas = new CanvasWindow();
                 subscribeToCanvasHandler();
                 canvas.Show();
+                alignScreens();
                 if (kinect.getActiveBodyId() != bodyId) {
                     kinect.SetActiveBody(bodyId);
                 } else kinect.setHand(rightHand);
@@ -115,6 +125,7 @@ namespace gbtis {
                     canvas = null;
                 }
                 standby.Show();
+                alignScreens();
             }));
         }
 

@@ -17,8 +17,8 @@
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
 
-                <MenuItem x:Name="usersMenu" Header="_Users" IsEnabled="false">
-                </MenuItem>
+                <MenuItem x:Name="windowMenu" Header="_Windows"></MenuItem>
+                <MenuItem x:Name="usersMenu" Header="_Users" IsEnabled="false"></MenuItem>
             </Menu>
 
             <Grid>

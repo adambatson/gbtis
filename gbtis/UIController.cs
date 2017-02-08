@@ -42,11 +42,6 @@ namespace gbtis {
             adminHandler();
             admin.Show();
 
-            CanvasWindow w = new CanvasWindow();
-            w.Show();
-            admin.AlignWindow(w);
-            w.Help();
-
             //Starting the canvas screen
             canvas = null;
 

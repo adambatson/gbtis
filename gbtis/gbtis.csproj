@@ -89,6 +89,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\Pip.xaml.cs">
+      <DependentUpon>Pip.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\CharacterRecognizer.cs" />
     <Compile Include="Windows\AdminWindow.xaml.cs">
       <DependentUpon>AdminWindow.xaml</DependentUpon>
@@ -113,6 +116,10 @@
     </Compile>
     <Compile Include="Controls\TextBlockFadeAnimation.cs" />
     <Compile Include="UIController.cs" />
+    <Page Include="Controls\Pip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\AdminWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

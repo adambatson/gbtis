@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:gbtis"
+        xmlns:controls="clr-namespace:gbtis.Controls"
         mc:Ignorable="d"
         
         Closing="FileExit_Click"
@@ -15,12 +16,26 @@
                     <MenuItem x:Name="fileStandbyButton" x:FieldModifier="public"  Header="_Return To Standby" Click="FileStandby_Click" />
                     <MenuItem x:Name="fileExitButton" x:FieldModifier="public"  Header="_Exit" Click="FileExit_Click" />
                 </MenuItem>
+
+                <MenuItem x:Name="windowMenu" Header="_Windows"></MenuItem>
             </Menu>
 
             <Grid>
                 <Border Background="DarkBlue" BorderThickness="1,1,0,0" BorderBrush="Black">
                     <Image x:Name="sensorFeed" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
+
+                <Viewbox x:Name="noKinect" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.RowSpan="3" Grid.ColumnSpan="4">
+                    <Border>
+                        <TextBlock Margin="10" FontWeight="Bold" Foreground="White" Text="No kinect found">
+                            <TextBlock.Effect>
+                                <DropShadowEffect BlurRadius="2" Direction="0" ShadowDepth="0"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </Border>
+                </Viewbox>
+
+                <Grid x:Name="pipContainer"></Grid>
             </Grid>
         </DockPanel>
     </Grid>

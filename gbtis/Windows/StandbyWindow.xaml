@@ -8,7 +8,7 @@
         
         Closing="Window_Closed"
         WindowStyle="None" ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />

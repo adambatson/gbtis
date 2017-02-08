@@ -47,8 +47,30 @@ namespace gbtis {
             //Starting the canvas screen
             canvas = null;
 
+<<<<<<< HEAD
             //TESTING PURPOSES
             names = new List<String>();
+=======
+            startTimer();
+            admin.ScreenChanged += () => alignScreens();
+        }
+
+        private void alignScreens() {
+            if (standby != null)
+                admin.AlignWindow(standby);
+
+            if (canvas != null)
+                admin.AlignWindow(canvas);
+        }
+
+        /// <summary>
+        /// A timer that shoots out an event "TOCK" every 50 ms
+        /// </summary>
+        public static void startTimer() {
+            Timer timer = new Timer(TICK);
+            timer.Elapsed += (s, e) => Tock?.Invoke(timer, new EventArgs()); ;
+            timer.Start();
+>>>>>>> 4bb5d981358823412f6c3018618542b3be84f4b7
         }
         
         /// <summary>
@@ -68,7 +90,11 @@ namespace gbtis {
                 canvas = new CanvasWindow();
                 subscribeToCanvasHandler();
                 canvas.Show();
+<<<<<<< HEAD
                 //only sets new user if the canvas is starting with a new user
+=======
+                alignScreens();
+>>>>>>> 4bb5d981358823412f6c3018618542b3be84f4b7
                 if (kinect.getActiveBodyId() != bodyId) {
                     kinect.SetActiveBody(bodyId);
                 }
@@ -112,6 +138,11 @@ namespace gbtis {
                     }
                     standby.Show();
                 }
+<<<<<<< HEAD
+=======
+                standby.Show();
+                alignScreens();
+>>>>>>> 4bb5d981358823412f6c3018618542b3be84f4b7
             }));
         }
 

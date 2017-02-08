@@ -32,6 +32,7 @@ namespace gbtis {
             kinect = Kinect.getInstance();
             kinectHandler();
 
+
             //Starting the standby window
             standby = new StandbyWindow();
             standbyHandler();
@@ -40,6 +41,11 @@ namespace gbtis {
             admin = new AdminWindow();
             adminHandler();
             admin.Show();
+
+            CanvasWindow w = new CanvasWindow();
+            w.Show();
+            admin.AlignWindow(w);
+            w.Help();
 
             //Starting the canvas screen
             canvas = null;

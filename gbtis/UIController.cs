@@ -26,35 +26,30 @@ namespace gbtis {
             //How GBTIS operates
             this.demoMode = demoMode;
 
+            //TESTING PURPOSES
+            names = new List<String>();
+
             //Making the kinect Controller
             kinect = Kinect.getInstance();
             kinectHandler();
 
-            //Starting the standby window
-            standby = new StandbyWindow();
-            standbyHandler();
-
+            admin = new AdminWindow();
             //Starting and showing the admin window only if its normal mode
             if (!demoMode) {
-                admin = new AdminWindow();
                 adminHandler();
                 admin.Show();
             }
-            else {
-                standby.Show();
-            }
+
+            //Starting the standby window
+            showStandby();
 
             //Starting the canvas screen
             canvas = null;
-
-<<<<<<< HEAD
-            //TESTING PURPOSES
-            names = new List<String>();
-=======
-            startTimer();
-            admin.ScreenChanged += () => alignScreens();
         }
 
+        /// <summary>
+        /// Aligns the screens to the screen the user has choosen
+        /// </summary>
         private void alignScreens() {
             if (standby != null)
                 admin.AlignWindow(standby);
@@ -64,15 +59,51 @@ namespace gbtis {
         }
 
         /// <summary>
-        /// A timer that shoots out an event "TOCK" every 50 ms
+        /// opens a new canvas screen
         /// </summary>
-        public static void startTimer() {
-            Timer timer = new Timer(TICK);
-            timer.Elapsed += (s, e) => Tock?.Invoke(timer, new EventArgs()); ;
-            timer.Start();
->>>>>>> 4bb5d981358823412f6c3018618542b3be84f4b7
+        private void showCanvas() {
+            if (canvas == null) {
+                canvas = new CanvasWindow();
+                subscribeToCanvasHandler();
+            }
+            canvas.Show();
+            alignScreens();
         }
-        
+
+        /// <summary>
+        /// closes current canvas screen
+        /// </summary>
+        private void closeCanvas() {
+            if (canvas != null) {
+                canvas.Hide();
+                unsubscribeToCanvasHandler();
+                canvas.Close();
+                canvas = null;
+            }
+        }
+
+        /// <summary>
+        /// opens a new standby screen
+        /// </summary>
+        private void showStandby() {
+            if (standby == null) {
+                standby = new StandbyWindow(names.ToArray());
+            }
+            standby.Show();
+            alignScreens();
+        }
+
+        /// <summary>
+        /// closes current standby screen
+        /// </summary>
+        private void closeStandby() {
+            if (standby != null) {
+                standby.Hide();
+                standby.Close();
+                standby = null;
+            }
+        }
+
         /// <summary>
         /// Handles all the UI related Kinect events
         /// </summary>
@@ -85,21 +116,13 @@ namespace gbtis {
         /// Switch from Standby to Canvas
         /// </summary>
         private void waveOccured(ulong bodyId, bool rightHand) {
-            if ( (canvas == null) && (standby.IsVisible) ) {
-                standby.Hide();
-                canvas = new CanvasWindow();
-                subscribeToCanvasHandler();
-                canvas.Show();
-<<<<<<< HEAD
-                //only sets new user if the canvas is starting with a new user
-=======
-                alignScreens();
->>>>>>> 4bb5d981358823412f6c3018618542b3be84f4b7
+            if (canvas == null) {
+                closeStandby();
+                showCanvas();
                 if (kinect.getActiveBodyId() != bodyId) {
                     kinect.SetActiveBody(bodyId);
                 }
             }
-            //happens when changing hands with either screen
             if (kinect.getActiveBodyId() == bodyId) {
                 kinect.setHand(rightHand);
             }
@@ -130,19 +153,9 @@ namespace gbtis {
                 if (demoMode) {
                     exitAll();
                 } else {
-                    if (canvas != null) {
-                        canvas.Hide();
-                        unsubscribeToCanvasHandler();
-                        canvas.Close();
-                        canvas = null;
-                    }
-                    standby.Show();
+                    closeCanvas();
+                    showStandby();
                 }
-<<<<<<< HEAD
-=======
-                standby.Show();
-                alignScreens();
->>>>>>> 4bb5d981358823412f6c3018618542b3be84f4b7
             }));
         }
 
@@ -153,8 +166,6 @@ namespace gbtis {
         /// </summary>
         private void saveName(String s) {
             names.Add(s);
-            String[] party = names.ToArray();
-            standby.setNames(party);
             goToStandby();
         }
 
@@ -164,13 +175,7 @@ namespace gbtis {
         private void adminHandler() {
             admin.Exit += (s, e) => {  exitAll(); };
             admin.Standby += (s, e) => { goToStandby(); };
-        }
-
-        /// <summary>
-        /// Handles all the UI related Standby events
-        /// </summary>
-        private void standbyHandler() {
-            standby.Exit += (s, e) => { exitAll(); };
+            admin.ScreenChanged += () => { alignScreens(); };
         }
 
         /// <summary>
@@ -181,14 +186,5 @@ namespace gbtis {
         private void exitAll() {
             Environment.Exit(0);
         }
-
-        // Default names for testing purposes
-        private static String[] DEFAULT_NAMES = {
-                "Adam Batson",
-                "Max DeMelo",
-                "Richard Carson",
-                "Eranga Ukwatta",
-                "Sreeraman Rajan"
-            };
     }
 }

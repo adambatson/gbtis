@@ -24,7 +24,7 @@ namespace gbtis.Windows {
         /// Constructor for the standby window
         /// </summary>
         /// <param name="_sensor">An open kinect sensor, or null</param>
-        public StandbyWindow() {
+        public StandbyWindow(String[] names) {
             InitializeComponent();
             Kinect kinect = Kinect.getInstance();
 
@@ -40,7 +40,11 @@ namespace gbtis.Windows {
             topName.Text = "";
             centerName.Text = "";
             bottomName.Text = "";
-            names = new String[] {" "};
+            if (names.Length == 0) {
+                this.names = DEFAULT_NAMES;
+            } else {
+                this.names = names;
+            }
 
             // Start the timer for the name animation
             Timer timer = new Timer(nameFadeInterval);
@@ -115,5 +119,14 @@ namespace gbtis.Windows {
 
         // Temporary source of names to display.
         private static Random selector = new Random();
+
+        // Default names for testing purposes
+        private static String[] DEFAULT_NAMES = {
+                "Adam Batson",
+                "Max DeMelo",
+                "Richard Carson",
+                "Eranga Ukwatta",
+                "Sreeraman Rajan"
+            };
     }
 }

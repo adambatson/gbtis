@@ -33,6 +33,7 @@ namespace gbtis {
             kinect = Kinect.getInstance();
             kinectHandler();
 
+            //Starting and showing the admin window
             admin = new AdminWindow();
             //Starting and showing the admin window only if its normal mode
             if (!demoMode) {

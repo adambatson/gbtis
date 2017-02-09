@@ -92,6 +92,9 @@
     <Compile Include="Controls\Pip.xaml.cs">
       <DependentUpon>Pip.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Help.xaml.cs">
+      <DependentUpon>Help.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\CharacterRecognizer.cs" />
     <Compile Include="Windows\AdminWindow.xaml.cs">
       <DependentUpon>AdminWindow.xaml</DependentUpon>
@@ -118,7 +121,10 @@
     <Compile Include="UIController.cs" />
     <Page Include="Controls\Pip.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Help.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\AdminWindow.xaml">
       <SubType>Designer</SubType>
@@ -172,7 +178,9 @@
     <None Include="Resources\gbtisg.gbd" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -191,6 +199,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\excellent.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Closed.png" />
+    <Resource Include="Resources\Lasso.png" />
+    <Resource Include="Resources\Open.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

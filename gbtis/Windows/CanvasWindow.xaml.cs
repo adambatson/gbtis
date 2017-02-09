@@ -110,12 +110,14 @@ namespace gbtis.Windows {
         /// Show the help overlay
         /// </summary>
         public void Help() {
-            helpOverlay.AnimateOpacity(1);
-            Timer t = new Timer(HELP_DURATION);
-            t.Elapsed += (s, e) => Dispatcher.Invoke(new Action(() => {
-                helpOverlay.AnimateOpacity(0);
+            Dispatcher.Invoke(new Action(() => {
+                helpOverlay.AnimateOpacity(1);
+                Timer t = new Timer(HELP_DURATION);
+                t.Elapsed += (s, e) => Dispatcher.Invoke(new Action(() => {
+                    helpOverlay.AnimateOpacity(0);
+                }));
+                t.Start();
             }));
-            t.Start();
         }
 
         //im so sorry

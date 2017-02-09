@@ -9,46 +9,48 @@ using System.Timers;
 using System.Windows;
 using System.Data;
 using gbtis.Windows;
-//using System.Data.SQLite;
+using System.Collections;
 
 namespace gbtis { 
     class UIController {
-        // Timer set to tick every 50 ms
-        public static int TICK = 50;
-        public static event EventHandler Tock;
+        private Boolean demoMode;
+        private AdminWindow admin;
+        private StandbyWindow standby;
+        private CanvasWindow canvas;
+        private Kinect kinect;
 
-        //private SQLiteConnection sqlite;
+        //TESTING PURPOSES
+        private List<String> names;
 
-        AdminWindow admin;
-        StandbyWindow standby;
-        CanvasWindow canvas;
-        Kinect kinect;
+        public UIController(Boolean demoMode) {
+            //How GBTIS operates
+            this.demoMode = demoMode;
 
-        public UIController() {
-            //Starting SQlite Connection
-            //sqlite = new SQLiteConnection("location of datebase");  //Not fully implemented
+            //TESTING PURPOSES
+            names = new List<String>();
 
             //Making the kinect Controller
             kinect = Kinect.getInstance();
             kinectHandler();
 
-
-            //Starting the standby window
-            standby = new StandbyWindow();
-            standbyHandler();
-
             //Starting and showing the admin window
             admin = new AdminWindow();
-            adminHandler();
-            admin.Show();
+            //Starting and showing the admin window only if its normal mode
+            if (!demoMode) {
+                adminHandler();
+                admin.Show();
+            }
+
+            //Starting the standby window
+            showStandby();
 
             //Starting the canvas screen
             canvas = null;
-
-            startTimer();
-            admin.ScreenChanged += () => alignScreens();
         }
 
+        /// <summary>
+        /// Aligns the screens to the screen the user has choosen
+        /// </summary>
         private void alignScreens() {
             if (standby != null)
                 admin.AlignWindow(standby);
@@ -58,12 +60,49 @@ namespace gbtis {
         }
 
         /// <summary>
-        /// A timer that shoots out an event "TOCK" every 50 ms
+        /// opens a new canvas screen
         /// </summary>
-        public static void startTimer() {
-            Timer timer = new Timer(TICK);
-            timer.Elapsed += (s, e) => Tock?.Invoke(timer, new EventArgs()); ;
-            timer.Start();
+        private void showCanvas() {
+            if (canvas == null) {
+                canvas = new CanvasWindow();
+                subscribeToCanvasHandler();
+            }
+            canvas.Show();
+            alignScreens();
+        }
+
+        /// <summary>
+        /// closes current canvas screen
+        /// </summary>
+        private void closeCanvas() {
+            if (canvas != null) {
+                canvas.Hide();
+                unsubscribeToCanvasHandler();
+                canvas.Close();
+                canvas = null;
+            }
+        }
+
+        /// <summary>
+        /// opens a new standby screen
+        /// </summary>
+        private void showStandby() {
+            if (standby == null) {
+                standby = new StandbyWindow(names.ToArray());
+            }
+            standby.Show();
+            alignScreens();
+        }
+
+        /// <summary>
+        /// closes current standby screen
+        /// </summary>
+        private void closeStandby() {
+            if (standby != null) {
+                standby.Hide();
+                standby.Close();
+                standby = null;
+            }
         }
 
         /// <summary>
@@ -78,22 +117,15 @@ namespace gbtis {
         /// Switch from Standby to Canvas
         /// </summary>
         private void waveOccured(ulong bodyId, bool rightHand) {
-            if ((canvas == null)&&(standby.IsVisible)) {
-                standby.Hide();
-                canvas = new CanvasWindow();
-                subscribeToCanvasHandler();
-                canvas.Show();
-                alignScreens();
+            if (canvas == null) {
+                closeStandby();
+                showCanvas();
                 if (kinect.getActiveBodyId() != bodyId) {
                     kinect.SetActiveBody(bodyId);
-                } else kinect.setHand(rightHand);
+                }
             }
-            else {
-                /*standby.Hide();
-                canvas.clearScreen();
-                canvas.Show();*/
-                if (kinect.getActiveBodyId() == bodyId)
-                    kinect.setHand(rightHand);
+            if (kinect.getActiveBodyId() == bodyId) {
+                kinect.setHand(rightHand);
             }
         }
 
@@ -119,14 +151,12 @@ namespace gbtis {
         /// </summary>
         private void goToStandby() {
             Application.Current.Dispatcher.Invoke(new Action(() => {
-                if (canvas != null) {
-                    canvas.Hide();
-                    unsubscribeToCanvasHandler();
-                    canvas.Close();
-                    canvas = null;
+                if (demoMode) {
+                    exitAll();
+                } else {
+                    closeCanvas();
+                    showStandby();
                 }
-                standby.Show();
-                alignScreens();
             }));
         }
 
@@ -136,6 +166,7 @@ namespace gbtis {
         /// As well as save the name from what was inputted
         /// </summary>
         private void saveName(String s) {
+            names.Add(s);
             goToStandby();
         }
 
@@ -145,15 +176,7 @@ namespace gbtis {
         private void adminHandler() {
             admin.Exit += (s, e) => {  exitAll(); };
             admin.Standby += (s, e) => { goToStandby(); };
-            //Broken with new body setting features
-            //admin.Input += (s, e) => { waveOccured(); };
-        }
-
-        /// <summary>
-        /// Handles all the UI related Standby events
-        /// </summary>
-        private void standbyHandler() {
-            standby.Exit += (s, e) => { exitAll(); };
+            admin.ScreenChanged += () => { alignScreens(); };
         }
 
         /// <summary>

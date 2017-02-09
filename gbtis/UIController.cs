@@ -32,6 +32,7 @@ namespace gbtis {
             kinect = Kinect.getInstance();
             kinectHandler();
 
+
             //Starting the standby window
             standby = new StandbyWindow();
             standbyHandler();

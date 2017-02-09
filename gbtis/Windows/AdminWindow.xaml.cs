@@ -59,6 +59,10 @@ namespace gbtis.Windows {
                 windowMenu.Items.Add(item);
             }
 
+            // Insure we get a window
+            if (PrimaryMonitor == null)
+                PrimaryMonitor = System.Windows.Forms.Screen.PrimaryScreen;
+
             // Realign
             ScreenChanged?.Invoke();
         }

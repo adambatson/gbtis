@@ -46,75 +46,79 @@ namespace gbtis.Windows {
             // Init canvas
             ocr = new CharacterRecognizer(canvas);
             Dispatcher.Invoke(new Action(() => recognize()));
+        }
 
-            //Cursor Events
-            cursor.Moved += (p) => {
-                cursorMove();
-            };
-            cursor.ModeStart += (m) => {
-                cursorDown();
-            };
-            cursor.ModeEnd += (m) => {
-                cursorUp();
-            };
+        /// <summary>
+        /// Handling it
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e">It</param>
+        public void Handle(Object s, RoutedEventArgs e) {
+            e.Handled = true;
+        }
 
-            // Set the margin, so that we can scale to match the visuals
-            sensorOverlay.SizeChanged += (s, e) => {
-                Size bounds = (sensorOverlay.ActualWidth > 0) ?
-                    new Size(sensorOverlay.ActualWidth, sensorOverlay.ActualHeight) :
-                    new Size(ActualWidth, ActualHeight);
+        /// <summary>
+        /// Handle a resize of the overlay
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        public void HandleResize(Object s, EventArgs e) {
+            Size bounds = (sensorOverlay.ActualWidth > 0) ?
+                new Size(sensorOverlay.ActualWidth, sensorOverlay.ActualHeight) :
+                new Size(ActualWidth, ActualHeight);
 
-                cursor.SetBounds(bounds, sensorOverlay.Margin.Left);
-            };
-
-            // Disable default canvas controls
-            canvas.PreviewMouseDown += (s, e) => e.Handled = true;
-            canvas.PreviewMouseUp += (s, e) => e.Handled = true;
-            canvas.PreviewStylusDown += (s, e) => e.Handled = true;
-            canvas.PreviewStylusUp += (s, e) => e.Handled = true;
-            canvas.PreviewTouchDown += (s, e) => e.Handled = true;
-            canvas.PreviewTouchUp += (s, e) => e.Handled = true;
-
-            // Button events
-            cursor.Moved += (p) => {
-                //p = kinect.ColorToInterface(p, new Size(ActualWidth, ActualHeight));
-                helpButton.Over((helpButton.Intersects(this, p)));
-                clearButton.Over((clearButton.Intersects(this, p)));
-                cancelButton.Over((cancelButton.Intersects(this, p)));
-                continueButton.Over((continueButton.Intersects(this, p)));
-            };
-            clearButton.Clicked += (s, e) => {
-                this.Dispatcher.Invoke(new Action(() => {
-                    canvas.Strokes.Clear();
-                    recognize();
-                }));
-            };
-            cancelButton.Clicked += (s, e) => Cancel?.Invoke();
-            helpButton.Clicked += (s, e) => Help();
-            continueButton.Clicked += (s, e) => {
-                Dispatcher.Invoke(new Action(() => {
-                    sensorOverlay.Opacity = 1;
-                    thanksMsg.Opacity = 1;
-                    cursor.Opacity = 0;
-                    canvasBorder.Opacity = 0;
-                    buttonBar.Opacity = 0;
-                }));
-
-                Timer t = new Timer(THANKS_DURATION);
-                t.Elapsed += (ss, ee) => Continue?.Invoke(Text);
-                t.Start();
-            };
+            cursor.SetBounds(bounds, sensorOverlay.Margin.Left);
         }
 
         /// <summary>
         /// Show the help overlay
         /// </summary>
-        public void Help() {
+        public void HelpClicked(Object source, EventArgs e) {
             helpOverlay.AnimateOpacity(1);
             Timer t = new Timer(HELP_DURATION);
-            t.Elapsed += (s, e) => Dispatcher.Invoke(new Action(() => {
+            t.Elapsed += (s, ee) => Dispatcher.Invoke(new Action(() => {
                 helpOverlay.AnimateOpacity(0);
             }));
+            t.Start();
+        }
+
+        /// <summary>
+        /// Cancel the operation
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public void CancelClicked(Object source, EventArgs e) {
+            Cancel?.Invoke();
+        }
+
+        /// <summary>
+        /// Clear the canvas
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public void ClearClicked(Object source, EventArgs e) {
+            this.Dispatcher.Invoke(new Action(() => {
+                canvas.Strokes.Clear();
+                recognize();
+            }));
+        }
+
+        /// <summary>
+        /// Move to the next step
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public void ContinueClicked(Object source, EventArgs e) {
+            Dispatcher.Invoke(new Action(() => {
+                sensorOverlay.Opacity = 1;
+                thanksMsg.Opacity = 1;
+                cursor.Opacity = 0;
+                canvasBorder.Opacity = 0;
+                buttonBar.Opacity = 0;
+            }));
+
+            Timer t = new Timer(THANKS_DURATION);
+            t.Elapsed += (ss, ee) => Continue?.Invoke(Text);
             t.Start();
         }
 
@@ -139,7 +143,15 @@ namespace gbtis.Windows {
         /// <param name="p">The point</param>
         /// <returns>A Point</returns>
         private Point relativeTransform(Point p) {
+            p = sensorOverlay.TransformToAncestor(this).Transform(p);
             p = this.TransformToDescendant(canvas).Transform(p);
+
+            Size bounds = new Size(canvas.ActualWidth, canvas.ActualHeight);
+            if (p.X > canvas.ActualWidth) p.X = canvas.ActualWidth;
+            if (p.X < 0) p.X = 0;
+            if (p.Y > canvas.ActualHeight) p.Y = canvas.ActualHeight;
+            if (p.Y < 0) p.Y = 0;
+
             return new Point(p.X, p.Y);
         }
 
@@ -148,7 +160,15 @@ namespace gbtis.Windows {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorMove() {
+        private void cursorMove(Point p) {
+            p = relativeTransform(p);
+
+            // Check buttons
+            helpButton.Over((helpButton.Intersects(this, p)));
+            clearButton.Over((clearButton.Intersects(this, p)));
+            cancelButton.Over((cancelButton.Intersects(this, p)));
+            continueButton.Over((continueButton.Intersects(this, p)));
+
             // Stop if input capture isn't ready
             if (stylusPoints == null) return;
 
@@ -164,7 +184,7 @@ namespace gbtis.Windows {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorDown() {
+        private void cursorDown(CursorModes m) {
             // Start input capture
             if (stylusPoints == null)
                 stylusPoints = new StylusPointCollection();
@@ -182,7 +202,7 @@ namespace gbtis.Windows {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorUp() {
+        private void cursorUp(CursorModes m) {
             // Revert to standby cursor
             if (cursor.Mode == CursorModes.Idle)
                 canvas.EditingMode = InkCanvasEditingMode.Select;

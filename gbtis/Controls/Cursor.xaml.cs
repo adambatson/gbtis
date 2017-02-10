@@ -104,7 +104,7 @@ namespace gbtis.Controls {
 
                     ModeEnd?.Invoke(m);
                 };
-                /*
+                
                 // Mouse controls
                 parentWindow.MouseMove += (s, e) => {
                     Position = Mouse.GetPosition(parentWindow);
@@ -123,7 +123,7 @@ namespace gbtis.Controls {
                     Mode = mouseMode();
 
                     ModeEnd?.Invoke(Mode);
-                };*/
+                };
             };
         }
 

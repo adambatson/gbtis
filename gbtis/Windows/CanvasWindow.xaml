@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:gbtis"
         xmlns:controls="clr-namespace:gbtis.Controls"
         mc:Ignorable="d"
+        Loaded="HandleResize"
         
         WindowStyle="None" ResizeMode="NoResize" Cursor="None"
         WindowStartupLocation="CenterScreen">
@@ -25,16 +26,17 @@
             </Grid.ColumnDefinitions>
 
            
-            <controls:HoverButton x:Name="helpButton" x:FieldModifier="public" Grid.Column="0" Text="Help" Color="SlateGray" Margin="0,0,10,0" />
-            <controls:HoverButton x:Name="clearButton" x:FieldModifier="public" Grid.Column="1" Text="Clear" Color="RoyalBlue" />
-            <controls:HoverButton x:Name="cancelButton" x:FieldModifier="public" Grid.Column="2" Text="Cancel" Color="Crimson" />
-            <controls:HoverButton x:Name="continueButton" x:FieldModifier="public" Grid.Column="3" Text="Continue" Color="ForestGreen" />
+            <controls:HoverButton x:Name="helpButton" x:FieldModifier="public" Grid.Column="0" Clicked="HelpClicked" Text="Help" Color="SlateGray" Margin="0,0,10,0" />
+            <controls:HoverButton x:Name="clearButton" x:FieldModifier="public" Grid.Column="1" Clicked="ClearClicked" Text="Clear" Color="RoyalBlue" />
+            <controls:HoverButton x:Name="cancelButton" x:FieldModifier="public" Grid.Column="2" Clicked="CancelClicked" Text="Cancel" Color="Crimson" />
+            <controls:HoverButton x:Name="continueButton" x:FieldModifier="public" Grid.Column="3" Clicked="ContinueClicked" Text="Continue" Color="ForestGreen" />
 
         </Grid>
 
         <Border x:Name="canvasBorder" BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1">
             <Grid>
-                <InkCanvas x:Name="canvas" EditingMode="Select" UseCustomCursor="True" Cursor="None">
+                <InkCanvas x:Name="canvas" EditingMode="Select" UseCustomCursor="True" Cursor="None"
+                           PreviewMouseDown="Handle" PreviewMouseUp="Handle" PreviewStylusDown="Handle" PreviewStylusUp="Handle" PreviewTouchDown="Handle" PreviewTouchUp="Handle">
                     <InkPresenter x:Name="canvasPresenter" />
                     <InkCanvas.DefaultDrawingAttributes>
                         <DrawingAttributes Color="Black" FitToCurve="true" Width="10" Height="10"/>
@@ -48,12 +50,18 @@
         </Viewbox>
 
         <Grid Grid.ColumnSpan="4" Grid.RowSpan="3">
-            <controls:Cursor x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <controls:Cursor Moved="cursorMove" ModeStart="cursorDown" ModeEnd="cursorUp" x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
-        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="5">
-            <Image x:Name="sensorOverlay" Opacity="0.2" Margin="-0"
+        <Border Grid.RowSpan="3" Grid.ColumnSpan="4">
+            <Image x:Name="sensorOverlay" Opacity="0.2" SizeChanged="HandleResize"
                    Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                   Grid.ColumnSpan="3" Grid.RowSpan="10" />
+                   Grid.ColumnSpan="4" Grid.RowSpan="3" />
+            <Border.RenderTransform>
+                <ScaleTransform ScaleX="1.47" ScaleY="1.47" />
+            </Border.RenderTransform>
+            <Border.RenderTransformOrigin>
+                <Point X="0.5" Y="0.5" />
+            </Border.RenderTransformOrigin>
         </Border>
         <Viewbox HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.RowSpan="3" Grid.ColumnSpan="4">
             <Border>

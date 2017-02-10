@@ -13,7 +13,6 @@ namespace gbtis.Windows {
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
-        public const int HELP_DURATION = 10000;
         public const int THANKS_DURATION = 3000;
         public const int FR_CA = 0x0c0c;
 
@@ -110,12 +109,9 @@ namespace gbtis.Windows {
         /// Show the help overlay
         /// </summary>
         public void Help() {
-            helpOverlay.AnimateOpacity(1);
-            Timer t = new Timer(HELP_DURATION);
-            t.Elapsed += (s, e) => Dispatcher.Invoke(new Action(() => {
-                helpOverlay.AnimateOpacity(0);
+            Dispatcher.Invoke(new Action(() => {
+                helpOverlay.Show();
             }));
-            t.Start();
         }
 
         //im so sorry

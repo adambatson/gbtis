@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,173 +21,147 @@ namespace gbtis.Controls {
     /// Interaction logic for Help.xaml
     /// </summary>
     public partial class Help : UserControl {
+        public const double INVISIBLE = 0;
+        public const double PARTIALLY_VISIBLE = 0.7;
+        public const double VISIBLE = 1;
+        public const int SHOW_FOR = 10000;
+        public static readonly PointF HAND_OFFSET = new PointF{ X=0.1f, Y=0.1f };
+
+        private LineTracking tracking;
+
         public Help() {
             InitializeComponent();
 
             Loaded += (s, e) => {
-                Wave_Frame1();
-                Draw_Frame1();
+                tracking = LineTracking.Both;
+                cursorHand_LayoutUpdated(null, null);
+
+                tracking = LineTracking.End;
+                StartStoryboard(waveHand, "Wave");
+                StartStoryboard(cursorHand, "Frame1");
             };
         }
 
-        public void AnimateOpacity(double newOpacity) {
-            Storyboard board = new Storyboard();
+        /// <summary>
+        /// Display the overlay
+        /// </summary>
+        public void Show() {
+            Timer t = new Timer(SHOW_FOR);
+            t.Elapsed += (s, e) => Dispatcher.Invoke(new Action(() => {
+                StartStoryboard(this, "FadeOut");
+            }));
 
-            DoubleAnimation animation = new DoubleAnimation(newOpacity, new Duration(TimeSpan.FromSeconds(1.5)));
-            animation.AccelerationRatio = animation.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(animation, this);
-            Storyboard.SetTargetProperty(animation, new PropertyPath(UserControl.OpacityProperty));
-            board.Children.Add(animation);
-
-            board.Begin(this);
+            StartStoryboard(this, "FadeIn");
+            t.Start();
         }
 
         /// <summary>
-        /// DRAWING ANIMATION BEGIN
+        /// Allows the line to track the hand
         /// </summary>
+        /// <param name="sender">The hand</param>
+        /// <param name="e">Event args</param>
+        private void cursorHand_LayoutUpdated(object sender, EventArgs e) {
+            if (tracking == LineTracking.None) return;
 
-        private void Draw_Frame1() {
-            drawnLine.Opacity = 1;
-            cursorHand.Opacity = 1;
+            // Get position of the hand
             var handPoint = cursorHand.TransformToAncestor(this)
                 .Transform(new Point(0, 0));
-            drawnLine.X1 = drawnLine.X2 = handPoint.X + cursorHand.ActualWidth / 2;
-            drawnLine.Y1 = drawnLine.Y2 = handPoint.Y + 15;
-
-            cursorHand.Source = new BitmapImage(new Uri("/Resources/Lasso.png", UriKind.Relative));
-            Storyboard board = new Storyboard();
-
-            ThicknessAnimation moveRight = new ThicknessAnimation(new Thickness(400, 0, 0, 0), new Duration(TimeSpan.FromSeconds(1.5)));
-            moveRight.AccelerationRatio = moveRight.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(moveRight, cursorHand);
-            Storyboard.SetTargetProperty(moveRight, new PropertyPath(Image.MarginProperty));
-            board.Children.Add(moveRight);
-
-            cursorHand.LayoutUpdated += LineEndTracking;
-            cursorHand.LayoutUpdated -= LineStartTracking;
-
-            board.Completed += (s, e) => Draw_Frame2();
-            board.Begin(this);
-        }
-
-        private void Draw_Frame2() {
-            cursorHand.Source = new BitmapImage(new Uri("/Resources/Closed.png", UriKind.Relative));
-            cursorHand.Opacity = 0.7;
-            Storyboard board = new Storyboard();
-
-            ThicknessAnimation moveLeft = new ThicknessAnimation(new Thickness(0, 50, 0, 0), new Duration(TimeSpan.FromSeconds(1)));
-            moveLeft.AccelerationRatio = moveLeft.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(moveLeft, cursorHand);
-            Storyboard.SetTargetProperty(moveLeft, new PropertyPath(Image.MarginProperty));
-            board.Children.Add(moveLeft);
-
-            cursorHand.LayoutUpdated -= LineEndTracking;
-            cursorHand.LayoutUpdated -= LineStartTracking;
-
-            board.Completed += (s, e) => Draw_Frame3();
-            board.Begin(this);
-        }
-
-        private void Draw_Frame3() {
-            Storyboard board = new Storyboard();
-
-            ThicknessAnimation moveLeft = new ThicknessAnimation(new Thickness(-400, 0, 0, 0), new Duration(TimeSpan.FromSeconds(1)));
-            moveLeft.AccelerationRatio = moveLeft.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(moveLeft, cursorHand);
-            Storyboard.SetTargetProperty(moveLeft, new PropertyPath(Image.MarginProperty));
-            board.Children.Add(moveLeft);
-
-            board.Completed += (s, e) => Draw_Frame4();
-            board.Begin(this);
-        }
-
-        private void Draw_Frame4() {
-            cursorHand.Source = new BitmapImage(new Uri("/Resources/Open.png", UriKind.Relative));
-            cursorHand.Opacity = 1;
-            Storyboard board = new Storyboard();
-
-            ThicknessAnimation moveRight = new ThicknessAnimation(new Thickness(400, 0, 0, 0), new Duration(TimeSpan.FromSeconds(1.5)));
-            moveRight.AccelerationRatio = moveRight.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(moveRight, cursorHand);
-            Storyboard.SetTargetProperty(moveRight, new PropertyPath(Image.MarginProperty));
-            board.Children.Add(moveRight);
-
-            cursorHand.LayoutUpdated -= LineEndTracking;
-            cursorHand.LayoutUpdated += LineStartTracking;
-
-            board.Completed += (s, e) => {
-                drawnLine.Opacity = 0;
-                Draw_Frame5();
-            };
-            board.Begin(this);
-        }
-
-        private void Draw_Frame5() {
-            cursorHand.Source = new BitmapImage(new Uri("/Resources/Closed.png", UriKind.Relative));
-            cursorHand.Opacity = 0.7;
-            Storyboard board = new Storyboard();
-
-            ThicknessAnimation moveLeft = new ThicknessAnimation(new Thickness(0, 50, 0, 0), new Duration(TimeSpan.FromSeconds(1)));
-            moveLeft.AccelerationRatio = moveLeft.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(moveLeft, cursorHand);
-            Storyboard.SetTargetProperty(moveLeft, new PropertyPath(Image.MarginProperty));
-            board.Children.Add(moveLeft);
-
-            cursorHand.LayoutUpdated -= LineEndTracking;
-            cursorHand.LayoutUpdated -= LineStartTracking;
-
-            board.Completed += (s, e) => Draw_Frame6();
-            board.Begin(this);
-        }
-
-        private void Draw_Frame6() {
-            Storyboard board = new Storyboard();
-
-            ThicknessAnimation moveLeft = new ThicknessAnimation(new Thickness(-400, 0, 0, 0), new Duration(TimeSpan.FromSeconds(1)));
-            moveLeft.AccelerationRatio = moveLeft.DecelerationRatio = 0.1;
-            Storyboard.SetTarget(moveLeft, cursorHand);
-            Storyboard.SetTargetProperty(moveLeft, new PropertyPath(Image.MarginProperty));
-            board.Children.Add(moveLeft);
-
-            board.Completed += (s, e) => Draw_Frame1();
-            board.Begin(this);
-        }
-
-        /// <summary>
-        /// DRAWING ANIMATION ENDS
-        /// </summary>
-
-        /// <summary>
-        /// WAVE ANIMATION BEGIN
-        /// </summary>
-
-        private void Wave_Frame1() {
-            ((Storyboard)waveHand.FindResource("wave")).Begin();
-        }
-
-        /// <summary>
-        /// WAVE ANIMATION ENDS
-        /// </summary>
-
-        private void LineStartTracking(Object source, EventArgs args) {
-            LineTracking(false);
-        }
-
-        private void LineEndTracking(Object source, EventArgs args) {
-            LineTracking(true);
-        }
-
-        private void LineTracking(bool end) {
-            var handPoint = cursorHand.TransformToAncestor(this)
-                .Transform(new Point(0, 0));
-
-            if (end) {
+            
+            if (tracking == LineTracking.Start || tracking == LineTracking.Both) {
                 drawnLine.X2 = handPoint.X + cursorHand.ActualWidth / 2;
-                drawnLine.Y2 = handPoint.Y + 15;
-            } else {
-                drawnLine.X1 = handPoint.X + cursorHand.ActualWidth / 2;
-                drawnLine.Y1 = handPoint.Y + 15;
+                drawnLine.Y2 = handPoint.Y + cursorHand.ActualWidth * HAND_OFFSET.X;
             }
+
+            if (tracking == LineTracking.End || tracking == LineTracking.Both) {
+                drawnLine.X1 = handPoint.X + cursorHand.ActualWidth / 2;
+                drawnLine.Y1 = handPoint.Y + cursorHand.ActualWidth * HAND_OFFSET.Y;
+            }
+        }
+
+        /// <summary>
+        /// Drawing right
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Frame1_Completed(object sender, EventArgs e) {
+            cursorHand.Source = OpenResource("Closed.png");
+            tracking = LineTracking.None;
+            cursorHand.Opacity = PARTIALLY_VISIBLE;
+            drawnLine.Opacity = INVISIBLE;
+
+            StartStoryboard(cursorHand, "Frame2");
+        }
+
+        /// <summary>
+        /// First half of idle motion left
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Frame2_Completed(object sender, EventArgs e) {
+            StartStoryboard(cursorHand, "Frame3");
+        }
+
+        /// <summary>
+        /// Left idle motion finishes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Frame3_Completed(object sender, EventArgs e) {
+            cursorHand.Source = OpenResource("Open.png");
+            tracking = LineTracking.Start;
+            cursorHand.Opacity = VISIBLE;
+            drawnLine.Opacity =  VISIBLE;
+
+            StartStoryboard(cursorHand, "Frame4");
+        }
+
+        /// <summary>
+        /// Erase right ends
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Frame4_Completed(object sender, EventArgs e) {
+            cursorHand.Source = OpenResource("Closed.png");
+            tracking = LineTracking.None;
+            cursorHand.Opacity = PARTIALLY_VISIBLE;
+            drawnLine.Opacity = INVISIBLE;
+
+            StartStoryboard(cursorHand, "Frame5");
+        }
+
+        /// <summary>
+        /// First half of return left
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Frame5_Completed(object sender, EventArgs e) {
+            StartStoryboard(cursorHand, "Frame6");
+        }
+
+        /// <summary>
+        /// Return left complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Frame6_Completed(object sender, EventArgs e) {
+            cursorHand.Source = OpenResource("Lasso.png");
+            tracking = LineTracking.End;
+            cursorHand.Opacity = VISIBLE;
+            drawnLine.Opacity = VISIBLE;
+
+            StartStoryboard(cursorHand, "Frame1");
+        }
+
+        private BitmapImage OpenResource(string path) {
+            return new BitmapImage(new Uri(string.Format("/Resources/{0}", path), UriKind.Relative));
+        }
+ 
+        private void StartStoryboard(FrameworkElement source, String key) {
+            ((Storyboard)source.FindResource(key)).Begin();
+        }
+
+        private enum LineTracking {
+            None, Start, End, Both
         }
     }
 }

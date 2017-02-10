@@ -205,9 +205,6 @@
     <Resource Include="Resources\Lasso.png" />
     <Resource Include="Resources\Open.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\1080.jpg" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

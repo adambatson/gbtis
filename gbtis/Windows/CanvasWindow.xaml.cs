@@ -13,6 +13,7 @@ namespace gbtis.Windows {
     /// Interaction logic for CanvasWindow.xaml
     /// </summary>
     public partial class CanvasWindow : Window {
+        public const double SENSOR_SCALING = 1.47;
         public const int THANKS_DURATION = 3000;
         public const int FR_CA = 0x0c0c;
 
@@ -64,13 +65,24 @@ namespace gbtis.Windows {
         public void HandleResize(Object s, EventArgs e) {
             if (ActualHeight > ActualWidth) {
                 // Portrait mode
-                Size size = new Size(ActualHeight * ActualHeight / ActualWidth, ActualHeight); // Treat the image as if it is as wide as in landscape, even though the height is now massive
-                double hOffset = (size.Width / 2) - (ActualWidth / 2); // The left edge of the centered viewport of the expanded width
-                Size bounds = new Size(size.Width * 1.47, size.Height * 1.47);
-                cursor.SetBounds(bounds, new Size(hOffset + size.Width * .47 / 2, size.Height * .47 / 2));
+                // Scale the width to treat it as if it was widescreen, scaled to the new height
+                // For example, 1920 is to 1080 what X is to 1920
+                Size size = new Size(ActualHeight * ActualHeight / ActualWidth, ActualHeight);
+
+                // This will be at the left of the image, offscreen. Offset to the left edge of our viewport
+                // The middle of our virual image - half the viewport width
+                double hOffset = (size.Width / 2) - (ActualWidth / 2);
+
+                // Scale the canvas - note that the deadzones are hidden anyway, so no scaling
+                Size bounds = new Size(size.Width, size.Height);
+                cursor.SetBounds(bounds, new Size(hOffset + size.Width / 2, size.Height / 2));
             } else {
-                Size bounds = new Size(ActualWidth * 1.47, ActualHeight * 1.47);
-                cursor.SetBounds(bounds, new Size(ActualWidth * .47 / 2, ActualHeight * .47 / 2));
+                // Landscape mode
+                // Zoom in to hide the non depth-tracked areas
+                Size bounds = new Size(ActualWidth * SENSOR_SCALING, ActualHeight * SENSOR_SCALING);
+
+                // Cursor has an offset of the area that was added
+                cursor.SetBounds(bounds, new Size(ActualWidth * (SENSOR_SCALING-1) / 2, ActualHeight * (SENSOR_SCALING-1) / 2));
             }
         }
 

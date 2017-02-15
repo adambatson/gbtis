@@ -49,8 +49,8 @@ namespace gbtis.Controls {
         private Point _position;
         public Point Position {
             get { return new Point(
-                (_position.X + ActualWidth / 2) - offset.Width, 
-                (_position.Y + ActualHeight / 2) - offset.Height); }
+                ((_position.X + ActualWidth / 2) - offset.Width), 
+                ((_position.Y + ActualHeight / 2) - offset.Height)); }
             set {
                 value = new Point(
                     value.X - ActualWidth / 2, 
@@ -105,7 +105,7 @@ namespace gbtis.Controls {
                     ModeEnd?.Invoke(m);
                 };
                 
-                // Mouse controls
+                /* Mouse controls
                 parentWindow.MouseMove += (s, e) => {
                     Position = Mouse.GetPosition(parentWindow);
                     Mode = mouseMode();
@@ -123,7 +123,7 @@ namespace gbtis.Controls {
                     Mode = mouseMode();
 
                     ModeEnd?.Invoke(Mode);
-                };
+                }; */
             };
         }
 

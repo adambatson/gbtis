@@ -62,9 +62,16 @@ namespace gbtis.Windows {
         /// <param name="s"></param>
         /// <param name="e"></param>
         public void HandleResize(Object s, EventArgs e) {
-            Size bounds = new Size(ActualWidth*1.47, ActualHeight * 1.47);
-
-            cursor.SetBounds(bounds, new Size(ActualWidth * .47 / 2, ActualHeight * .47 / 2));
+            if (ActualHeight > ActualWidth) {
+                // Portrait mode
+                Size size = new Size(ActualHeight * ActualHeight / ActualWidth, ActualHeight); // Treat the image as if it is as wide as in landscape, even though the height is now massive
+                double hOffset = (size.Width / 2) - (ActualWidth / 2); // The left edge of the centered viewport of the expanded width
+                Size bounds = new Size(size.Width * 1.47, size.Height * 1.47);
+                cursor.SetBounds(bounds, new Size(hOffset + size.Width * .47 / 2, size.Height * .47 / 2));
+            } else {
+                Size bounds = new Size(ActualWidth * 1.47, ActualHeight * 1.47);
+                cursor.SetBounds(bounds, new Size(ActualWidth * .47 / 2, ActualHeight * .47 / 2));
+            }
         }
 
         /// <summary>
@@ -139,7 +146,6 @@ namespace gbtis.Windows {
         private Point relativeTransform(Point p) {
             p = this.TransformToDescendant(canvas).Transform(p);
 
-            Size bounds = new Size(canvas.ActualWidth, canvas.ActualHeight);
             if (p.X > canvas.ActualWidth) p.X = canvas.ActualWidth;
             if (p.X < 0) p.X = 0;
             if (p.Y > canvas.ActualHeight) p.Y = canvas.ActualHeight;

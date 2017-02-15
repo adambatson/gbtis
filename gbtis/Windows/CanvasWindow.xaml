@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:gbtis"
         xmlns:controls="clr-namespace:gbtis.Controls"
         mc:Ignorable="d"
-        Loaded="HandleResize"
         
         WindowStyle="None" ResizeMode="NoResize" Cursor="None"
         WindowStartupLocation="CenterScreen">
@@ -54,7 +53,7 @@
         </Grid>
         <Border Grid.RowSpan="3" Grid.ColumnSpan="4" Loaded="HandleResize">
             <Image x:Name="sensorOverlay" Opacity="0.2" SizeChanged="HandleResize"
-                   Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                   Stretch="UniformToFill"  HorizontalAlignment="Center" VerticalAlignment="Center" 
                    Grid.ColumnSpan="4" Grid.RowSpan="3" />
             <Border.RenderTransform>
                 <ScaleTransform ScaleX="1.47" ScaleY="1.47" />

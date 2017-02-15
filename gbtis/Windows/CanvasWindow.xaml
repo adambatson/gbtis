@@ -15,7 +15,8 @@
             <RowDefinition Height="8*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+    
+        <!-- Toolbar at the top of the screen -->
         <Grid x:Name="buttonBar" Grid.Row="0" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -32,6 +33,7 @@
 
         </Grid>
 
+        <!-- The drawing canvas -->
         <Border x:Name="canvasBorder" BorderBrush="Black" BorderThickness="0,1,0,1" Grid.Row="1">
             <Grid>
                 <InkCanvas x:Name="canvas" EditingMode="Select" UseCustomCursor="True" Cursor="None"
@@ -43,18 +45,23 @@
                 </InkCanvas>
             </Grid>
         </Border>
-
+        
+        <!-- Text at the bottom of the canvas -->
         <Viewbox HorizontalAlignment="Stretch" Grid.Row="2">
             <TextBlock Margin="10,0,10,0" x:Name="previewText" />
         </Viewbox>
-
+        
+        <!-- The cursor --> 
         <Grid Grid.ColumnSpan="4" Grid.RowSpan="3">
             <controls:Cursor Moved="cursorMove" ModeStart="cursorDown" ModeEnd="cursorUp" x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
+        
+        <!-- Sensor overlay -->
         <Border Grid.RowSpan="3" Grid.ColumnSpan="4" Loaded="HandleResize">
             <Image x:Name="sensorOverlay" Opacity="0.2" SizeChanged="HandleResize"
                    Stretch="UniformToFill"  HorizontalAlignment="Center" VerticalAlignment="Center" 
                    Grid.ColumnSpan="4" Grid.RowSpan="3" />
+            <!-- Scaling to hide the deadzone -->
             <Border.RenderTransform>
                 <ScaleTransform ScaleX="1.47" ScaleY="1.47" />
             </Border.RenderTransform>
@@ -62,6 +69,8 @@
                 <Point X="0.5" Y="0.5" />
             </Border.RenderTransformOrigin>
         </Border>
+        
+        <!-- Thanks message -->
         <Viewbox HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.RowSpan="3" Grid.ColumnSpan="4">
             <Border>
                 <TextBlock x:Name="thanksMsg" Opacity="0" Margin="10" FontWeight="Bold" Foreground="White" Text="Thank you!">
@@ -71,7 +80,8 @@
                 </TextBlock>
             </Border>
         </Viewbox>
-
+        
+        <!-- For displaying help -->
         <controls:Help x:Name="helpOverlay" Opacity="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="1" Grid.ColumnSpan="4" Grid.Row="1" />
     </Grid>
 </Window>

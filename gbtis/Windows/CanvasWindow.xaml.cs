@@ -62,11 +62,9 @@ namespace gbtis.Windows {
         /// <param name="s"></param>
         /// <param name="e"></param>
         public void HandleResize(Object s, EventArgs e) {
-            Size bounds = (sensorOverlay.ActualWidth > 0) ?
-                new Size(sensorOverlay.ActualWidth, sensorOverlay.ActualHeight) :
-                new Size(ActualWidth, ActualHeight);
+            Size bounds = new Size(ActualWidth*1.47, ActualHeight * 1.47);
 
-            cursor.SetBounds(bounds, sensorOverlay.Margin.Left);
+            cursor.SetBounds(bounds, new Size(ActualWidth * .47 / 2, ActualHeight * .47 / 2));
         }
 
         /// <summary>
@@ -139,7 +137,6 @@ namespace gbtis.Windows {
         /// <param name="p">The point</param>
         /// <returns>A Point</returns>
         private Point relativeTransform(Point p) {
-            p = sensorOverlay.TransformToAncestor(this).Transform(p);
             p = this.TransformToDescendant(canvas).Transform(p);
 
             Size bounds = new Size(canvas.ActualWidth, canvas.ActualHeight);

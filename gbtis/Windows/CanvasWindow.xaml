@@ -52,7 +52,7 @@
         <Grid Grid.ColumnSpan="4" Grid.RowSpan="3">
             <controls:Cursor Moved="cursorMove" ModeStart="cursorDown" ModeEnd="cursorUp" x:Name="cursor" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
-        <Border Grid.RowSpan="3" Grid.ColumnSpan="4">
+        <Border Grid.RowSpan="3" Grid.ColumnSpan="4" Loaded="HandleResize">
             <Image x:Name="sensorOverlay" Opacity="0.2" SizeChanged="HandleResize"
                    Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" 
                    Grid.ColumnSpan="4" Grid.RowSpan="3" />

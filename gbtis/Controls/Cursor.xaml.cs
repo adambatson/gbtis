@@ -39,7 +39,7 @@ namespace gbtis.Controls {
         public int Size { get { return _size; } }
 
         // Parent bounds
-        double offset;
+        private Size offset;
         private Window parentWindow;
         private Size parentBounds;
 
@@ -49,15 +49,15 @@ namespace gbtis.Controls {
         private Point _position;
         public Point Position {
             get { return new Point(
-                (_position.X + ActualWidth / 2) + offset, 
-                (_position.Y + ActualHeight / 2) + offset); }
+                (_position.X + ActualWidth / 2) - offset.Width, 
+                (_position.Y + ActualHeight / 2) - offset.Height); }
             set {
                 value = new Point(
                     value.X - ActualWidth / 2, 
                     value.Y - ActualHeight / 2);
 
                 try {
-                    Margin = new Thickness(value.X + offset, value.Y + offset, 0, 0);
+                    Margin = new Thickness(value.X - offset.Width, value.Y - offset.Height, 0, 0);
                 } catch (Exception) { return; }
                 _position = value;
                 Moved?.Invoke(Position);
@@ -73,7 +73,7 @@ namespace gbtis.Controls {
             set { _mode=value; setMode(value); }
         }
 
-        public void SetBounds(Size bounds, double offset) {
+        public void SetBounds(Size bounds, Size offset) {
             parentBounds = bounds;
             this.offset = offset;
         }

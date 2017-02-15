@@ -42,7 +42,7 @@ namespace gbtis {
             }
 
             //Starting the standby window
-            showCanvas(); //showStandby();
+            showStandby();
 
             //Starting the canvas screen
             canvas = null;

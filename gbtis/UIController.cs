@@ -10,6 +10,9 @@ using System.Windows;
 using System.Data;
 using gbtis.Windows;
 using System.Collections;
+using System.Net.Http;
+using System.Configuration;
+using System.Net.Http.Headers;
 
 namespace gbtis { 
     class UIController {
@@ -19,10 +22,19 @@ namespace gbtis {
         private CanvasWindow canvas;
         private Kinect kinect;
 
+        private String GBTISAASADDRESS = "http://Gbtisaas.Herokuapp.com/";
+
+        static HttpClient client = new HttpClient();
+
         //TESTING PURPOSES
         private List<String> names;
 
         public UIController(Boolean demoMode) {
+
+            client.BaseAddress = new Uri(GBTISAASADDRESS);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
             //How GBTIS operates
             this.demoMode = demoMode;
 
@@ -46,6 +58,13 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = null;
+        }
+
+        static async Task<Uri> createMessageAsync(Messages message) {
+            HttpResponseMessage response = await client.PostAsJsonAsync("messages", message);
+            response.EnsureSuccessStatusCode();
+
+            return response.Headers.Location;
         }
 
         /// <summary>
@@ -165,7 +184,13 @@ namespace gbtis {
         /// Switch back to standby from canvas 
         /// As well as save the name from what was inputted
         /// </summary>
-        private void saveName(String s) {
+        private async void saveName(String s) {
+            try {
+                Messages message = new Messages(s);
+                await createMessageAsync(message);
+            } catch (Exception e) {
+                Console.Out.WriteLine(e.Message);
+            }
             names.Add(s);
             goToStandby();
         }
@@ -186,6 +211,20 @@ namespace gbtis {
         /// </summary>
         private void exitAll() {
             Environment.Exit(0);
+        }
+    }
+
+    public class Messages {
+        public String content { get; set; }
+        public Boolean approved { get; set; }
+        public int guestbook_id { get; set; }
+        public int votes { get; set; }
+
+        public Messages(String content) {
+            this.content = content;
+            this.approved = true;
+            this.guestbook_id = 2;
+            this.votes = 0;
         }
     }
 }

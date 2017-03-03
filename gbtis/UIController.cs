@@ -16,21 +16,22 @@ using System.Net.Http.Headers;
 
 namespace gbtis { 
     class UIController {
+
+        private int GUESTBOOKID;
+
         private Boolean demoMode;
         private AdminWindow admin;
         private StandbyWindow standby;
         private CanvasWindow canvas;
         private Kinect kinect;
 
-        private String GBTISAASADDRESS = "http://Gbtisaas.Herokuapp.com/";
-
         static HttpClient client = new HttpClient();
 
         //TESTING PURPOSES
         private List<String> names;
 
-        public UIController(Boolean demoMode) {
-
+        public UIController(Boolean demoMode, String GBTISAASADDRESS, int GUESTBOOKID) {
+            this.GUESTBOOKID = GUESTBOOKID;
             client.BaseAddress = new Uri(GBTISAASADDRESS);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -60,11 +61,20 @@ namespace gbtis {
             canvas = null;
         }
 
-        static async Task<Uri> createMessageAsync(Messages message) {
+        static async Task<Uri> createMessageAsync(message message) {
             HttpResponseMessage response = await client.PostAsJsonAsync("messages", message);
             response.EnsureSuccessStatusCode();
 
             return response.Headers.Location;
+        }
+
+        static async Task<message> getMessageAsync(String path) {
+            message message = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode) {
+                message = await response.Content.ReadAsAsync<message>();
+            }
+            return message;
         }
 
         /// <summary>
@@ -186,8 +196,7 @@ namespace gbtis {
         /// </summary>
         private async void saveName(String s) {
             try {
-                Messages message = new Messages(s);
-                await createMessageAsync(message);
+                await createMessageAsync(new message(s, GUESTBOOKID));
             } catch (Exception e) {
                 Console.Out.WriteLine(e.Message);
             }
@@ -214,16 +223,16 @@ namespace gbtis {
         }
     }
 
-    public class Messages {
+    public class message {
         public String content { get; set; }
         public Boolean approved { get; set; }
         public int guestbook_id { get; set; }
         public int votes { get; set; }
 
-        public Messages(String content) {
+        public message(String content, int id) {
             this.content = content;
             this.approved = true;
-            this.guestbook_id = 2;
+            this.guestbook_id = id;
             this.votes = 0;
         }
     }

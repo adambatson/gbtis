@@ -12,9 +12,9 @@ namespace gbtis {
             UIController uicont;
 
             if (ConfigurationManager.AppSettings.Get("DemoMode").Equals("1")) {
-                uicont = new UIController(true);
+                uicont = new UIController(true, ConfigurationManager.AppSettings.Get("GBTISaaSAddress"), 12);
             } else {
-                uicont = new UIController(false);
+                uicont = new UIController(false, ConfigurationManager.AppSettings.Get("GBTISaaSAddress"), 12);
             }
         }
     }

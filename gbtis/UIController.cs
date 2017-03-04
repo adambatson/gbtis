@@ -61,6 +61,15 @@ namespace gbtis {
             canvas = null;
         }
 
+        private async void namesInit() {
+            names = new List<String>();
+            List<message> messages = await getMessageAsync("/messages");
+            foreach(message m in messages) {
+                if (m.guestbook_id == GUESTBOOKID)
+                    names.Add(m.content);
+            }
+        } 
+
         static async Task<Uri> createMessageAsync(message message) {
             HttpResponseMessage response = await client.PostAsJsonAsync("messages", message);
             response.EnsureSuccessStatusCode();
@@ -68,13 +77,13 @@ namespace gbtis {
             return response.Headers.Location;
         }
 
-        static async Task<message> getMessageAsync(String path) {
-            message message = null;
+        static async Task<List<message>> getMessageAsync(String path) {
+            List<message> messages = new List<message>();
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode) {
-                message = await response.Content.ReadAsAsync<message>();
+                messages = await response.Content.ReadAsAsync<List<message>>();
             }
-            return message;
+            return messages;
         }
 
         /// <summary>
@@ -116,6 +125,7 @@ namespace gbtis {
         /// opens a new standby screen
         /// </summary>
         private void showStandby() {
+            namesInit();
             if (standby == null) {
                 standby = new StandbyWindow(names.ToArray());
             }
@@ -225,15 +235,11 @@ namespace gbtis {
 
     public class message {
         public String content { get; set; }
-        public Boolean approved { get; set; }
         public int guestbook_id { get; set; }
-        public int votes { get; set; }
 
         public message(String content, int id) {
             this.content = content;
-            this.approved = true;
             this.guestbook_id = id;
-            this.votes = 0;
         }
     }
 }

@@ -17,7 +17,7 @@ using System.Net.Http.Headers;
 namespace gbtis { 
     class UIController {
 
-        private int GUESTBOOKID;
+        private String AUTHKEY;
 
         private Boolean demoMode;
         private AdminWindow admin;
@@ -30,12 +30,13 @@ namespace gbtis {
         //TESTING PURPOSES
         private List<String> names;
 
-        public UIController(Boolean demoMode, String GBTISAASADDRESS, int GUESTBOOKID) {
-            this.GUESTBOOKID = GUESTBOOKID;
+        public UIController(Boolean demoMode, String GBTISAASADDRESS, String AUTHKEY) {
+            this.AUTHKEY = AUTHKEY;
             client.BaseAddress = new Uri(GBTISAASADDRESS);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+            names = new List<string>();
+            namesInit();
             //How GBTIS operates
             this.demoMode = demoMode;
 
@@ -62,12 +63,16 @@ namespace gbtis {
         }
 
         private async void namesInit() {
-            names = new List<String>();
-            List<message> messages = await getMessageAsync("/messages");
-            foreach(message m in messages) {
-                if (m.guestbook_id == GUESTBOOKID)
+            names = new List<string>();
+            Application.Current.Dispatcher.Invoke(new Action(async() => {
+                String uri = "messages";
+                List<message> messages = await getMessageAsync(uri);
+                foreach(message m in messages) {
                     names.Add(m.content);
-            }
+                }
+                if ((standby != null) && (names.Count != 0))
+                    standby.setNames(names.ToArray());
+            }));
         } 
 
         static async Task<Uri> createMessageAsync(message message) {
@@ -206,7 +211,7 @@ namespace gbtis {
         /// </summary>
         private async void saveName(String s) {
             try {
-                await createMessageAsync(new message(s, GUESTBOOKID));
+                await createMessageAsync(new message(s, AUTHKEY));
             } catch (Exception e) {
                 Console.Out.WriteLine(e.Message);
             }
@@ -235,11 +240,11 @@ namespace gbtis {
 
     public class message {
         public String content { get; set; }
-        public int guestbook_id { get; set; }
+        public String key { get; set; }
 
-        public message(String content, int id) {
+        public message(String content, String key) {
             this.content = content;
-            this.guestbook_id = id;
+            this.key = key;
         }
     }
 }

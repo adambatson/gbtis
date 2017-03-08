@@ -26,13 +26,18 @@
         <!-- Shows a random selection of entries -->
         <Border Background="White" Opacity="0.6" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid>
-                <Viewbox VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Viewbox Grid.Row="0" HorizontalAlignment="Stretch">
                     <TextBlock x:Name="topName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" />
                 </Viewbox>
-                <Viewbox VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+                <Viewbox  Grid.Row="1" HorizontalAlignment="Stretch">
                     <TextBlock x:Name="centerName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" TextAlignment="Right" />
                 </Viewbox>
-                <Viewbox VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                <Viewbox  Grid.Row="2" HorizontalAlignment="Stretch">
                     <TextBlock x:Name="bottomName" Margin="5" Text="Loading..." HorizontalAlignment="Stretch" TextAlignment="Right" />
                 </Viewbox>
             </Grid>

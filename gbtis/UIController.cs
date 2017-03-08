@@ -24,6 +24,7 @@ namespace gbtis {
         private StandbyWindow standby;
         private CanvasWindow canvas;
         private Kinect kinect;
+        private bool canWave;
 
         static HttpClient client = new HttpClient();
 
@@ -39,6 +40,7 @@ namespace gbtis {
             namesInit();
             //How GBTIS operates
             this.demoMode = demoMode;
+            canWave = false;
 
             //TESTING PURPOSES
             names = new List<String>();
@@ -60,6 +62,12 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = null;
+        }
+
+        private void enableWave() {
+            Timer t = new Timer(5000);
+            t.Elapsed += (s,e) => canWave = true;
+            t.Start();
         }
 
         private async void namesInit() {
@@ -128,6 +136,7 @@ namespace gbtis {
         /// opens a new standby screen
         /// </summary>
         private void showStandby() {
+            enableWave();
             namesInit();
             if (standby == null) {
                 standby = new StandbyWindow(names.ToArray());
@@ -159,6 +168,9 @@ namespace gbtis {
         /// Switch from Standby to Canvas
         /// </summary>
         private void waveOccured(ulong bodyId, bool rightHand) {
+            if (!canWave) return;
+            canWave = false;
+
             if (canvas == null) {
                 closeStandby();
                 showCanvas();

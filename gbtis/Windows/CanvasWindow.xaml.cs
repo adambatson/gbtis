@@ -171,20 +171,20 @@ namespace gbtis.Windows {
         /// </summary>
         /// <param name="cursor">Position</param>
         /// <param name="mode">State</param>
-        private void cursorMove(Point p) {
-            p = relativeTransform(p);
+        private void cursorMove(Point point) {
+            var p = relativeTransform(point);
 
             // Check buttons
-            helpButton.Over((helpButton.Intersects(this, p)));
-            clearButton.Over((clearButton.Intersects(this, p)));
-            cancelButton.Over((cancelButton.Intersects(this, p)));
-            continueButton.Over((continueButton.Intersects(this, p)));
+            helpButton.Over((helpButton.Intersects(this, point)));
+            clearButton.Over((clearButton.Intersects(this, point)));
+            cancelButton.Over((cancelButton.Intersects(this, point)));
+            continueButton.Over((continueButton.Intersects(this, point)));
 
             // Stop if input capture isn't ready
             if (stylusPoints == null) return;
 
             // Add current point
-            stylusPoints.Add(toStylusPoint(relativeTransform(cursor.Position)));
+            stylusPoints.Add(toStylusPoint(p));
 
             //Erase if need be
             if (cursor.Mode == CursorModes.Erase) erase();

@@ -44,7 +44,6 @@ namespace gbtis {
         //Events
         public event BitMapReadyHandler BitMapReady;
         public event WaveGestureHandler WaveGestureOccured;
-        public event EasterEggHandler EasterEggGestureOccured;
         public event SensorStatusHandler SensorStatusChanged;
         public event ModeChangedHandler ModeStart;
         public event ModeChangedHandler ModeEnd;

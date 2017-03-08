@@ -63,9 +63,9 @@ namespace gbtis {
         }
 
         private async void namesInit() {
-            names = new List<string>();
             Application.Current.Dispatcher.Invoke(new Action(async() => {
-                String uri = "messages";
+                names = new List<string>();
+                String uri = "guestbooks?key=" + AUTHKEY;
                 List<message> messages = await getMessageAsync(uri);
                 foreach(message m in messages) {
                     names.Add(m.content);
@@ -75,20 +75,18 @@ namespace gbtis {
             }));
         } 
 
-        static async Task<Uri> createMessageAsync(message message) {
+        static async void createMessageAsync(message message) {
             HttpResponseMessage response = await client.PostAsJsonAsync("messages", message);
             response.EnsureSuccessStatusCode();
-
-            return response.Headers.Location;
         }
 
         static async Task<List<message>> getMessageAsync(String path) {
-            List<message> messages = new List<message>();
+            List<message> content = new List<message>();
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode) {
-                messages = await response.Content.ReadAsAsync<List<message>>();
+                content = await response.Content.ReadAsAsync<List<message>>();
             }
-            return messages;
+            return content;
         }
 
         /// <summary>
@@ -211,7 +209,7 @@ namespace gbtis {
         /// </summary>
         private async void saveName(String s) {
             try {
-                await createMessageAsync(new message(s, AUTHKEY));
+              createMessageAsync(new message(s, AUTHKEY));
             } catch (Exception e) {
                 Console.Out.WriteLine(e.Message);
             }

@@ -10,19 +10,33 @@ using System.Windows;
 using System.Data;
 using gbtis.Windows;
 using System.Collections;
+using System.Net.Http;
+using System.Configuration;
+using System.Net.Http.Headers;
 
 namespace gbtis { 
     class UIController {
+
+        private String AUTHKEY;
+
         private Boolean demoMode;
         private AdminWindow admin;
         private StandbyWindow standby;
         private CanvasWindow canvas;
         private Kinect kinect;
 
+        static HttpClient client = new HttpClient();
+
         //TESTING PURPOSES
         private List<String> names;
 
-        public UIController(Boolean demoMode) {
+        public UIController(Boolean demoMode, String GBTISAASADDRESS, String AUTHKEY) {
+            this.AUTHKEY = AUTHKEY;
+            client.BaseAddress = new Uri(GBTISAASADDRESS);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            names = new List<string>();
+            namesInit();
             //How GBTIS operates
             this.demoMode = demoMode;
 
@@ -46,6 +60,33 @@ namespace gbtis {
 
             //Starting the canvas screen
             canvas = null;
+        }
+
+        private async void namesInit() {
+            Application.Current.Dispatcher.Invoke(new Action(async() => {
+                names = new List<string>();
+                String uri = "guestbooks?key=" + AUTHKEY;
+                List<message> messages = await getMessageAsync(uri);
+                foreach(message m in messages) {
+                    names.Add(m.content);
+                }
+                if ((standby != null) && (names.Count != 0))
+                    standby.setNames(names.ToArray());
+            }));
+        } 
+
+        static async void createMessageAsync(message message) {
+            HttpResponseMessage response = await client.PostAsJsonAsync("messages", message);
+            response.EnsureSuccessStatusCode();
+        }
+
+        static async Task<List<message>> getMessageAsync(String path) {
+            List<message> content = new List<message>();
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode) {
+                content = await response.Content.ReadAsAsync<List<message>>();
+            }
+            return content;
         }
 
         /// <summary>
@@ -87,6 +128,7 @@ namespace gbtis {
         /// opens a new standby screen
         /// </summary>
         private void showStandby() {
+            namesInit();
             if (standby == null) {
                 standby = new StandbyWindow(names.ToArray());
             }
@@ -165,7 +207,12 @@ namespace gbtis {
         /// Switch back to standby from canvas 
         /// As well as save the name from what was inputted
         /// </summary>
-        private void saveName(String s) {
+        private async void saveName(String s) {
+            try {
+              createMessageAsync(new message(s, AUTHKEY));
+            } catch (Exception e) {
+                Console.Out.WriteLine(e.Message);
+            }
             names.Add(s);
             goToStandby();
         }
@@ -186,6 +233,16 @@ namespace gbtis {
         /// </summary>
         private void exitAll() {
             Environment.Exit(0);
+        }
+    }
+
+    public class message {
+        public String content { get; set; }
+        public String key { get; set; }
+
+        public message(String content, String key) {
+            this.content = content;
+            this.key = key;
         }
     }
 }

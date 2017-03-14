@@ -28,7 +28,7 @@ namespace gbtis {
         private static readonly Kinect instance = new Kinect();
 
         //Constants
-        private const double WAVE_CONFIDENCE = 0.7;
+        private const double WAVE_CONFIDENCE = 0.40;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
         private const int FRAME_SKIP_HAND_STATUS = 3;
@@ -253,7 +253,7 @@ namespace gbtis {
             try {
                 db = new VisualGestureBuilderDatabase(
                   @"..\..\Resources\gbtisg.gbd");
-            } catch (Exception) {
+            } catch (Exception e) {
                 return;
             }
 
@@ -261,7 +261,7 @@ namespace gbtis {
             // gesture in there).
             waveGesture = db.AvailableGestures.Where(g => g.Name == "wave").Single();
 
-            easterEgg = db.AvailableGestures.Where(g => g.Name == "dab").Single();
+            //easterEgg = db.AvailableGestures.Where(g => g.Name == "dab").Single();
             for (int i = 0; i < numBodies; i++) {
                 gestureSources[i] = new VisualGestureBuilderFrameSource(sensor, 0);
                 gestureReaders[i] = gestureSources[i].OpenReader();

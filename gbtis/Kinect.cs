@@ -28,7 +28,7 @@ namespace gbtis {
         private static readonly Kinect instance = new Kinect();
 
         //Constants
-        private const double WAVE_CONFIDENCE = 0.40;
+        private const double WAVE_CONFIDENCE = 0.35;
         private const double EASTER_EGG_CONFIDENCE = 0.5;
         private const float SMOOTHING_FACTOR = 0.35f;
         private const int FRAME_SKIP_HAND_STATUS = 3;

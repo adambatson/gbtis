@@ -25,7 +25,9 @@ namespace gbtis {
         private CanvasWindow canvas;
         private Kinect kinect;
         private bool canWave;
+        private Timer timeoutTimer;
 
+        private static int demoTimeout = 180000;
         static HttpClient client = new HttpClient();
 
         //TESTING PURPOSES
@@ -56,12 +58,32 @@ namespace gbtis {
                 adminHandler();
                 admin.Show();
             }
+            else {
+                //Demomode will close in 3 min due to inactivity
+                timeoutTimerInit();
+                kinect.FingerPositionChanged += resetTimeoutTimer;
+            }
 
             //Starting the standby window
             showStandby();
 
             //Starting the canvas screen
             canvas = null;
+        }
+
+        private void timeoutTimerInit() {
+            timeoutTimer = new Timer(demoTimeout);
+            timeoutTimer.Elapsed += HandleTimer;
+            timeoutTimer.Start();
+        }
+
+        private void resetTimeoutTimer(Point point) {
+            timeoutTimer.Stop();
+            timeoutTimerInit();
+        }
+
+        private void HandleTimer(Object source, ElapsedEventArgs e) {
+            exitAll();
         }
 
         private void enableWave() {

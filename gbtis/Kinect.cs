@@ -8,6 +8,7 @@ using System.Windows;
 using gbtis.Helpers;
 using gbtis.Windows;
 using System.Collections.Generic;
+using System.IO;
 
 namespace gbtis {
     //Deleagtes for custom event handlers
@@ -251,8 +252,13 @@ namespace gbtis {
         /// </summary>
         private void OpenGestureReader() {
             try {
-                db = new VisualGestureBuilderDatabase(
-                  @"..\..\Resources\gbtisg.gbd");
+                if (File.Exists("gbtisg.gbd")) {
+                    db = new VisualGestureBuilderDatabase(
+                        @"gbtisg.gbd");
+                } else {
+                    db = new VisualGestureBuilderDatabase(
+                      @"..\..\Resources\gbtisg.gbd");
+                }
             } catch (Exception e) {
                 return;
             }

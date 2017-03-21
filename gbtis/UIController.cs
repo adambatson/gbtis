@@ -61,7 +61,7 @@ namespace gbtis {
             else {
                 //Demomode will close in 3 min due to inactivity
                 timeoutTimerInit();
-                kinect.FingerPositionChanged += resetTimeoutTimer;
+                kinect.ModeEnd += resetTimeoutTimer;
             }
 
             //Starting the standby window
@@ -77,7 +77,7 @@ namespace gbtis {
             timeoutTimer.Start();
         }
 
-        private void resetTimeoutTimer(Point point) {
+        private void resetTimeoutTimer(CursorModes mode) {
             timeoutTimer.Stop();
             timeoutTimerInit();
         }
